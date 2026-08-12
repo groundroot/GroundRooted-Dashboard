@@ -1,7 +1,8 @@
 {
-  "_comment": "추적할 GitHub 저장소 목록. slug는 대시보드 projects.slug와 일치. kind: app|music|platform|plugin|site",
+  "_comment": "추적할 GitHub 저장소 목록. slug/name/kind는 projects 테이블을 덮어쓰므로 DB와 일치시킬 것. kind: app|music|platform|plugin|site",
   "repos": [
-    { "slug": "prayerwire", "name": "PrayerWire", "kind": "platform", "repo": "groundroot/pray-for-world" },
-    { "slug": "hq-dashboard", "name": "GroundRooted HQ 대시보드", "kind": "site", "repo": "groundroot/GroundRooted-Dashboard" }
+    { "slug": "hq-dashboard", "name": "GroundRooted HQ 대시보드", "kind": "site", "repo": "groundroot/GroundRooted-Dashboard" },
+    { "slug": "pray-for-world", "name": "Pray for World", "kind": "platform", "repo": "groundroot/pray-for-world" },
+    { "slug": "audio-drift-sync", "name": "Audio Drift Sync", "kind": "app", "repo": "groundroot/audio-drift-sync" }
   ]
 }
