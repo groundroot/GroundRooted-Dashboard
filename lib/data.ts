@@ -34,6 +34,23 @@ export type RevenuePoint = { date: string; amount: number };
 
 export type Briefing = { brief_date: string; summary_md: string } | null;
 
+export type AiUsageRow = {
+  tool: string;
+  model: string;
+  input_tokens: number;
+  cache_write_tokens: number;
+  cache_read_tokens: number;
+  output_tokens: number;
+  cost_usd: number;
+};
+
+export type AiUsage = {
+  monthCost: number;
+  totalCost: number;
+  byTool: { tool: string; cost: number; tokens: number }[];
+  topModels: { model: string; tool: string; cost: number }[];
+};
+
 export type DashboardData = {
   demo: boolean;
   projects: Project[];
@@ -43,7 +60,45 @@ export type DashboardData = {
   revenueToday: number;
   revenueMonth: number;
   briefing: Briefing;
+  aiUsage: AiUsage;
 };
+
+const EMPTY_AI_USAGE: AiUsage = { monthCost: 0, totalCost: 0, byTool: [], topModels: [] };
+
+/** ai_usage 행들을 도구별·모델별로 접는다. */
+function foldAiUsage(rows: (AiUsageRow & { usage_date: string })[], monthStart: Date): AiUsage {
+  const tools = new Map<string, { cost: number; tokens: number }>();
+  const models = new Map<string, { model: string; tool: string; cost: number }>();
+  let monthCost = 0;
+  let totalCost = 0;
+
+  for (const r of rows) {
+    const cost = Number(r.cost_usd);
+    const tokens =
+      Number(r.input_tokens) +
+      Number(r.cache_write_tokens) +
+      Number(r.cache_read_tokens) +
+      Number(r.output_tokens);
+    totalCost += cost;
+    if (new Date(r.usage_date) >= monthStart) monthCost += cost;
+
+    const t = tools.get(r.tool) ?? { cost: 0, tokens: 0 };
+    tools.set(r.tool, { cost: t.cost + cost, tokens: t.tokens + tokens });
+
+    const key = `${r.tool}|${r.model}`;
+    const m = models.get(key) ?? { model: r.model, tool: r.tool, cost: 0 };
+    models.set(key, { ...m, cost: m.cost + cost });
+  }
+
+  return {
+    monthCost,
+    totalCost,
+    byTool: [...tools.entries()]
+      .map(([tool, v]) => ({ tool, ...v }))
+      .sort((a, b) => b.cost - a.cost),
+    topModels: [...models.values()].sort((a, b) => b.cost - a.cost).slice(0, 6),
+  };
+}
 
 // 서버 전용 키로 읽는다 — 이 파일은 서버 컴포넌트에서만 실행되고, 사이트 전체는
 // middleware.ts의 비밀번호로 막혀 있다. anon 키로는 RLS(to authenticated)에 막혀 빈 값만 온다.
@@ -105,6 +160,20 @@ function mockData(): DashboardData {
       summary_md:
         "어제 매출 $42 (사이트 1건, Elgato 2건). Prayer & Peace Vol.2 유튜브 업로드 완료, 음원 유통 등록 대기 중. app-beta 스토어 심사 3일째 — 지연 시 확인 필요. PrayerWire 알림 기능 개발 진행 중.",
     },
+    aiUsage: {
+      monthCost: 812.4,
+      totalCost: 4210.5,
+      byTool: [
+        { tool: "claude-code", cost: 3600.2, tokens: 980_000_000 },
+        { tool: "codex", cost: 560.1, tokens: 210_000_000 },
+        { tool: "cline", cost: 50.2, tokens: 12_000_000 },
+      ],
+      topModels: [
+        { model: "claude-opus-5", tool: "claude-code", cost: 2100.0 },
+        { model: "claude-fable-5", tool: "claude-code", cost: 1500.2 },
+        { model: "gpt-5.4", tool: "codex", cost: 560.1 },
+      ],
+    },
   };
 }
 
@@ -118,12 +187,15 @@ async function liveData(): Promise<DashboardData> {
   monthStart.setDate(1);
   monthStart.setHours(0, 0, 0, 0);
 
-  const [projects, albums, events, revenue, briefing] = await Promise.all([
+  const [projects, albums, events, revenue, briefing, aiUsage] = await Promise.all([
     supabase.from("projects").select("*").neq("status", "archived").order("updated_at", { ascending: false }),
     supabase.from("albums").select("*").order("planned_at", { ascending: false }).limit(8),
     supabase.from("events").select("id,source,type,title,occurred_at").order("occurred_at", { ascending: false }).limit(20),
     supabase.from("revenue").select("amount,occurred_at").gte("occurred_at", since30.toISOString()),
     supabase.from("briefings").select("brief_date,summary_md").order("brief_date", { ascending: false }).limit(1),
+    supabase
+      .from("ai_usage")
+      .select("tool,model,usage_date,input_tokens,cache_write_tokens,cache_read_tokens,output_tokens,cost_usd"),
   ]);
 
   const byDay = new Map<string, number>();
@@ -151,6 +223,7 @@ async function liveData(): Promise<DashboardData> {
     revenueToday,
     revenueMonth,
     briefing: briefing.data?.[0] ?? null,
+    aiUsage: aiUsage.data ? foldAiUsage(aiUsage.data as never, monthStart) : EMPTY_AI_USAGE,
   };
 }
 

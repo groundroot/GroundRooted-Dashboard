@@ -133,6 +133,47 @@ export default async function Page() {
               );
             })}
           </section>
+
+          <section className="card">
+            <h2>
+              AI 에이전트 사용량<span className="sub">정가 환산 · 구독 실결제액 아님</span>
+            </h2>
+            <div className="ai-head">
+              <div>
+                <div className="label">이번 달</div>
+                <div className="value">${d.aiUsage.monthCost.toFixed(0)}</div>
+              </div>
+              <div>
+                <div className="label">누적 전체</div>
+                <div className="value">${d.aiUsage.totalCost.toFixed(0)}</div>
+              </div>
+            </div>
+
+            {d.aiUsage.byTool.length === 0 ? (
+              <p className="ai-empty">
+                아직 집계가 없습니다. 맥에서 <code>node collectors/collect-ai-usage.mjs</code>를 실행하세요.
+              </p>
+            ) : (
+              <>
+                <div className="ai-rows">
+                  {d.aiUsage.byTool.map((t) => (
+                    <div className="ai-row" key={t.tool}>
+                      <span className="chip">{t.tool}</span>
+                      <span className="ai-tokens">{(t.tokens / 1_000_000).toFixed(0)}M 토큰</span>
+                      <span className="ai-cost">${t.cost.toFixed(2)}</span>
+                    </div>
+                  ))}
+                </div>
+                <div className="ai-models">
+                  {d.aiUsage.topModels.map((m) => (
+                    <span className="ai-model" key={`${m.tool}-${m.model}`}>
+                      {m.model} <b>${m.cost.toFixed(0)}</b>
+                    </span>
+                  ))}
+                </div>
+              </>
+            )}
+          </section>
         </div>
 
         <div className="col">
