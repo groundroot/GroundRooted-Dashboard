@@ -45,10 +45,12 @@ export type DashboardData = {
   briefing: Briefing;
 };
 
-const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// 서버 전용 키로 읽는다 — 이 파일은 서버 컴포넌트에서만 실행되고, 사이트 전체는
+// middleware.ts의 비밀번호로 막혀 있다. anon 키로는 RLS(to authenticated)에 막혀 빈 값만 온다.
+const url = process.env.SUPABASE_URL;
+const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-export const hasSupabase = Boolean(url && anon);
+export const hasSupabase = Boolean(url && key);
 
 function iso(daysAgo: number, hour = 12): string {
   const d = new Date();
@@ -107,7 +109,7 @@ function mockData(): DashboardData {
 }
 
 async function liveData(): Promise<DashboardData> {
-  const supabase = createClient(url!, anon!);
+  const supabase = createClient(url!, key!);
   const since30 = new Date();
   since30.setDate(since30.getDate() - 29);
   since30.setHours(0, 0, 0, 0);

@@ -18,19 +18,25 @@ npm run dev   # http://localhost:3000
 
 1. [supabase.com](https://supabase.com)에서 무료 프로젝트 생성
 2. **SQL Editor**에 `sql/schema.sql` 내용을 붙여넣어 실행
-3. **Settings → API**에서 URL과 anon key 복사
+3. **Settings → API**에서 URL과 service_role key 복사
 4. `.env.example`을 `.env.local`로 복사하고 값 입력:
 
 ```
-NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+SUPABASE_URL=https://xxxx.supabase.co
+SUPABASE_SERVICE_ROLE_KEY=eyJ...
 ```
+
+스키마의 RLS 정책이 `to authenticated`라 anon key로는 아무것도 읽히지 않습니다.
+대시보드는 서버 컴포넌트에서만 DB를 읽고, 사이트 전체는 아래 비밀번호로 막습니다.
 
 ## 3. Vercel 배포
 
 1. 이 폴더를 GitHub 저장소로 푸시 (예: `groundrooted/hq-dashboard`)
 2. [vercel.com](https://vercel.com)에서 저장소 Import
-3. Environment Variables에 위 2개 값 추가 → Deploy
+3. Environment Variables에 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
+   그리고 접속 비밀번호 `DASHBOARD_PASSWORD` 추가 → Deploy
+   (`middleware.ts`가 사이트 전체를 Basic 인증으로 막습니다. 아이디는 아무거나, 비밀번호만 맞으면 됩니다.
+   Stripe 웹훅 경로 `/api/webhooks/*`는 인증에서 제외됩니다.)
 4. 도메인 연결: Vercel 프로젝트 → Domains → `hq.groundrooted.com` 추가 후
    안내되는 CNAME 레코드를 DNS에 등록
 
