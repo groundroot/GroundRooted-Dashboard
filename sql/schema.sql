@@ -27,7 +27,9 @@ create table if not exists events (
   external_id text,                            -- 소스별 고유 ID (커밋 SHA, 영상 ID 등) — 중복 방지
   occurred_at timestamptz not null default now()
 );
-create unique index if not exists events_dedupe_idx on events (source, external_id) where external_id is not null;
+-- 부분 인덱스(where external_id is not null)를 쓰면 PostgREST의 on_conflict 추론이 실패한다(42P10).
+-- NULL은 서로 다른 값으로 취급되므로 조건절 없이도 external_id가 있는 행만 중복 방지된다.
+create unique index if not exists events_dedupe_idx on events (source, external_id);
 create index if not exists events_occurred_idx on events (occurred_at desc);
 create index if not exists events_project_idx on events (project_id, occurred_at desc);
 
