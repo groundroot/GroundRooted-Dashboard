@@ -136,7 +136,7 @@ export default async function Page() {
 
           <section className="card">
             <h2>
-              AI 에이전트 사용량<span className="sub">정가 환산 · 구독 실결제액 아님</span>
+              AI 에이전트 비용<span className="sub">실제 지출 vs 정가 환산 사용액</span>
             </h2>
             <div className="ai-head">
               <div>
