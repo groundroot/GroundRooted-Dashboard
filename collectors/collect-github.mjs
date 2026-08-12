@@ -52,9 +52,14 @@ for (const { slug, name, kind, repo } of repos) {
   }
 
   // 2) 프로젝트 upsert
+  // updated_at은 수집 시각이 아니라 마지막 커밋 시각이어야 한다 — 보드가 "n일 전"으로 활동을 보여주므로,
+  // 수집 시각을 넣으면 몇 달 방치된 프로젝트도 6시간마다 "방금"이 된다.
+  const latest = (await gh(`/repos/${repo}/commits?per_page=1`)) ?? [];
+  const lastActivity = latest[0]?.commit?.author?.date;
+
   await sbUpsert(
     "projects",
-    { slug, name, kind, repo, ...(stage ? { stage } : {}), status: "active", updated_at: new Date().toISOString() },
+    { slug, name, kind, repo, ...(stage ? { stage } : {}), status: "active", updated_at: lastActivity ?? new Date().toISOString() },
     "slug"
   );
 
