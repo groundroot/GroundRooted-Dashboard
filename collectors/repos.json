@@ -1,0 +1,7 @@
+{
+  "_comment": "추적할 GitHub 저장소 목록. slug는 대시보드 projects.slug와 일치. kind: app|music|platform|plugin|site",
+  "repos": [
+    { "slug": "prayerwire", "name": "PrayerWire", "kind": "platform", "repo": "OWNER/prayerwire" },
+    { "slug": "app-alpha", "name": "앱 프로젝트 A", "kind": "app", "repo": "OWNER/app-alpha" }
+  ]
+}
