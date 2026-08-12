@@ -45,11 +45,30 @@ export type AiUsageRow = {
 };
 
 export type AiUsage = {
-  monthCost: number;
-  totalCost: number;
-  byTool: { tool: string; cost: number; tokens: number }[];
+  monthCost: number; // 정가 환산 사용액 (이번 달)
+  totalCost: number; // 정가 환산 사용액 (누적)
+  fixedMonthly: number; // 월 구독료 합
+  meteredMonth: number; // 종량제 도구의 이번 달 실사용액
+  actualMonth: number; // 이번 달 실제 지출 = 구독료 + 종량제
+  subscriptions: { service: string; monthly: number; count: number }[];
+  byTool: { tool: string; cost: number; tokens: number; metered: boolean }[];
   topModels: { model: string; tool: string; cost: number }[];
+  topProjects: { project: string; cost: number }[];
 };
+
+// 실제 구독료 (월 고정). 사장님 확인:
+// Claude Max 5x 1개 + Claude Pro 2개 + ChatGPT Plus 1개 + Google AI Pro 1개.
+// ChatGPT는 Codex 로그의 plan_type: "plus"로도 확인됨.
+// Google AI Pro는 Antigravity/Gemini용 — 사용량 로그가 로컬에 없어 정가 환산은 못 잡힌다.
+const SUBSCRIPTIONS = [
+  { service: "Claude Max 5x", monthly: 100, count: 1 },
+  { service: "Claude Pro", monthly: 20, count: 2 },
+  { service: "ChatGPT Plus", monthly: 20, count: 1 },
+  { service: "Google AI Pro", monthly: 19.99, count: 1 },
+];
+
+// 종량제 도구 — 로그에 적힌 비용이 곧 실제 청구액이라 구독료에 더해야 한다.
+const METERED_TOOLS = new Set(["cline", "command-code"]);
 
 export type DashboardData = {
   demo: boolean;
@@ -63,11 +82,27 @@ export type DashboardData = {
   aiUsage: AiUsage;
 };
 
-const EMPTY_AI_USAGE: AiUsage = { monthCost: 0, totalCost: 0, byTool: [], topModels: [] };
+const FIXED_MONTHLY = SUBSCRIPTIONS.reduce((s, x) => s + x.monthly * x.count, 0);
 
-/** ai_usage 행들을 도구별·모델별로 접는다. */
-function foldAiUsage(rows: (AiUsageRow & { usage_date: string })[], monthStart: Date): AiUsage {
-  const tools = new Map<string, { cost: number; tokens: number }>();
+const EMPTY_AI_USAGE: AiUsage = {
+  monthCost: 0,
+  totalCost: 0,
+  fixedMonthly: FIXED_MONTHLY,
+  meteredMonth: 0,
+  actualMonth: FIXED_MONTHLY,
+  subscriptions: SUBSCRIPTIONS,
+  byTool: [],
+  topModels: [],
+  topProjects: [],
+};
+
+/** ai_usage 행들을 도구별·모델별로 접고, 구독료와 합쳐 이번 달 실제 지출을 낸다. */
+function foldAiUsage(
+  rows: (AiUsageRow & { usage_date: string })[],
+  projectRows: { project: string; cost_usd: number }[],
+  monthStart: Date
+): AiUsage {
+  const tools = new Map<string, { cost: number; tokens: number; monthCost: number }>();
   const models = new Map<string, { model: string; tool: string; cost: number }>();
   let monthCost = 0;
   let totalCost = 0;
@@ -79,24 +114,45 @@ function foldAiUsage(rows: (AiUsageRow & { usage_date: string })[], monthStart: 
       Number(r.cache_write_tokens) +
       Number(r.cache_read_tokens) +
       Number(r.output_tokens);
+    const inMonth = new Date(r.usage_date) >= monthStart;
     totalCost += cost;
-    if (new Date(r.usage_date) >= monthStart) monthCost += cost;
+    if (inMonth) monthCost += cost;
 
-    const t = tools.get(r.tool) ?? { cost: 0, tokens: 0 };
-    tools.set(r.tool, { cost: t.cost + cost, tokens: t.tokens + tokens });
+    const t = tools.get(r.tool) ?? { cost: 0, tokens: 0, monthCost: 0 };
+    tools.set(r.tool, {
+      cost: t.cost + cost,
+      tokens: t.tokens + tokens,
+      monthCost: t.monthCost + (inMonth ? cost : 0),
+    });
 
     const key = `${r.tool}|${r.model}`;
     const m = models.get(key) ?? { model: r.model, tool: r.tool, cost: 0 };
     models.set(key, { ...m, cost: m.cost + cost });
   }
 
+  let meteredMonth = 0;
+  for (const [tool, v] of tools) if (METERED_TOOLS.has(tool)) meteredMonth += v.monthCost;
+
+  const byProject = new Map<string, number>();
+  for (const p of projectRows) {
+    byProject.set(p.project, (byProject.get(p.project) ?? 0) + Number(p.cost_usd));
+  }
+
   return {
     monthCost,
     totalCost,
+    fixedMonthly: FIXED_MONTHLY,
+    meteredMonth,
+    actualMonth: FIXED_MONTHLY + meteredMonth,
+    subscriptions: SUBSCRIPTIONS,
     byTool: [...tools.entries()]
-      .map(([tool, v]) => ({ tool, ...v }))
+      .map(([tool, v]) => ({ tool, cost: v.cost, tokens: v.tokens, metered: METERED_TOOLS.has(tool) }))
       .sort((a, b) => b.cost - a.cost),
     topModels: [...models.values()].sort((a, b) => b.cost - a.cost).slice(0, 6),
+    topProjects: [...byProject.entries()]
+      .map(([project, cost]) => ({ project, cost }))
+      .sort((a, b) => b.cost - a.cost)
+      .slice(0, 8),
   };
 }
 
@@ -161,17 +217,24 @@ function mockData(): DashboardData {
         "어제 매출 $42 (사이트 1건, Elgato 2건). Prayer & Peace Vol.2 유튜브 업로드 완료, 음원 유통 등록 대기 중. app-beta 스토어 심사 3일째 — 지연 시 확인 필요. PrayerWire 알림 기능 개발 진행 중.",
     },
     aiUsage: {
+      ...EMPTY_AI_USAGE,
       monthCost: 812.4,
       totalCost: 4210.5,
+      meteredMonth: 12.3,
+      actualMonth: FIXED_MONTHLY + 12.3,
       byTool: [
-        { tool: "claude-code", cost: 3600.2, tokens: 980_000_000 },
-        { tool: "codex", cost: 560.1, tokens: 210_000_000 },
-        { tool: "cline", cost: 50.2, tokens: 12_000_000 },
+        { tool: "claude-code", cost: 3600.2, tokens: 980_000_000, metered: false },
+        { tool: "codex", cost: 560.1, tokens: 210_000_000, metered: false },
+        { tool: "cline", cost: 50.2, tokens: 12_000_000, metered: true },
       ],
       topModels: [
         { model: "claude-opus-5", tool: "claude-code", cost: 2100.0 },
         { model: "claude-fable-5", tool: "claude-code", cost: 1500.2 },
         { model: "gpt-5.4", tool: "codex", cost: 560.1 },
+      ],
+      topProjects: [
+        { project: "fcpcli", cost: 2100.5 },
+        { project: "pray for world", cost: 640.2 },
       ],
     },
   };
@@ -187,7 +250,7 @@ async function liveData(): Promise<DashboardData> {
   monthStart.setDate(1);
   monthStart.setHours(0, 0, 0, 0);
 
-  const [projects, albums, events, revenue, briefing, aiUsage] = await Promise.all([
+  const [projects, albums, events, revenue, briefing, aiUsage, aiProjects] = await Promise.all([
     supabase.from("projects").select("*").neq("status", "archived").order("updated_at", { ascending: false }),
     supabase.from("albums").select("*").order("planned_at", { ascending: false }).limit(8),
     supabase.from("events").select("id,source,type,title,occurred_at").order("occurred_at", { ascending: false }).limit(20),
@@ -196,6 +259,7 @@ async function liveData(): Promise<DashboardData> {
     supabase
       .from("ai_usage")
       .select("tool,model,usage_date,input_tokens,cache_write_tokens,cache_read_tokens,output_tokens,cost_usd"),
+    supabase.from("ai_project_cost").select("project,cost_usd"),
   ]);
 
   const byDay = new Map<string, number>();
@@ -223,7 +287,9 @@ async function liveData(): Promise<DashboardData> {
     revenueToday,
     revenueMonth,
     briefing: briefing.data?.[0] ?? null,
-    aiUsage: aiUsage.data ? foldAiUsage(aiUsage.data as never, monthStart) : EMPTY_AI_USAGE,
+    aiUsage: aiUsage.data
+      ? foldAiUsage(aiUsage.data as never, (aiProjects.data ?? []) as never, monthStart)
+      : EMPTY_AI_USAGE,
   };
 }
 

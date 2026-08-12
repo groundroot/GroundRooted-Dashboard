@@ -232,3 +232,14 @@ a { color: inherit; }
 }
 .ai-model b { color: var(--text-primary); }
 .ai-empty { font-size: 13px; color: var(--text-secondary); margin: 0; }
+.ai-sub { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+.ai-sub.up { color: var(--delta-good); font-weight: 600; }
+.ai-subs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; }
+.ai-row.two { grid-template-columns: 1fr auto; }
+.ai-proj { font-size: 13px; color: var(--text-primary); }
+.ai-h3 {
+  margin: 16px 0 2px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}

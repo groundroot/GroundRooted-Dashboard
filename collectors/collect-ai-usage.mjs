@@ -42,6 +42,38 @@ function normalizeModel(model) {
 
 const unpriced = new Set();
 const rows = new Map(); // "tool|model|date" → row
+const projects = new Map(); // "project|tool" → row
+
+const HOME = homedir();
+
+/** 작업 경로를 프로젝트 이름으로 접는다. 하위 디렉터리에서 실행한 것도 같은 프로젝트로 묶인다. */
+function projectFromCwd(cwd) {
+  if (!cwd) return null;
+  const rel = cwd.startsWith(HOME) ? cwd.slice(HOME.length + 1) : cwd;
+  for (const root of ["orca/projects/", "코딩/"]) {
+    if (rel.startsWith(root)) {
+      const rest = rel.slice(root.length);
+      return rest.split("/")[0] || null;
+    }
+  }
+  if (!rel || rel === cwd) return cwd; // 홈 밖 경로는 그대로
+  return rel.split("/")[0] || null;
+}
+
+/** Command Code는 cwd를 슬러그로 바꿔 폴더명에 쓴다: users-chrictvictory-orca-projects-band-score */
+function projectFromSlug(slug) {
+  const m = slug.match(/orca-projects-(.+)$/) || slug.match(/^users-[^-]+-(.+)$/);
+  return m ? m[1].replace(/-/g, " ") : slug;
+}
+
+function addProject(project, tool, cost, tokens) {
+  if (!project) return;
+  const key = `${project}|${tool}`;
+  const r = projects.get(key) ?? { project, tool, cost_usd: 0, tokens: 0 };
+  r.cost_usd += cost;
+  r.tokens += tokens;
+  projects.set(key, r);
+}
 
 function bucket(tool, model, date) {
   const key = `${tool}|${model}|${date}`;
@@ -149,13 +181,16 @@ function collectClaude() {
       r.output_tokens += outp;
 
       const p = PRICING[model];
+      let cost = 0;
       if (p) {
-        r.cost_usd +=
+        cost =
           (inp * p.in + w5 * p.in * 1.25 + w1h * p.in * 2 + read * p.in * 0.1 + outp * p.out) / 1e6;
+        r.cost_usd += cost;
       } else {
         r.priced = false;
         unpriced.add(model);
       }
+      addProject(projectFromCwd(d.cwd), "claude-code", cost, inp + w5 + w1h + read + outp);
       messages++;
     }
   }
@@ -177,6 +212,7 @@ function collectCodex() {
       continue;
     }
     let model = null;
+    let cwd = null;
     let prev = { input: 0, cached: 0, output: 0 };
     let counted = false;
 
@@ -188,8 +224,10 @@ function collectCodex() {
       } catch {
         continue;
       }
+      if (d.type === "session_meta" && d.payload?.cwd) cwd = d.payload.cwd;
       if (d.type === "turn_context" && d.payload?.model) {
         model = normalizeModel(d.payload.model);
+        if (d.payload.cwd) cwd = d.payload.cwd;
         continue;
       }
       if (d.type !== "event_msg" || d.payload?.type !== "token_count") continue;
@@ -220,13 +258,15 @@ function collectCodex() {
       r.output_tokens += Math.max(0, dOut);
 
       const p = PRICING[model];
+      let cost = 0;
       if (p) {
-        r.cost_usd +=
-          (fresh * p.in + Math.max(0, dCached) * p.in * 0.1 + Math.max(0, dOut) * p.out) / 1e6;
+        cost = (fresh * p.in + Math.max(0, dCached) * p.in * 0.1 + Math.max(0, dOut) * p.out) / 1e6;
+        r.cost_usd += cost;
       } else {
         r.priced = false;
         unpriced.add(model);
       }
+      addProject(projectFromCwd(cwd), "codex", cost, fresh + Math.max(0, dCached) + Math.max(0, dOut));
       counted = true;
     }
     if (counted) sessions++;
@@ -256,6 +296,12 @@ function collectCline() {
       const date = new Date(m.ts ?? s.ended_at ?? 0).toISOString().slice(0, 10);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || date === "1970-01-01") continue;
       addPrecomputed("cline", model, date, t, t.cost);
+      addProject(
+        projectFromCwd(s.cwd),
+        "cline",
+        t.cost ?? 0,
+        (t.inputTokens ?? 0) + (t.outputTokens ?? 0) + (t.cacheReadTokens ?? 0) + (t.cacheWriteTokens ?? 0)
+      );
       messages++;
     }
   }
@@ -275,6 +321,7 @@ function collectCommandCode() {
     } catch {
       continue;
     }
+    const project = projectFromSlug(file.split("/").at(-2) ?? "");
     for (const line of text.split("\n")) {
       if (!line || !line.includes('"usage"')) continue;
       let d;
@@ -286,7 +333,14 @@ function collectCommandCode() {
       if (!d.usage || !d.model) continue;
       const date = String(d.timestamp || "").slice(0, 10);
       if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) continue;
-      addPrecomputed("command-code", normalizeModel(d.model), date, d.usage, d.usage.costUsd);
+      const u = d.usage;
+      addPrecomputed("command-code", normalizeModel(d.model), date, u, u.costUsd);
+      addProject(
+        project,
+        "command-code",
+        u.costUsd ?? 0,
+        (u.inputTokens ?? 0) + (u.outputTokens ?? 0) + (u.cacheReadTokens ?? 0) + (u.cacheWriteTokens ?? 0)
+      );
       messages++;
     }
   }
@@ -318,5 +372,21 @@ if (unpriced.size) {
   console.log(`  ⚠ 단가 미등록 모델(비용 0으로 집계됨): ${[...unpriced].join(", ")}`);
 }
 
+const projectList = [...projects.values()]
+  .filter((r) => r.cost_usd > 0.005)
+  .map((r) => ({
+    ...r,
+    cost_usd: Math.round(r.cost_usd * 10000) / 10000,
+    updated_at: new Date().toISOString(),
+  }));
+
+const topProjects = new Map();
+for (const r of projectList) topProjects.set(r.project, (topProjects.get(r.project) ?? 0) + r.cost_usd);
+console.log(`  프로젝트 ${topProjects.size}개 — 상위 5개:`);
+for (const [p, c] of [...topProjects].sort((a, b) => b[1] - a[1]).slice(0, 5)) {
+  console.log(`    ${p.padEnd(28)} $${c.toFixed(2)}`);
+}
+
 await sbUpsert("ai_usage", list, "tool,model,usage_date");
+await sbUpsert("ai_project_cost", projectList, "project,tool");
 console.log(DRY ? "완료 (DRY RUN — 실제 쓰기 없음)" : "완료");

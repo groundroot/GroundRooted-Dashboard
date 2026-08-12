@@ -140,13 +140,28 @@ export default async function Page() {
             </h2>
             <div className="ai-head">
               <div>
-                <div className="label">이번 달</div>
-                <div className="value">${d.aiUsage.monthCost.toFixed(0)}</div>
+                <div className="label">이번 달 실제 지출</div>
+                <div className="value">${d.aiUsage.actualMonth.toFixed(0)}</div>
+                <div className="ai-sub">
+                  구독 ${d.aiUsage.fixedMonthly.toFixed(0)} + 종량 ${d.aiUsage.meteredMonth.toFixed(0)}
+                </div>
               </div>
               <div>
-                <div className="label">누적 전체</div>
-                <div className="value">${d.aiUsage.totalCost.toFixed(0)}</div>
+                <div className="label">이번 달 사용액 (정가 환산)</div>
+                <div className="value">${d.aiUsage.monthCost.toFixed(0)}</div>
+                <div className="ai-sub up">
+                  지출 대비 {(d.aiUsage.monthCost / Math.max(1, d.aiUsage.actualMonth)).toFixed(1)}배
+                </div>
               </div>
+            </div>
+
+            <div className="ai-subs">
+              {d.aiUsage.subscriptions.map((s) => (
+                <span className="ai-model" key={s.service}>
+                  {s.service}
+                  {s.count > 1 ? ` ×${s.count}` : ""} <b>${(s.monthly * s.count).toFixed(0)}</b>
+                </span>
+              ))}
             </div>
 
             {d.aiUsage.byTool.length === 0 ? (
@@ -158,7 +173,10 @@ export default async function Page() {
                 <div className="ai-rows">
                   {d.aiUsage.byTool.map((t) => (
                     <div className="ai-row" key={t.tool}>
-                      <span className="chip">{t.tool}</span>
+                      <span className="chip">
+                        {t.tool}
+                        {t.metered ? " · 종량제" : ""}
+                      </span>
                       <span className="ai-tokens">{(t.tokens / 1_000_000).toFixed(0)}M 토큰</span>
                       <span className="ai-cost">${t.cost.toFixed(2)}</span>
                     </div>
@@ -171,6 +189,20 @@ export default async function Page() {
                     </span>
                   ))}
                 </div>
+
+                {d.aiUsage.topProjects.length > 0 && (
+                  <>
+                    <h3 className="ai-h3">프로젝트별 투입 (누적 · 정가 환산)</h3>
+                    <div className="ai-rows">
+                      {d.aiUsage.topProjects.map((p) => (
+                        <div className="ai-row two" key={p.project}>
+                          <span className="ai-proj">{p.project}</span>
+                          <span className="ai-cost">${p.cost.toFixed(2)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
               </>
             )}
           </section>
