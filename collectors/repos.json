@@ -6,7 +6,7 @@
     { "slug": "audio-drift-sync", "name": "Audio Drift Sync", "kind": "app", "repo": "groundroot/audio-drift-sync" },
     { "slug": "pray-for-world", "name": "Pray for World", "kind": "platform", "repo": "groundroot/pray-for-world" },
     { "slug": "photoslide-studio", "name": "Photoslide Studio", "kind": "app", "repo": "groundroot/PhotoslideStudioMac" },
-    { "slug": "kakaocli", "name": "kakaocli", "kind": "app", "repo": "groundroot/kakaocli" },
-    { "slug": "docs-converter", "name": "Docs Converter", "kind": "app", "repo": "groundroot/document-converter-pro" }
-  ]
+    { "slug": "kakaocli", "name": "kakaocli", "kind": "app", "repo": "groundroot/kakaocli" }
+  ],
+  "_note": "document-converter-pro(비공개)는 뺐다. Actions 기본 토큰은 다른 저장소의 비공개 코드를 못 읽어서 수집이 조용히 실패하고, updated_at이 수집 시각으로 덮여 항상 '방금'이 된다. repo 읽기 권한 PAT를 GH_PAT 시크릿에 넣으면 다시 추가할 수 있다."
 }
