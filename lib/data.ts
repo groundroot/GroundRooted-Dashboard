@@ -65,10 +65,12 @@ const SUBSCRIPTIONS = [
   { service: "Claude Pro", monthly: 20, count: 2 },
   { service: "ChatGPT Plus", monthly: 20, count: 1 },
   { service: "Google AI Pro", monthly: 19.99, count: 1 },
+  { service: "Command Code", monthly: 1, count: 1 },
 ];
 
 // 종량제 도구 — 로그에 적힌 비용이 곧 실제 청구액이라 구독료에 더해야 한다.
-const METERED_TOOLS = new Set(["cline", "command-code"]);
+// Command Code는 로그에 costUsd가 있지만 $1 정액제라 여기 넣지 않는다(그 값은 정가 환산액).
+const METERED_TOOLS = new Set(["cline"]);
 
 export type DashboardData = {
   demo: boolean;
