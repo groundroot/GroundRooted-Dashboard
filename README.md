@@ -85,6 +85,18 @@ node collectors/parse-elgato.mjs sales.csv
 엔드포인트 `https://<도메인>/api/webhooks/stripe`, 이벤트 `checkout.session.completed`.
 Vercel 환경변수에 `STRIPE_WEBHOOK_SECRET`, `SUPABASE_SERVICE_ROLE_KEY` 추가.
 
+**⑤ AI 에이전트 사용량·비용** — 이 맥의 로컬 로그를 읽어 집계합니다.
+로그가 맥에만 있어서 **GitHub Actions에서는 못 돌고, 맥에서 실행**해야 합니다:
+
+```bash
+SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node collectors/collect-ai-usage.mjs
+```
+
+읽는 곳: Claude Code(`~/.claude/projects`), Codex(`~/.codex/sessions`),
+Cline CLI(`~/.cline/data/sessions`), Command Code(`~/.commandcode/projects`).
+Antigravity는 사용량을 로컬에 저장하지 않아 집계에서 빠집니다.
+금액은 **공식 정가 환산액**이며 구독 실결제액과 다릅니다.
+
 모든 수집기는 `DRY_RUN=1`로 실행하면 DB에 쓰지 않고 동작만 확인할 수 있습니다.
 
 ### 남은 데이터 소스 (이후 단계)
