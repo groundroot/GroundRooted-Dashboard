@@ -1,0 +1,246 @@
+/* Shared public-site foundation. All rules are scoped away from authenticated HQ. */
+.gr-public {
+  --site-ink: #1c2b3f;
+  --site-muted: #56657a;
+  --site-blue: #1657e8;
+  --site-green: #2c624d;
+  --site-surface: #f3f6f9;
+  font-family:
+    'Pretendard Variable',
+    Pretendard,
+    -apple-system,
+    sans-serif;
+  color: var(--site-ink);
+  background: #fff;
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+}
+.gr-public :is(a, button, summary, input) {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: #dce9ff;
+}
+.gr-public :is(a, button, summary, input):focus-visible {
+  outline: 3px solid var(--site-blue);
+  outline-offset: 5px;
+}
+.gr-public :is(h1, h2, h3) {
+  text-wrap: balance;
+}
+.gr-public :is(section[id], main, [id]):target {
+  scroll-margin-top: 100px;
+}
+.gr-public .site-container {
+  width: min(1200px, calc(100% - 80px));
+  margin-inline: auto;
+}
+.gr-public .site-skip {
+  position: fixed;
+  top: -100px;
+  left: 20px;
+  padding: 16px 24px;
+  z-index: 200;
+  background: #fff;
+  color: var(--site-blue);
+}
+.gr-public .site-skip:focus {
+  top: 12px;
+}
+.gr-public .site-header {
+  position: sticky;
+  top: 0;
+  z-index: 80;
+  background: #fff;
+}
+.gr-public .site-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 80px;
+  gap: 32px;
+}
+.gr-public .site-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  font-size: 23px;
+  font-weight: 700;
+  letter-spacing: -0.065em;
+  text-decoration: none;
+  color: var(--site-ink);
+  white-space: nowrap;
+}
+.gr-public .site-brand svg {
+  color: var(--site-green);
+}
+.gr-public .site-brand-dot {
+  color: var(--site-green);
+  margin-left: -7px;
+}
+.gr-public .site-desktop-nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+.gr-public .site-header nav a {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 44px;
+  font-size: 14px;
+  font-weight: 550;
+  color: var(--site-muted);
+  text-decoration: none;
+}
+.gr-public .site-header nav a[aria-current='page'] {
+  color: var(--site-blue);
+  text-decoration: underline;
+  text-underline-offset: 7px;
+}
+.gr-public .site-mobile-menu {
+  display: none;
+}
+.gr-public .site-footer {
+  background: #f5f7f8;
+  padding: 64px 0 24px;
+}
+.gr-public .site-footer-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr 1fr;
+  gap: 60px;
+}
+.gr-public .site-footer p {
+  font-size: 14px;
+  color: var(--site-muted);
+  line-height: 1.85;
+  margin: 18px 0 0;
+}
+.gr-public .site-footer nav {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.gr-public .site-footer nav h2 {
+  font-size: 12px;
+  font-weight: 650;
+  margin: 0 0 12px;
+  letter-spacing: 0;
+  line-height: 1.5;
+}
+.gr-public .site-footer nav a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  font-size: 13px;
+  color: var(--site-muted);
+  text-decoration: none;
+}
+.gr-public .site-footer-bottom {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 56px;
+  font-size: 12px;
+  color: var(--site-muted);
+}
+.gr-public .site-footer-bottom a {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: none;
+}
+@media (max-width: 900px) {
+  .gr-public .site-container {
+    width: calc(100% - 48px);
+  }
+  .gr-public .site-desktop-nav {
+    gap: 18px;
+  }
+  .gr-public .site-header nav a {
+    font-size: 12px;
+  }
+  .gr-public .site-footer-grid {
+    gap: 28px;
+  }
+}
+@media (max-width: 767px) {
+  .gr-public .site-container {
+    width: calc(100% - 40px);
+  }
+  .gr-public .site-header-inner {
+    min-height: 68px;
+  }
+  .gr-public .site-brand {
+    font-size: 21px;
+  }
+  .gr-public .site-desktop-nav {
+    display: none;
+  }
+  .gr-public .site-mobile-menu {
+    display: block;
+  }
+  .gr-public .site-mobile-menu summary {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    min-height: 44px;
+    padding: 0 8px;
+    font-size: 14px;
+    list-style: none;
+  }
+  .gr-public .site-mobile-menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .gr-public .site-mobile-menu[open] summary svg {
+    transform: rotate(180deg);
+  }
+  .gr-public .site-mobile-menu nav {
+    position: absolute;
+    inset: 68px 0 auto;
+    background: #f2f5fa;
+    padding: 16px max(20px, env(safe-area-inset-left));
+    max-height: calc(100dvh - 68px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .gr-public .site-mobile-menu nav a {
+    min-height: 50px;
+    padding: 0 12px;
+    font-size: 16px;
+  }
+  .gr-public .site-footer {
+    padding-top: 40px;
+  }
+  .gr-public .site-footer-grid {
+    grid-template-columns: 1fr 1fr;
+    gap: 32px 20px;
+  }
+  .gr-public .site-footer-grid > div {
+    grid-column: 1 / -1;
+  }
+  .gr-public .site-footer-bottom {
+    gap: 4px 16px;
+    margin-top: 32px;
+    font-size: 11px;
+  }
+  .gr-public .site-footer-bottom > span:nth-child(2) {
+    order: 3;
+    width: 100%;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .gr-public *,
+  .gr-public *::before,
+  .gr-public *::after {
+    scroll-behavior: auto !important;
+  }
+}
+@media (forced-colors: active) {
+  .gr-public :is(button, summary, a[aria-current='page']) {
+    outline: 1px solid ButtonText;
+  }
+}

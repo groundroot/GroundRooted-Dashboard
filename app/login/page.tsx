@@ -21,7 +21,7 @@ export default async function LoginPage({
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });
-    redirect("/");
+    redirect("/admin/hq");
   }
 
   return (

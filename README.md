@@ -1,18 +1,64 @@
-# GroundRooted HQ — 운영 대시보드
+# GroundRooted — 앱 소개 사이트와 HQ
 
 앱 제작(Orca) · Suno 앨범 파이프라인 · 판매/매출 · PrayerWire 운영 현황을 한 화면에서 보는
 GroundRooted의 운영 대시보드입니다.
 
 - **Supabase 키가 없으면 데모 데이터로 동작**합니다 (화면 확인용).
-- 키를 넣으면 실제 DB를 읽고, 1분마다 서버 데이터가 갱신됩니다.
+- 키를 넣으면 HQ 요청 시 실제 DB를 읽습니다.
 - 대시보드는 **읽기 전용** — 데이터 쓰기는 수집기(cron/웹훅/Claude)가 담당합니다.
 
 ## 1. 로컬 실행
 
 ```bash
-npm install
-npm run dev   # http://localhost:3000
+# Node 24 (see .node-version), pnpm 11.20.0
+pnpm install --frozen-lockfile
+pnpm dev   # http://localhost:3000
 ```
+
+메인 `/`에서 ReadyMD(`/pdf-to-md`), YouTube to MD(`/youtube-to-md`), TypeCut Pro(`/typecut-pro`) 순서로 앱을 확인합니다. [제작 문서](website/README.md)와 구현 기록을 함께 읽습니다. 설명용 샘플로 구성한 내부 preview이며 실제 앱 변환·판매는 아직 연결하지 않았습니다. 개발 서버에서는 바로 접근할 수 있고 production build의 로컬 검수에는 `MARKETING_PREVIEW_ENABLED=true`를 명시합니다. 내부 HQ는 `/admin/hq`로 분리했으며 비밀번호 보호를 유지합니다. 로그인 후 HQ로 이동합니다.
+
+```bash
+pnpm typecheck
+pnpm build
+MARKETING_PREVIEW_ENABLED=true pnpm start
+```
+
+### 지속 실행되는 로컬 미리보기 (macOS)
+
+```bash
+# Node 24: 별도 소스 복사본에서 빌드 후 launchd로 실행
+pnpm preview:local
+# Node 24가 기본 버전이 아니면
+npx --yes --package=node@24 node scripts/preview-local.mjs
+```
+
+주소는 `http://127.0.0.1:3045`. 실행 파일과 로그는 `~/Library/Caches/GroundRooted/website-preview/`에 둔다. 터미널 종료 후에도 현재 로그인 세션에서 계속 실행되며, 프로세스가 종료되면 launchd가 다시 시작한다. 재로그인 후에는 위 명령을 다시 실행한다. 실행 중인 미리보기가 있으면 확인만 하며 임의로 교체하지 않는다. 소스를 갱신할 때는 `--refresh`로 새 복사본을 먼저 빌드한 뒤 해당 미리보기만 교체한다. 빌드 실패 시 기존 서버를 유지하며, 새 서버 시작 실패 시 이전 설정으로 복귀한다.
+
+```bash
+npx --yes --package=node@24 node scripts/preview-local.mjs --refresh
+# 미리보기 종료
+launchctl bootout gui/$(id -u)/com.groundrooted.website-preview
+```
+
+작업 트리의 `.next`와 다른 서버는 보존한다. `.env*`를 복사하지 않는 공개 페이지 전용 미리보기라 HQ는 비밀번호 미설정으로 차단된다.
+
+### 공개 사이트 품질 검수
+
+2026-10-04 개편의 스킬·공개 저장소 선정, 변경 범위와 검증은 [업그레이드 기록](website/enterprise-upgrade-20261004.md)에 정리했다.
+
+```bash
+# Node 24. 인증 경계 테스트는 production build가 먼저 필요하다.
+pnpm typecheck
+pnpm build --webpack
+pnpm test:calculations
+pnpm test:storefront
+# 별도 터미널에 localhost:3045 미리보기 서버 실행
+MARKETING_PREVIEW_ENABLED=true pnpm start --hostname 127.0.0.1 --port 3045
+# ego-browser CLI가 설치된 환경에서 실행. 전용 브라우저 작업 공간을 사용한다.
+node scripts/verify-public-ui.mjs http://127.0.0.1:3045
+```
+
+UI 검수 결과·화면은 `output/playwright/enterprise-upgrade/`에 저장된다. 실행 중인 서버를 보존하려면 소스 복사본에서 빌드와 검수를 실행한다. TypeCut Pro는 기존 공식 사이트로 연결한다. 실제 제품 출시나 공개 배포 완료를 의미하지 않는다.
 
 ## 2. Supabase 연결
 
@@ -27,7 +73,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 ```
 
 스키마의 RLS 정책이 `to authenticated`라 anon key로는 아무것도 읽히지 않습니다.
-대시보드는 서버 컴포넌트에서만 DB를 읽고, 사이트 전체는 아래 비밀번호로 막습니다.
+대시보드는 서버 컴포넌트에서만 DB를 읽고, HQ와 비공개 경로는 아래 비밀번호로 막습니다. 위의 미리보기 설정은 명시된 공개 페이지에만 적용됩니다.
 
 ## 3. Vercel 배포
 
@@ -35,7 +81,7 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
 2. [vercel.com](https://vercel.com)에서 저장소 Import
 3. Environment Variables에 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`,
    그리고 접속 비밀번호 `DASHBOARD_PASSWORD` 추가 → Deploy
-   (`middleware.ts`가 사이트 전체를 Basic 인증으로 막습니다. 아이디는 아무거나, 비밀번호만 맞으면 됩니다.
+   (`proxy.ts`가 로그인 쿠키를 검사하고 비로그인 사용자는 `/login`으로 보냅니다.
    Stripe 웹훅 경로 `/api/webhooks/*`는 인증에서 제외됩니다.)
 4. 도메인 연결: Vercel 프로젝트 → Domains → `hq.groundrooted.com` 추가 후
    안내되는 CNAME 레코드를 DNS에 등록
@@ -115,3 +161,9 @@ components/     RevenueChart 등 UI 컴포넌트
 lib/data.ts     Supabase 조회 + 데모 데이터 폴백
 sql/schema.sql  DB 스키마 (Supabase에 1회 실행)
 ```
+
+네이버페이 판매 준비: [가맹 경로·구현 순서·확인 대기 항목](website/naverpay-sales-plan-20261004.md).
+
+섹션별 GPT Image·Higgsfield 자산과 인터랙션: [생성 프롬프트·구현·검증 기록](website/interactive-art-direction-20261004.md).
+
+최신 디자인: [Flexibits 레퍼런스 개편 기록](website/flexibits-redesign-20261004.md), `DESIGN.md` 5.0.
