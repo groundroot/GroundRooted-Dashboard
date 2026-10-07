@@ -83,8 +83,8 @@ SUPABASE_SERVICE_ROLE_KEY=eyJ...
    그리고 접속 비밀번호 `DASHBOARD_PASSWORD` 추가 → Deploy
    (`proxy.ts`가 로그인 쿠키를 검사하고 비로그인 사용자는 `/login`으로 보냅니다.
    Stripe 웹훅 경로 `/api/webhooks/*`는 인증에서 제외됩니다.)
-4. 도메인 연결: Vercel 프로젝트 → Domains → `hq.groundrooted.com` 추가 후
-   안내되는 CNAME 레코드를 DNS에 등록
+4. 도메인: `groundrooted.com`(www → apex 308). DNS는 Cloudflare에서 A `@`·CNAME `www`·TXT `_vercel`을
+   **DNS 전용(회색 구름)**으로 둔다. 공개 페이지는 production의 `MARKETING_PREVIEW_ENABLED=true`로 열린다.
 
 ## 4. 수집기 (GitHub Actions — 서버 불필요)
 
