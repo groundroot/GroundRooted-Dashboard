@@ -3,12 +3,14 @@
 export const plans = {
   kit: { name: '클로드 비디오 키트 for 파이널컷프로 — 키트만 제공', amount: 300_000 },
   lesson: { name: '클로드 비디오 키트 for 파이널컷프로 — 키트 + 3회 강의', amount: 500_000 },
+  // 임시: 실결제 연동 점검용 소액 상품. 점검(결제 후 바로 취소)이 끝나면 지운다.
+  livetest: { name: '결제 점검용 소액 결제 (바로 취소됩니다)', amount: 1_000 },
 } as const;
 export type PlanId = keyof typeof plans;
 
 export const isPlanId = (v: unknown): v is PlanId => typeof v === 'string' && Object.hasOwn(plans, v);
 
-const ORDER_ID = /^vk-(kit|lesson)-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+const ORDER_ID = /^vk-(kit|lesson|livetest)-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 export const makeOrderId = (plan: PlanId, uuid: string) => `vk-${plan}-${uuid}`;
 
 // 승인 요청 전에 주문번호와 금액이 서버 가격표와 맞는지 확인한다.
