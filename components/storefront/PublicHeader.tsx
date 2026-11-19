@@ -23,7 +23,7 @@ export default function PublicHeader({ current }: { current?: string }) {
         </a>
       ))}
       <a href="/videokit" onClick={close}>
-        비디오 제작키트
+        클로드 비디오 키트
       </a>
       <a href="/#about" onClick={close}>
         만드는 이야기

@@ -49,9 +49,9 @@ export default function HomePage() {
       </article>
       <article className="fx-typecut-banner fx-videokit-banner">
         <div className="fx-banner-copy">
-          <h2><Clapperboard size={30} strokeWidth={1.8} aria-hidden="true" />비디오 제작키트</h2>
-          <p>영상편집 노가다, 이제 끝낼 때가 되었습니다.<br />파이널컷 1:1 강의와 클로드 비디오 제작키트.</p>
-          <a href="/videokit" className="fx-pill fx-pill-videokit">강의·제작키트 보기 <ArrowRight size={18} aria-hidden="true" /></a>
+          <h2><Clapperboard size={30} strokeWidth={1.8} aria-hidden="true" />클로드 비디오 키트 <em>for 파이널컷프로</em></h2>
+          <p>영상편집 노가다, 이제 끝낼 때가 되었습니다.<br />영상 제작은 클로드에게, 검수는 파이널컷에서.</p>
+          <a href="/videokit" className="fx-pill fx-pill-videokit">키트 살펴보기 <ArrowRight size={18} aria-hidden="true" /></a>
         </div>
       </article>
     </section>
