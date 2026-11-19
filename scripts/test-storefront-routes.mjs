@@ -33,8 +33,8 @@ await withServer({port:3035,password,preview:true}, async request => {
   for (const [path, text] of [['/videokit/terms', '이용약관'], ['/videokit/privacy', '개인정보처리방침'], ['/price', '결제 링크를 확인해 주세요'], ['/price?plan=kit', '300,000원'], ['/price?plan=lesson', '500,000원'], ['/price?plan=toString', '결제 링크를 확인해 주세요'], ['/price/fail?code=PAY_PROCESS_CANCELED', '결제를 취소했습니다'], ['/price/success', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-x&amount=1&paymentKey=p', '결제를 확인하지 못했습니다']]) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.ok((await r.text()).includes(text), `${path} should include ${text}`);
   }
-  for (const path of ['/price/other', '/videokit/secret.html']) { const r = await request(path); assert.equal(r.status, 307, path); }
-  for (const path of ['/videokit', '/videokit/diagram.html', '/videokit/instructor']) {
+  for (const path of ['/price/other', '/videokit/secret.html', '/videokit/instructor']) { const r = await request(path); assert.equal(r.status, 307, path); }
+  for (const path of ['/videokit', '/videokit/diagram.html']) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /text\/html/);
     if (path === '/videokit') { const html = await r.text(); assert.ok(html.includes('src="/videokit/diagram.html"')); assert.ok(html.includes('open.kakao.com')); }
   }

@@ -4,7 +4,6 @@ const nextConfig = {
   async rewrites() {
     return [
       { source: '/videokit', destination: '/videokit/index.html' },
-      { source: '/videokit/instructor', destination: '/videokit/instructor.html' },
       { source: '/videokit/terms', destination: '/videokit/terms.html' },
       { source: '/videokit/privacy', destination: '/videokit/privacy.html' },
     ];
