@@ -1,0 +1,755 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>강성철의 마스터 클래스 — 파이널컷 프로 · 클로드 비디오 제작키트</title>
+<meta name="description" content="강성철의 1:1 파이널컷 프로 강의와 클로드 코드 기반 파이널컷 자동 편집 제작키트(Production Kit). 문의와 신청은 카카오톡 1:1로 받습니다.">
+<meta property="og:title" content="강성철의 마스터 클래스">
+<meta property="og:description" content="파이널컷 프로 1:1 강의 · 파이널컷 클로드 비디오 제작키트. 카카오톡 1:1 문의.">
+<meta property="og:url" content="https://groundrooted.com/videokit">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#131316">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css">
+<style>
+:root{
+  --bg:#131316;
+  --panel:#1b1b20;
+  --panel-2:#22222a;
+  --line:#2e2e37;
+  --line-soft:#24242c;
+  --ink:#ecebe6;
+  --ink-2:#b4b2aa;
+  --ink-3:#8a8880;
+  --head:#ff6b3d;          /* playhead */
+  --clip-v1:#5b6cf0;       /* 파이널컷 1:1 */
+  --clip-v2:#a46cf0;       /* 클로드 비디오 제작키트 */
+  --clip-a1:#2fb39a;       /* 멘토링 */
+  --kakao:#fee500;
+  --kakao-ink:#191600;
+  --mono:"JetBrains Mono",ui-monospace,monospace;
+  --sans:"Pretendard Variable",Pretendard,-apple-system,"Apple SD Gothic Neo",sans-serif;
+  --gutter:clamp(16px,4vw,48px);
+  --max:1160px;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scrollbar-color:#3a3a45 var(--bg)}
+body{
+  background:var(--bg);color:var(--ink);
+  font-family:var(--sans);font-size:17px;line-height:1.7;
+  word-break:keep-all;overflow-wrap:break-word;
+  -webkit-font-smoothing:antialiased;
+}
+::selection{background:var(--head);color:#120600}
+::-webkit-scrollbar{width:10px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:#33333d;border-radius:10px;border:2px solid var(--bg)}
+a{color:inherit;text-underline-offset:.22em;text-decoration-thickness:1px}
+:focus-visible{outline:2px solid var(--head);outline-offset:3px;border-radius:4px}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 var(--gutter)}
+.tc{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:0}
+
+/* ---------- top bar ---------- */
+.bar{
+  position:sticky;top:0;z-index:20;
+  background:color-mix(in srgb,var(--bg) 88%,transparent);
+  backdrop-filter:saturate(1.2) blur(10px);
+  border-bottom:1px solid var(--line-soft);
+}
+.bar .wrap{display:flex;align-items:center;justify-content:space-between;height:60px;gap:16px}
+.brand{font-weight:700;font-size:16px;text-decoration:none;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.rec{width:9px;height:9px;border-radius:50%;background:var(--head);box-shadow:0 0 0 3px color-mix(in srgb,var(--head) 25%,transparent)}
+.nav{display:flex;gap:26px;font-size:15px;color:var(--ink-2)}
+.nav a{text-decoration:none}
+.nav a:hover{color:var(--ink)}
+@media (max-width:760px){.nav{display:none}}
+
+/* ---------- buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;gap:10px;
+  height:52px;padding:0 22px;border-radius:12px;
+  font-weight:650;font-size:16px;text-decoration:none;white-space:nowrap;
+  transition:transform .2s var(--ease),background .2s,box-shadow .2s;
+}
+.btn svg{width:20px;height:20px;flex:none}
+.btn-kakao{background:var(--kakao);color:var(--kakao-ink);box-shadow:0 6px 16px -6px rgba(0,0,0,.6)}
+.btn-kakao:hover{transform:translateY(-2px);box-shadow:0 10px 22px -8px rgba(0,0,0,.7)}
+.btn-ghost{border:1px solid var(--line);color:var(--ink)}
+.btn-ghost:hover{background:var(--panel-2)}
+.btn-sm{height:40px;padding:0 14px;font-size:14px;border-radius:10px}
+.btn-sm svg{width:17px;height:17px}
+
+/* ---------- hero ---------- */
+.hero{padding:clamp(56px,9vw,120px) 0 clamp(48px,7vw,88px)}
+.hero h1{
+  font-size:clamp(40px,7.4vw,92px);line-height:1.04;letter-spacing:-.04em;font-weight:800;
+  text-wrap:balance;max-width:16ch;
+}
+.hero h1 span{color:var(--head)}
+.hero .lede{margin-top:28px;font-size:clamp(17px,1.7vw,20px);color:var(--ink-2);max-width:38em;text-wrap:pretty}
+.hero .lede b{color:var(--ink);font-weight:600}
+.hero .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+.note{margin-top:16px;font-size:14px;color:var(--ink-3)}
+
+/* ---------- timeline (signature) ---------- */
+.tl{
+  margin-top:clamp(48px,7vw,80px);
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  overflow:hidden;box-shadow:0 30px 60px -30px rgba(0,0,0,.7);
+}
+.tl-head{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+.tl-head .tc{font-size:15px;color:var(--ink)}
+.tl-head .tc i{font-style:normal;color:var(--head)}
+.tl-body{position:relative;padding:0 18px 18px 0}
+.ruler,.track{display:grid;grid-template-columns:64px 1fr;align-items:stretch}
+.ruler .lane{
+  height:30px;position:relative;
+  background:repeating-linear-gradient(90deg,var(--line) 0 1px,transparent 1px 2%) bottom/100% 7px no-repeat,
+             repeating-linear-gradient(90deg,#4a4a55 0 1px,transparent 1px 10%) bottom/100% 13px no-repeat;
+}
+.ruler .lane span{position:absolute;top:4px;font-size:10.5px;color:var(--ink-3);transform:translateX(4px)}
+.track{margin-top:8px}
+.track .tag{display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+.track .lane{position:relative;height:54px;background:var(--line-soft);border-radius:8px}
+.clip{
+  position:absolute;top:4px;bottom:4px;border-radius:7px;
+  display:flex;flex-direction:column;justify-content:center;padding:0 14px;
+  text-decoration:none;color:#fff;overflow:hidden;
+  transition:filter .2s,transform .2s var(--ease);
+}
+.clip:hover{filter:brightness(1.12);transform:translateY(-1px)}
+.clip b{font-size:14.5px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clip small{font-size:12px;opacity:.94;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.clip.v1{background:linear-gradient(180deg,#3d4bcc,#3442bd)}
+.clip.v2{background:linear-gradient(180deg,#6f3ac2,#6331b4)}
+.clip.a1{background:linear-gradient(180deg,#43cdb2,var(--clip-a1));color:#03201a}
+.clip.a1::after{ /* waveform */
+  content:"";position:absolute;left:0;right:0;bottom:0;height:45%;opacity:.35;
+  background:repeating-linear-gradient(90deg,#062a23 0 2px,transparent 2px 5px);
+  -webkit-mask:linear-gradient(0deg,#000,transparent);mask:linear-gradient(0deg,#000,transparent);
+}
+.playhead{
+  position:absolute;top:0;bottom:0;left:calc(64px + (100% - 82px) * var(--p,.58));
+  width:2px;background:var(--head);pointer-events:none;z-index:3;
+}
+.playhead::before{content:"";position:absolute;top:0;left:-6px;width:14px;height:12px;background:var(--head);clip-path:polygon(0 0,100% 0,100% 55%,50% 100%,0 55%)}
+@media (max-width:640px){
+  .ruler,.track{grid-template-columns:40px 1fr}
+  .playhead{left:calc(40px + (100% - 58px) * var(--p,.58))}
+  .track .lane{height:56px}
+  .clip{padding:0 10px}
+  
+}
+
+/* ---------- sections ---------- */
+section{padding:clamp(72px,10vw,128px) 0;border-top:1px solid var(--line-soft)}
+.sec-head{display:grid;grid-template-columns:minmax(0,1fr);gap:18px;margin-bottom:clamp(36px,5vw,56px)}
+.sec-head h2{font-size:clamp(30px,4.4vw,52px);line-height:1.15;letter-spacing:-.035em;font-weight:750;text-wrap:balance}
+.sec-head h2 .en{display:block;font-family:var(--mono);font-size:max(13px,.36em);font-weight:500;letter-spacing:.02em;color:var(--ink-3);margin-top:10px}
+.sec-head p{color:var(--ink-2);max-width:40em;font-size:18px}
+
+/* course block */
+.course{display:grid;grid-template-columns:1fr 1fr;gap:clamp(28px,5vw,72px);align-items:start}
+@media (max-width:860px){.course{grid-template-columns:1fr}}
+.plans{border-top:1px solid var(--line)}
+.plan{display:grid;grid-template-columns:1fr auto;gap:6px 20px;padding:26px 0;border-bottom:1px solid var(--line)}
+.plan h3{font-size:20px;font-weight:650;letter-spacing:-.015em}
+.plan .meta{grid-column:1;color:var(--ink-3);font-size:15px}
+.plan .price{grid-row:1/3;grid-column:2;text-align:right;align-self:center}
+.price strong{font-size:clamp(30px,3.6vw,40px);font-weight:750;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.price strong small{font-size:17px;font-weight:600;margin-left:2px}
+.price span{display:block;font-size:13px;color:var(--ink-3)}
+.plan.featured h3::after{content:"강의 포함";margin-left:10px;font-size:12px;font-weight:600;padding:3px 8px;border-radius:6px;background:color-mix(in srgb,var(--clip-v2) 22%,transparent);color:#d6bbff;vertical-align:3px}
+
+.detail h4{font-size:15px;font-weight:600;color:var(--ink-3);margin:0 0 14px}
+.detail + .detail{margin-top:40px}
+.list{list-style:none;display:grid;gap:14px}
+.list li{display:grid;grid-template-columns:22px 1fr;gap:12px;color:var(--ink-2)}
+.list li b{color:var(--ink);font-weight:600}
+.list svg{width:20px;height:20px;margin-top:4px;color:var(--ink-3)}
+.steps{list-style:none;counter-reset:s;display:grid;gap:0;border-left:1px solid var(--line);margin-left:6px}
+.steps li{position:relative;padding:0 0 22px 28px;color:var(--ink-2)}
+.steps li:last-child{padding-bottom:0}
+.steps li::before{content:"";position:absolute;left:-6px;top:9px;width:11px;height:11px;border-radius:3px;background:var(--clip-v2)}
+.steps li b{display:block;color:var(--ink);font-weight:600}
+.support{
+  margin-top:clamp(32px,4vw,48px);padding:24px 26px;border-radius:14px;
+  background:color-mix(in srgb,var(--clip-a1) 10%,var(--panel));
+  border:1px solid color-mix(in srgb,var(--clip-a1) 30%,var(--line));
+  display:grid;grid-template-columns:auto 1fr;gap:18px;align-items:start;
+}
+.support svg{width:26px;height:26px;color:#6fe0c9;margin-top:3px}
+.support b{display:block;font-size:18px;font-weight:650;margin-bottom:4px}
+.support p{color:#c4d8d2;font-size:16px}
+.addon{margin-top:clamp(48px,6vw,72px);display:grid;grid-template-columns:1fr auto;gap:20px 40px;align-items:center;padding:28px 0;border-top:1px dashed var(--line);border-bottom:1px dashed var(--line)}
+.addon h3{font-size:20px;font-weight:650}
+.addon p{color:var(--ink-2);font-size:16px;margin-top:4px}
+@media (max-width:560px){
+  .addon{grid-template-columns:1fr}
+  .plan{grid-template-columns:1fr}
+  .plan .price{grid-row:auto;grid-column:1;text-align:left;margin-top:8px}
+}
+
+/* free / paid mix */
+.mix{margin-top:clamp(56px,7vw,88px)}
+.mix-head h3{font-size:clamp(22px,2.4vw,28px);font-weight:700;letter-spacing:-.025em}
+.mix-head p{color:var(--ink-2);font-size:16px;margin-top:8px;max-width:44em}
+.mix-grid{margin-top:24px;border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:8px clamp(14px,2.4vw,24px)}
+.mix-cols,.mix-row{display:grid;grid-template-columns:minmax(120px,190px) 1fr 1fr;gap:10px;align-items:center}
+.mix-cols{padding:10px 0;font-size:13px;font-weight:600}
+.mix-cols span:nth-child(2){color:#8ff0dc}.mix-cols span:nth-child(3){color:#d6bbff}
+.mix-row{padding:9px 0;border-top:1px solid var(--line-soft)}
+.mix-k{font-size:15px;font-weight:600}
+.opt{font:inherit;font-size:14px;text-align:left;padding:10px 12px;border-radius:9px;border:1px solid var(--line);background:transparent;color:var(--ink-3);cursor:pointer;transition:background .2s,border-color .2s,color .2s}
+.opt:hover{color:var(--ink)}
+.mix-row[data-pick="free"] .opt.free,.opt.free.on{background:color-mix(in srgb,var(--clip-a1) 16%,transparent);border-color:color-mix(in srgb,var(--clip-a1) 60%,transparent);color:#c8fbef}
+.mix-row[data-pick="paid"] .opt.paid{background:color-mix(in srgb,var(--clip-v2) 18%,transparent);border-color:color-mix(in srgb,var(--clip-v2) 60%,transparent);color:#ead9ff}
+.opt.na{cursor:default;border-style:dashed;color:var(--ink-3)}
+.mix-row.fixed .opt{cursor:default}
+.mix-sum{margin-top:14px;font-size:15px;color:var(--ink-2)}
+.mix-sum b{color:var(--ink)}
+@media (max-width:640px){
+  .mix-cols{display:none}
+  .mix-row{grid-template-columns:1fr 1fr;padding:12px 0}
+  .mix-k{grid-column:1/-1}
+  .opt{font-size:13px}
+}
+/* update promise */
+.promise{margin-top:clamp(48px,6vw,72px);padding:clamp(22px,3vw,32px);border-radius:16px;background:color-mix(in srgb,var(--clip-a1) 9%,var(--panel));border:1px solid color-mix(in srgb,var(--clip-a1) 28%,var(--line))}
+.promise h3{font-size:clamp(20px,2.2vw,25px);font-weight:700;letter-spacing:-.02em}
+.promise > p{color:#c4d8d2;margin-top:8px;font-size:16px}
+.promise ul{list-style:none;margin-top:18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px 28px}
+.promise li{color:#c4d8d2;font-size:15px}
+.promise li b{display:block;color:var(--ink);font-size:16px;margin-bottom:3px}
+.promise a{color:#e6fff8}
+
+/* who it's for */
+.for{margin-bottom:clamp(56px,7vw,88px);display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px clamp(28px,5vw,72px);align-items:start}
+.for h3{grid-column:1/-1;font-size:clamp(20px,2.2vw,26px);font-weight:700;letter-spacing:-.02em}
+.for ul{list-style:none;border-top:1px solid var(--line)}
+.for li{padding:15px 0 15px 30px;border-bottom:1px solid var(--line);position:relative;font-size:17px;color:var(--ink)}
+.for li::before{content:"";position:absolute;left:4px;top:24px;width:12px;height:2px;background:var(--head)}
+.for-answer p{font-size:clamp(19px,2vw,23px);line-height:1.55;letter-spacing:-.015em;color:var(--ink-2)}
+.for-answer p b{color:var(--ink);font-weight:700}
+.apps{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.app{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:10px;font-size:15px;font-weight:600;border:1px solid var(--line)}
+.app small{font-size:12px;font-weight:600;padding:2px 7px;border-radius:5px}
+.app.ok{background:var(--panel-2)}
+.app.ok small{background:color-mix(in srgb,var(--clip-a1) 22%,transparent);color:#8ff0dc}
+.app.soon{color:var(--ink-2);border-style:dashed}
+.app.soon small{background:var(--line-soft);color:var(--ink-2)}
+@media (max-width:860px){.for{grid-template-columns:1fr}}
+
+/* why + token comparison */
+.why{margin-bottom:clamp(56px,7vw,88px)}
+.why blockquote p{font-size:clamp(24px,3.2vw,38px);line-height:1.35;letter-spacing:-.03em;font-weight:700;text-wrap:balance;max-width:24em}
+.why blockquote em{font-style:normal;color:#c9a6ff}
+.why-body{margin-top:22px;color:var(--ink-2);font-size:18px;max-width:40em}
+.why-body b{color:var(--ink);font-weight:600}
+.tok{margin-top:clamp(36px,5vw,56px);padding:clamp(22px,3vw,34px);border:1px solid var(--line);border-radius:16px;background:var(--panel)}
+.tok h3{font-size:clamp(19px,2vw,23px);font-weight:700;letter-spacing:-.02em;margin-bottom:8px}
+.tok-row{display:grid;grid-template-columns:200px 1fr 96px;gap:24px;align-items:center;padding:22px 0;border-bottom:1px solid var(--line)}
+.tok-label b{display:block;font-size:17px;font-weight:650}
+.tok-label span{display:block;font-size:14px;color:var(--ink-3);margin-top:2px}
+.tok-bars{display:grid;gap:8px}
+.tbar{position:relative;height:34px;border-radius:7px;background:var(--line-soft)}
+.tbar::before{content:"";position:absolute;inset:0 auto 0 0;width:var(--v);min-width:6px;border-radius:7px}
+.tbar.off::before{background:#4a4a56}
+.tbar.on::before{background:var(--clip-a1)}
+.tbar span{position:absolute;inset:0;display:flex;align-items:center;padding:0 12px;font-size:13.5px;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tbar.on span{padding-left:max(12px,calc(var(--v) + 10px));color:#9ff0de}
+.local{font-size:15px;color:#9ff0de;background:color-mix(in srgb,var(--clip-a1) 12%,transparent);border-radius:7px;padding:9px 12px}
+.tok-save{text-align:right}
+.tok-save strong{display:block;font-size:clamp(28px,3vw,36px);font-weight:800;letter-spacing:-.03em;color:#6fe0c9;font-variant-numeric:tabular-nums}
+.tok-save span{font-size:13px;color:var(--ink-3)}
+.tok-note{margin-top:18px;font-size:13.5px;color:var(--ink-3);line-height:1.65;max-width:70em}
+@media (max-width:760px){
+  .tok-row{grid-template-columns:1fr auto;gap:12px 16px}
+  .tok-bars{grid-column:1/-1;grid-row:2}
+  .tbar span{white-space:normal;font-size:12.5px;line-height:1.3}
+  .tbar{height:auto;min-height:40px}
+}
+
+/* system diagram */
+.system{margin-top:clamp(56px,7vw,88px)}
+.system-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:20px}
+.system-head h3{font-size:clamp(22px,2.4vw,28px);font-weight:700;letter-spacing:-.025em}
+.system-head p{color:var(--ink-2);font-size:16px;margin-top:8px;max-width:44em}
+.system-head p b{color:var(--ink);font-weight:600}
+.system-frame{
+  --w:min(calc(100vw - 32px),1680px);
+  width:var(--w);position:relative;left:50%;transform:translateX(-50%);
+  border:1px solid var(--line);border-radius:16px;overflow:hidden;background:#f4f7f8;
+  box-shadow:0 30px 60px -30px rgba(0,0,0,.7);
+}
+.system-frame iframe{display:block;width:100%;height:calc((var(--w) - 94px) * 0.594 + 154px);border:0}
+.caps{list-style:none;margin-top:clamp(28px,4vw,44px);display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:0 40px}
+.caps li{padding:18px 0;border-top:1px solid var(--line);color:var(--ink-2);font-size:16px}
+.caps li b{display:block;color:var(--ink);font-size:17px;font-weight:650;margin-bottom:4px}
+.support a{color:#e6fff8}
+@media (max-width:640px){.system-head{flex-direction:column;align-items:flex-start}.system-head .btn-sm span{display:inline}}
+
+/* how it works */
+.how{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-top:1px solid var(--line)}
+.how div{padding:28px 28px 8px 0}
+.how div + div{padding-left:28px;border-left:1px solid var(--line)}
+.how h3{font-size:19px;font-weight:650;margin-bottom:8px}
+.how p{color:var(--ink-2);font-size:16px}
+@media (max-width:760px){
+  .how{grid-template-columns:1fr}
+  .how div,.how div+div{padding:24px 0;border-left:0;border-bottom:1px solid var(--line)}
+}
+
+/* instructor EDL */
+.about{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:clamp(32px,6vw,88px)}
+@media (max-width:860px){.about{grid-template-columns:1fr}}
+.about .who h3{font-size:clamp(34px,4vw,46px);font-weight:800;letter-spacing:-.035em;line-height:1.1}
+.about .who h3 span{display:block;font-size:16px;font-weight:500;color:var(--ink-3);letter-spacing:0;margin-top:10px;font-family:var(--mono)}
+.about .who p{margin-top:22px;color:var(--ink-2)}
+.edl-group + .edl-group{margin-top:36px}
+.edl-group h4{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:var(--ink-3);padding-bottom:10px;border-bottom:1px solid var(--line)}
+.edl-group h4 i{width:16px;height:8px;border-radius:2px;display:block}
+.edl{list-style:none}
+.edl li{display:grid;grid-template-columns:96px 1fr;gap:16px;padding:13px 0;border-bottom:1px solid var(--line-soft)}
+.edl .tc{font-size:13.5px;color:var(--ink-3);padding-top:3px}
+.edl span{color:var(--ink)}
+.edl em{font-style:normal;color:var(--ink-3)}
+@media (max-width:480px){.edl li{grid-template-columns:78px 1fr;gap:10px}}
+
+/* contact */
+.contact{padding-bottom:clamp(88px,12vw,140px)}
+.contact h2{font-size:clamp(36px,6vw,72px);line-height:1.08;letter-spacing:-.04em;font-weight:800;max-width:14ch;text-wrap:balance}
+.contact .lede{margin-top:22px;color:var(--ink-2);max-width:36em;font-size:18px}
+.contact .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
+.policy{margin-top:40px;display:flex;flex-wrap:wrap;gap:10px 28px;font-size:14px;color:var(--ink-3)}
+.policy span{display:inline-flex;gap:8px;align-items:center}
+.policy svg{width:16px;height:16px}
+
+footer{border-top:1px solid var(--line-soft);padding:28px 0;font-size:14px;color:var(--ink-3)}
+footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
+
+/* mobile sticky CTA */
+.dock{display:none}
+@media (max-width:640px){
+  .dock{
+    display:flex;position:fixed;left:12px;right:12px;bottom:12px;z-index:30;
+    transform:translateY(140%);transition:transform .45s var(--ease);
+  }
+  .dock.show{transform:none}
+  .dock .btn{flex:1;justify-content:center;box-shadow:0 12px 30px -8px rgba(0,0,0,.7)}
+  .bar .btn-sm span{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<!-- SVG 아이콘 (Lucide 계열, stroke 1.75) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-chat" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.5c-5.25 0-9.5 3.3-9.5 7.38 0 2.62 1.75 4.92 4.4 6.23l-.95 3.46c-.08.3.26.54.52.37l4.13-2.73c.46.05.93.08 1.4.08 5.25 0 9.5-3.3 9.5-7.4S17.25 3.5 12 3.5Z"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-life" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="m4.93 4.93 4.24 4.24M14.83 14.83l4.24 4.24M14.83 9.17l4.24-4.24M4.93 19.07l4.24-4.24"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></symbol>
+  <symbol id="i-card-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m2 2 20 20"/><path d="M8.5 5H20a2 2 0 0 1 2 2v10c0 .5-.2 1-.5 1.4M18 19H4a2 2 0 0 1-2-2V7c0-.6.3-1.2.8-1.6M2 10h8m6 0h6"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+</svg>
+
+<header class="bar">
+  <div class="wrap">
+    <a class="brand" href="#top"><i class="rec" aria-hidden="true"></i>강성철의 마스터 클래스</a>
+    <nav class="nav" aria-label="섹션">
+      <a href="#fcp">파이널컷 1:1</a>
+      <a href="#kit">비디오 제작키트</a>
+      <a href="#about">강사 소개</a>
+    </nav>
+    <a class="btn btn-kakao btn-sm js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg><span>카톡 문의</span></a>
+  </div>
+</header>
+
+<main id="top">
+  <div class="hero">
+    <div class="wrap">
+      <h1>영상편집 노가다,<br>이제 끝낼 때가 되었습니다<span>!</span></h1>
+      <p class="lede">
+        AI 영상제작 강사 <b>강성철</b>이 1:1로 가르칩니다.
+        <b>파이널컷 프로</b> 기초부터 실전 워크플로까지, 그리고 <b>클로드 코드로 파이널컷을 자동 편집</b>하는 방법까지.
+      </p>
+      <div class="actions">
+        <a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡 1:1 문의</a>
+        <a class="btn btn-ghost" href="#fcp">강의 살펴보기</a>
+      </div>
+      <p class="note">결제는 사이트에서 받지 않습니다. 카톡 상담으로 일정과 과정을 정한 뒤 안내드립니다.</p>
+
+      <div class="tl" aria-label="강의 구성 타임라인">
+        <div class="tl-head">
+          <span>MASTER CLASS · 2026</span>
+          <span class="tc" id="tcode">01<i>:</i>00<i>:</i>00<i>:</i>00</span>
+        </div>
+        <div class="tl-body" id="tl">
+          <div class="ruler" aria-hidden="true"><span></span><div class="lane">
+            <span class="tc" style="left:0">0주</span><span class="tc" style="left:20%">2주</span><span class="tc" style="left:40%">4주</span><span class="tc" style="left:60%">6주</span><span class="tc" style="left:80%">8주</span>
+          </div></div>
+          <div class="track"><span class="tag">V3</span><div class="lane">
+            <a class="clip v2" href="#kit" style="left:0;width:30%"><b>제작키트</b><small>3주 · 3회</small></a>
+          </div></div>
+          <div class="track"><span class="tag">V2</span><div class="lane">
+            <a class="clip v1" href="#fcp" style="left:0;width:50%"><b>파이널컷 5주 과정</b><small>회당 2시간</small></a>
+          </div></div>
+          <div class="track"><span class="tag">V1</span><div class="lane">
+            <a class="clip v1" href="#fcp" style="left:0;width:100%"><b>파이널컷 10주 과정</b><small>회당 1시간</small></a>
+          </div></div>
+          <div class="track"><span class="tag">A1</span><div class="lane">
+            <a class="clip a1" href="#fcp-support" style="left:0;width:100%"><b>수강 후 1년 멘토링</b><small>카톡 · 원격 지원</small></a>
+          </div></div>
+          <div class="playhead" id="ph" aria-hidden="true"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 파이널컷 1:1 -->
+  <section id="fcp">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>파이널컷 프로 1:1 강의</h2>
+        <p>사용법만 알려드리지 않습니다. 만들고 싶은 영상이 무엇인지 듣고, 그 목적을 달성하는 방법을 컨설팅과 함께 가르칩니다.</p>
+      </div>
+
+      <div class="course">
+        <div class="plans">
+          <div class="plan">
+            <h3>10주 과정</h3>
+            <p class="meta">주 1회 · 회당 1시간 (Q&amp;A 시간 별도)</p>
+            <div class="price"><strong>5<small>만원</small></strong><span>1회당</span></div>
+          </div>
+          <div class="plan">
+            <h3>5주 과정</h3>
+            <p class="meta">주 1회 · 회당 2시간</p>
+            <div class="price"><strong>10<small>만원</small></strong><span>1회당</span></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="detail">
+            <h4>이렇게 진행합니다</h4>
+            <ul class="list">
+              <li><svg><use href="#i-check"/></svg><span>일정에 따라 <b>5회 또는 10회</b>로 기간을 조정할 수 있습니다.</span></li>
+              <li><svg><use href="#i-check"/></svg><span>수강생 <b>레벨에 맞춰 커리큘럼</b>을 조정합니다.</span></li>
+              <li><svg><use href="#i-cal"/></svg><span>직장인과 학생을 위해 일정을 고정하지 않고 <b>주마다 조정</b>합니다.</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="support" id="fcp-support">
+        <svg><use href="#i-life"/></svg>
+        <div>
+          <b>수강 후 1년간, 24시간 365일 멘토링</b>
+          <p>제작 환경 개선, 유튜브 운영, 교육과 제작에 대한 피드백을 1:1 개인 카톡과 원격 지원으로 이어갑니다.</p>
+        </div>
+      </div>
+
+      <div class="addon">
+        <div>
+          <h3>촬영본 · 편집본 운영관리</h3>
+          <p>지속 가능한 편집을 위한 하드웨어 세팅과 파일 관리, 작업 후 아카이빙 운영까지 잡아드립니다.</p>
+        </div>
+        <div class="price"><strong>30<small>만원</small></strong></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 클로드 비디오 제작키트 -->
+  <section id="kit">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>파이널컷 클로드 비디오 제작키트 <span class="en">Production Kit</span></h2>
+        <p>AI와 함께 편집하는 제작키트(Production Kit)입니다. 세팅에 따라 완전 자동화가 가능하고, 원하시는 방향에 따라 작업 파이프라인 제작을 도와드립니다.</p>
+      </div>
+
+      <div class="for">
+        <h3>이런 분들을 위해 만들었습니다</h3>
+        <ul>
+          <li>영상을 만들며 피곤한 하루하루를 보냈던 분</li>
+          <li>영상편집 업무로 인한 스트레스가 많은 분</li>
+          <li>영상 제작이 즐거워서 시작했지만, 과도한 업무량으로 영상편집이 하기 싫어진 분</li>
+          <li>주기적으로 영상을 제작해야 해서 일상이 버거운 분</li>
+          <li>영상편집을 시작했다가 템플릿과 모션그래픽 소스를 구하는 데서 어려움을 겪은 분</li>
+        </ul>
+        <div class="for-answer">
+          <p><b>클로드 비디오 제작키트</b>는 영상 제작을 클로드에게 맡기고, 검수는 원하는 편집 프로그램을 골라서 할 수 있습니다.</p>
+          <div class="apps" aria-label="지원 편집 프로그램">
+            <span class="app ok">파이널컷 프로<small>지원</small></span>
+            <span class="app ok">캡컷<small>지원</small></span>
+            <span class="app soon">프리미어 프로<small>지원 예정</small></span>
+            <span class="app soon">다빈치 리졸브<small>지원 예정</small></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="why">
+        <blockquote>
+          <p>클로드는 모든 것을 할 수 있습니다.<br>하지만 <em>내가 원하는 방향대로</em> 할 수 있는가는 완전히 다른 이야기입니다.</p>
+        </blockquote>
+        <p class="why-body">이 제작키트에는 <b>영상 편집 20년 차의 노하우</b>가 담겨 있습니다. 판단이 필요한 일만 클로드가 맡고, 반복 작업은 가능한 한 <b>로컬 맥에서</b> 돌아가도록 만들어 <b>클로드 코드 토큰 사용량을 최소화</b>했습니다.</p>
+
+        <div class="tok">
+          <h3>제작키트를 쓸 때와 클로드에게 그냥 시킬 때</h3>
+          <div class="tok-row">
+            <div class="tok-label"><b>장면 분석</b><span>촬영본 290개를 클로드가 보는 비용</span></div>
+            <div class="tok-bars">
+              <div class="tbar off" style="--v:100%"><span>그냥 시킬 때 · 클립마다 프레임 1장 · 약 464,000 토큰</span></div>
+              <div class="tbar on" style="--v:4.3%"><span>제작키트 · 그리드 시트 13장 · 약 20,000 토큰</span></div>
+            </div>
+            <div class="tok-save"><strong>96%</strong><span>절약</span></div>
+          </div>
+          <div class="tok-row">
+            <div class="tok-label"><b>타임라인 작성</b><span>클로드가 직접 써야 하는 분량</span></div>
+            <div class="tok-bars">
+              <div class="tbar off" style="--v:100%"><span>그냥 시킬 때 · FCPXML 직접 작성 · 약 365만 자</span></div>
+              <div class="tbar on" style="--v:2.2%"><span>제작키트 · 콘티만 작성, FCPXML은 맥에서 생성 · 약 8만 자</span></div>
+            </div>
+            <div class="tok-save"><strong>98%</strong><span>절약</span></div>
+          </div>
+          <div class="tok-row">
+            <div class="tok-label"><b>음성 인식 · 음악 분석</b><span>인터뷰 전사, 곡 구조·박자 분석</span></div>
+            <div class="tok-bars">
+              <div class="local">제작키트는 맥에서 직접 처리합니다 (Qwen3-ASR, allin1 · madmom). 59분 인터뷰 전사에 약 25분.</div>
+            </div>
+            <div class="tok-save"><strong>0</strong><span>클로드 토큰</span></div>
+          </div>
+          <p class="tok-note">실제 작업 파일(촬영본 290개, 컷 389개)로 계산했습니다. 이미지 토큰은 Anthropic 공식 계산식(가로×세로÷750, 긴 변 1568px로 축소, 장당 최대 약 1,600 토큰) 기준이고, 그냥 시킬 때는 클립마다 프레임을 한 장만 본다고 가정한 보수적인 비교입니다. 타임라인은 실제 콘티(ch00–09)와 생성된 FCPXML의 글자 수 비교입니다.</p>
+        </div>
+      </div>
+
+      <div class="course">
+        <div class="plans">
+          <div class="plan featured">
+            <h3>제작키트 + 3회 강의</h3>
+            <p class="meta">3주 과정 · 제작키트 세팅부터 직접 제작까지 · 1년 후속지원</p>
+            <div class="price"><strong>50<small>만원</small></strong></div>
+          </div>
+          <div class="plan">
+            <h3>제작키트만 제공</h3>
+            <p class="meta">제작키트 파일만 받아 직접 세팅</p>
+            <div class="price"><strong>30<small>만원</small></strong></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="detail">
+            <h4>3주 커리큘럼</h4>
+            <ol class="steps">
+              <li><b>클로드 기초</b>클로드와 클로드 코드를 처음 쓰는 분도 따라올 수 있게 시작합니다.</li>
+              <li><b>클로드 × 파이널컷 제작키트 제공 및 세팅</b>내 컴퓨터에 제작키트를 설치하고 파이널컷과 연결합니다.</li>
+              <li><b>클로드 코드로 영상 제작 직접 해보기</b>내 소스로 자동 편집을 직접 돌려봅니다.</li>
+            </ol>
+          </div>
+          <div class="detail">
+            <h4>유튜브 학습 데이터</h4>
+            <ul class="list">
+              <li><svg><use href="#i-check"/></svg><span>제작키트에 <b>바이럴 비디오 공식을 위한 유튜브 학습 데이터</b>가 포함되어 있습니다.</span></li>
+              <li><svg><use href="#i-check"/></svg><span>강의 요청 시 <b>관련 카테고리에 대한 유튜브 학습 데이터</b>를 따로 제공합니다.</span></li>
+            </ul>
+          </div>
+          <div class="detail">
+            <h4>후속지원 (강의 포함 과정, 1년)</h4>
+            <ul class="list">
+              <li><svg><use href="#i-check"/></svg><span>스킬과 세팅 최적화</span></li>
+              <li><svg><use href="#i-check"/></svg><span>유튜브 학습 데이터 제공</span></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="system">
+        <div class="system-head">
+          <div>
+            <h3>제작키트에 들어 있는 것: FCP AI 편집 시스템</h3>
+            <p>매번 반드시 도는 <b>빌드 코어 9단계</b>가 촬영본을 파이널컷 타임라인까지 옮기고, 음악 · 자막 · B롤 · 쇼츠 같은 <b>플러그인 스킬 18개</b>를 필요할 때 끼우고 뺍니다. 상자를 누르면 연결이 강조되고, 확대 · 이동할 수 있습니다.</p>
+          </div>
+          <a class="btn btn-ghost btn-sm" href="/videokit/diagram.html" target="_blank" rel="noopener"><svg><use href="#i-arrow"/></svg><span>크게 보기</span></a>
+        </div>
+        <div class="system-frame">
+          <iframe src="/videokit/diagram.html" title="FCP AI 편집 시스템 — 빌드 코어와 플러그인 다이어그램" loading="lazy" scrolling="no"></iframe>
+        </div>
+        <ul class="caps">
+          <li><b>장면 분석</b>촬영본 전체를 한눈에 보는 시트로 정리해 필요한 장면을 고릅니다.</li>
+          <li><b>음성 인식</b>한국어 · 영어 인터뷰를 맥에서 자동으로 받아 적습니다.</li>
+          <li><b>음악 · 효과음</b>장면 길이와 박자에 맞춰 곡을 고르고 다듬습니다.</li>
+          <li><b>소스 가져오기</b>사이트에서 받아 오거나 편집 프로그램 안에서 골라 바로 씁니다.</li>
+          <li><b>타이틀 · 모션그래픽</b>구독 템플릿을 쓰거나 직접 만들어 넣습니다.</li>
+          <li><b>파이널컷 · 캡컷 연동</b>타임라인과 이벤트, 키워드까지 정리된 프로젝트로 넘깁니다.</li>
+        </ul>
+      </div>
+
+      <div class="mix" id="mix">
+        <div class="mix-head">
+          <h3>무료로도, 이미 쓰는 구독으로도</h3>
+          <p>빌드 코어와 플러그인은 항목마다 무료와 유료를 골라 쓸 수 있습니다. 이미 구독 중인 서비스를 그대로 쓰거나, 완전 무료 플랫폼으로만 꾸리거나, 섞어서 설정하세요. 눌러서 바꿔 보세요.</p>
+        </div>
+        <div class="mix-grid" role="group" aria-label="무료·유료 구성 선택">
+          <div class="mix-cols" aria-hidden="true"><span></span><span>무료</span><span>유료 · 구독</span></div>
+          <div class="mix-row" data-pick="free"><span class="mix-k">폰트</span><button type="button" class="opt free">눈누 무료 폰트</button><button type="button" class="opt paid">산돌구름</button></div>
+          <div class="mix-row" data-pick="paid"><span class="mix-k">타이틀 · 모션그래픽</span><button type="button" class="opt free">직접 렌더 (HyperFrames · Remotion)</button><button type="button" class="opt paid">motionVFX</button></div>
+          <div class="mix-row" data-pick="free"><span class="mix-k">효과음</span><button type="button" class="opt free">Openverse (CC0)</button><button type="button" class="opt paid">Artlist · Envato</button></div>
+          <div class="mix-row" data-pick="paid"><span class="mix-k">배경음악</span><button type="button" class="opt free">보유한 음원</button><button type="button" class="opt paid">Suno · Artlist</button></div>
+          <div class="mix-row" data-pick="free"><span class="mix-k">스톡 영상 · B롤</span><button type="button" class="opt free">촬영 원본에서 추출</button><button type="button" class="opt paid">Artlist · Envato</button></div>
+          <div class="mix-row" data-pick="free"><span class="mix-k">AI 장면 생성</span><button type="button" class="opt free">자리 표시로 두고 진행</button><button type="button" class="opt paid">Higgsfield</button></div>
+          <div class="mix-row" data-pick="paid"><span class="mix-k">편집 프로그램</span><button type="button" class="opt free">캡컷 · 파이널컷 일반 구매</button><button type="button" class="opt paid">파이널컷 구독제</button></div>
+          <div class="mix-row fixed"><span class="mix-k">음성 인식 · 내레이션</span><span class="opt free on">맥에서 로컬 처리</span><span class="opt na">항상 무료</span></div>
+        </div>
+        <p class="mix-sum" aria-live="polite"></p>
+      </div>
+
+      <div class="promise" id="kit-update">
+        <h3>저자가 매일 쓰는 시스템이라, 업데이트는 계속됩니다</h3>
+        <p>이 시스템은 저자 스스로 사용하기 위해 만들었고, 프로젝트가 계속 진행 중입니다. 지속적인 업데이트를 약속드립니다.</p>
+        <ul>
+          <li><b>외부 플러그인</b>사이트에서 소스를 가져오거나 프로그램 안에서 골라 가져오는 기능을 계속 늘립니다.</li>
+          <li><b>파이널컷 최신 버전</b>스탠드얼론 버전과 구독제(motionVFX 소스 활용) 모두 지원하고, 최신 업데이트를 가장 빠르게 적용합니다.</li>
+          <li><b>최적화 지원</b>새 버전과 변경 사항은 <a href="https://discord.gg/4UKVEK8kmb" target="_blank" rel="noopener">디스코드 채널</a>에 공유합니다.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 진행 방식 -->
+  <section id="how">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>신청은 카톡 한 번으로</h2>
+      </div>
+      <div class="how">
+        <div><h3>카톡으로 문의</h3><p>지금 수준과 만들고 싶은 영상, 가능한 요일을 알려주세요.</p></div>
+        <div><h3>과정 · 일정 상담</h3><p>레벨과 목적에 맞는 과정을 추천하고 첫 수업 일정을 잡습니다.</p></div>
+        <div><h3>수업 시작</h3><p>결제 방법은 상담 후 카톡으로 따로 안내드립니다. 사이트에서는 결제를 받지 않습니다.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 강사 -->
+  <section id="about">
+    <div class="wrap about">
+      <div class="who">
+        <h3>강성철<span>SungChul Kang</span></h3>
+        <p>파이널컷 프로 · AI 영상제작 강사</p>
+      </div>
+      <div>
+        <div class="edl-group">
+          <h4><i style="background:var(--clip-v1)"></i>경력</h4>
+          <ul class="edl">
+            <li><span class="tc">2026</span><span>나니아랩 A.I 영상제작 강사 <em>· AI 엔지니어 교육</em></span></li>
+            <li><span class="tc">2025</span><span>정립회관 파이널컷 프로 트레이닝 <em>· 50주년 기념 영상 제작 컨설팅</em></span></li>
+            <li><span class="tc">2020 –</span><span>유튜브 영상 편집 외주 · 구글 애드센스 광고 집행 대행</span></li>
+            <li><span class="tc">2020</span><span>Typed Biz 문서 협업툴 스타트업 <em>· UX · 마케팅 사용자 고문</em></span></li>
+            <li><span class="tc">2019 –</span><span>개인 · 그룹 온라인 교육 <em>· macOS, 파이널컷 프로, Notion, AI 툴 콘텐츠 제작</em></span></li>
+            <li><span class="tc">2018</span><span>바인프로덕션 직무교육 〈영상제작〉 <em>· Final Cut Pro X 트레이닝</em></span></li>
+          </ul>
+        </div>
+        <div class="edl-group">
+          <h4><i style="background:var(--clip-a1)"></i>프로젝트</h4>
+          <ul class="edl">
+            <li><span class="tc">2026</span><span>넥서스 AX 프로젝트 <em>· 130명이 참여한 로컬 AI 프로젝트</em></span></li>
+            <li><span class="tc">2020</span><span>뮤지컬 〈꽃보다 슈퍼스타〉 온라인 버전 제작 총괄</span></li>
+            <li><span class="tc">2019</span><span>파이널컷 다큐멘터리 〈Off The Tracks〉 한국어 번역</span></li>
+            <li><span class="tc">2019</span><span>부산미술협회 제7회 청년미술제 우수작가 초대전 <em>· 기술감독</em></span></li>
+            <li><span class="tc">2015</span><span>이스라엘 독립 건국 60주년 기념행사 인터뷰 영상 제작</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 문의 -->
+  <section id="contact" class="contact">
+    <div class="wrap">
+      <h2>어디서 막혔는지부터 말씀해 주세요.</h2>
+      <p class="lede">강의 문의와 신청은 카카오톡 1:1로만 받습니다. 수강생과 영상 만드는 사람들은 디스코드에서 함께 이야기합니다.</p>
+      <div class="actions">
+        <a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡 1:1 문의</a>
+        <a class="btn btn-ghost" href="https://discord.gg/4UKVEK8kmb" target="_blank" rel="noopener"><svg><use href="#i-users"/></svg>디스코드 커뮤니티</a>
+      </div>
+      <div class="policy">
+        <span><svg><use href="#i-card-off"/></svg>사이트 결제 없음 · 상담 후 안내</span>
+        <span><svg><use href="#i-cal"/></svg>일정은 주마다 조정 가능</span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 강성철</span>
+    <a href="https://sungchulblog.com/" target="_blank" rel="noopener">sungchulblog.com</a>
+  </div>
+</footer>
+
+<div class="dock" id="dock"><a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡 1:1 문의</a></div>
+
+<script>
+/* ▼ 카카오톡 1:1 오픈채팅 링크가 생기면 여기만 바꾸세요 (예: "https://open.kakao.com/o/xxxxxxx") */
+const KAKAO_URL = "https://open.kakao.com/o/s40bSEXi";
+
+document.querySelectorAll('.js-kakao').forEach(a=>{
+  if(KAKAO_URL){ a.href = KAKAO_URL; a.target = "_blank"; a.rel = "noopener"; }
+});
+
+/* 타임라인 플레이헤드: 처음 한 번 왼쪽에서 현재 위치까지 스윕 */
+(()=>{
+  const tl = document.getElementById('tl'), tc = document.getElementById('tcode');
+  const END = .58, TOTAL_FRAMES = 30 * 60 * 10; // 표시용 타임코드
+  const fmt = p => {
+    let f = Math.round(p * TOTAL_FRAMES), s = Math.floor(f/30), m = Math.floor(s/60);
+    const pad = n => String(n).padStart(2,'0');
+    return `01<i>:</i>${pad(m%60)}<i>:</i>${pad(s%60)}<i>:</i>${pad(f%30)}`;
+  };
+  const set = p => { tl.style.setProperty('--p', p); tc.innerHTML = fmt(p); };
+  set(END);
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const run = () => {
+    const t0 = performance.now(), D = 1800;
+    const step = now => {
+      const k = Math.min(1, (now - t0) / D), e = 1 - Math.pow(2, -10 * k);
+      set(END * (k === 1 ? 1 : e));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  const io = new IntersectionObserver(es => { if (es[0].isIntersecting){ io.disconnect(); run(); } }, {threshold:.5});
+  io.observe(tl);
+})();
+
+/* 무료·유료 믹스: 누르면 선택이 바뀌고 요약이 갱신된다 */
+(()=>{
+  const rows=[...document.querySelectorAll('.mix-row:not(.fixed)')], sum=document.querySelector('.mix-sum');
+  const upd=()=>{const paid=rows.filter(r=>r.dataset.pick==='paid').length, free=rows.length-paid+1;
+    sum.innerHTML=paid?`지금 구성: <b>무료 ${free}개 · 유료 ${paid}개</b>`:`지금 구성: <b>완전 무료</b>`;};
+  rows.forEach(r=>r.querySelectorAll('.opt').forEach(b=>{
+    b.setAttribute('aria-pressed','false');
+    b.addEventListener('click',()=>{r.dataset.pick=b.classList.contains('paid')?'paid':'free';
+      r.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',String(x===b))); upd();});
+    if((r.dataset.pick==='paid')===b.classList.contains('paid')) b.setAttribute('aria-pressed','true');
+  }));
+  upd();
+})();
+
+/* 모바일 하단 고정 문의 버튼: 히어로를 지나면 등장, 문의 섹션에서는 숨김 */
+(()=>{
+  const dock = document.getElementById('dock'), hero = document.querySelector('.hero'), contact = document.getElementById('contact');
+  let pastHero = false, atContact = false;
+  const upd = () => dock.classList.toggle('show', pastHero && !atContact);
+  new IntersectionObserver(([e]) => { pastHero = !e.isIntersecting; upd(); }).observe(hero);
+  new IntersectionObserver(([e]) => { atContact = e.isIntersecting; upd(); }).observe(contact);
+})();
+</script>
+</body>
+</html>
