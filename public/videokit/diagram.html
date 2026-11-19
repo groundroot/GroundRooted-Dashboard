@@ -8843,9 +8843,9 @@ svg [data-node-context^="빌드 코어"] > rect:not(.c-mask){stroke-width:2.5px!
 
       createFlows();
       html.setAttribute('data-motion-capable', 'true');
-      btn.hidden = false;
-      readerPaused = readStored() !== 'live';
-      btn.addEventListener('click', function () { setPaused(!readerPaused); });
+      // 강성철 페이지: 항상 동적으로 시작하고, 정적 전환 버튼은 쓰지 않는다.
+      btn.hidden = true;
+      readerPaused = false;
       if (motionQuery) {
         if (typeof motionQuery.addEventListener === 'function') motionQuery.addEventListener('change', render);
         else if (typeof motionQuery.addListener === 'function') motionQuery.addListener(render);
