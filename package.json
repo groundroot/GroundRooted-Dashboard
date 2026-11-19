@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit",
     "test:calculations": "node scripts/test-readymd-comparison.mjs && node scripts/test-book-scan.mjs",
     "test:storefront": "node scripts/test-storefront-routes.mjs",
+    "test:videokit": "node scripts/test-videokit-order.mjs",
     "preview:local": "node scripts/preview-local.mjs"
   },
   "dependencies": {
