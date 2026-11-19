@@ -22,6 +22,9 @@ export default function PublicHeader({ current }: { current?: string }) {
           {app.id === 'typecut-pro' && <ArrowUpRight size={14} aria-hidden="true" />}
         </a>
       ))}
+      <a href="/videokit" onClick={close}>
+        비디오 제작키트
+      </a>
       <a href="/#about" onClick={close}>
         만드는 이야기
       </a>

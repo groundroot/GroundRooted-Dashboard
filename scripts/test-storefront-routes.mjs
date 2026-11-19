@@ -28,7 +28,7 @@ await withServer({port:3035,password,preview:true}, async request => {
   for (const path of ['/', '/pdf-to-md', '/youtube-to-md']) {
     const r = await request(path); assert.equal(r.status,200,path); assert.match(r.headers.get('x-robots-tag'),/noindex/);
     const html=await r.text(); assert.ok(!html.includes('오늘 매출') && !html.includes('AI 에이전트 비용'), `HQ data in ${path}`);
-    if(path==='/') for(const href of ['/pdf-to-md','/youtube-to-md','https://groundroot.github.io/typecut-pro/']) assert.ok(html.includes(`href="${href}"`));
+    if(path==='/') for(const href of ['/pdf-to-md','/youtube-to-md','https://groundroot.github.io/typecut-pro/','/videokit']) assert.ok(html.includes(`href="${href}"`));
   }
   for (const path of ['/videokit', '/videokit/diagram.html']) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /text\/html/);

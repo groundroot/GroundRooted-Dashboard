@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight, BookOpen, FileText, Play, Plus, Scissors, Sprout } from 'lucide-react';
+import { ArrowRight, ArrowUpRight, BookOpen, Clapperboard, FileText, Play, Plus, Scissors, Sprout } from 'lucide-react';
 import StorefrontShell from '@/components/storefront/StorefrontShell';
 import AppMark from '@/components/storefront/AppMark';
 import ProductVisual from '@/components/storefront/ProductVisual';
@@ -46,6 +46,13 @@ export default function HomePage() {
           <a href={appCatalog[2].href} className="fx-pill fx-pill-typecut-pro">공식 사이트 보기 <ArrowUpRight size={18} aria-hidden="true" /></a>
         </div>
         <div className="fx-banner-art fx-banner-art-right" aria-hidden="true"><span /><span /><span /></div>
+      </article>
+      <article className="fx-typecut-banner fx-videokit-banner">
+        <div className="fx-banner-copy">
+          <h2><Clapperboard size={30} strokeWidth={1.8} aria-hidden="true" />비디오 제작키트</h2>
+          <p>영상편집 노가다, 이제 끝낼 때가 되었습니다.<br />파이널컷 1:1 강의와 클로드 비디오 제작키트.</p>
+          <a href="/videokit" className="fx-pill fx-pill-videokit">강의·제작키트 보기 <ArrowRight size={18} aria-hidden="true" /></a>
+        </div>
       </article>
     </section>
 

@@ -36,6 +36,10 @@
 .gr-public .fx-pill-typecut-pro { background: #6945bf; }
 #gr-storefront .fx-tile-status { margin-top: 14px; color: #4d6472; font-size: 11px; }
 #gr-storefront .fx-typecut-banner { position: relative; overflow: hidden; border-radius: 30px; background: #f6f2ff; margin-top: 28px; min-height: 222px; display: grid; place-items: center; padding: 36px 160px; }
+#gr-storefront .fx-videokit-banner { background: #16181d; color: #f4f1ea; min-height: 0; padding-block: 40px; }
+#gr-storefront .fx-videokit-banner h2 svg { color: #ff8a3d; }
+#gr-storefront .fx-videokit-banner p { word-break: keep-all; text-wrap: balance; }
+.gr-public .fx-pill-videokit { background: #ff8a3d; color: #16181d; }
 #gr-storefront .fx-banner-copy { position: relative; z-index: 1; text-align: center; }
 #gr-storefront .fx-banner-copy h2 { display: flex; align-items: center; justify-content: center; gap: 12px; font-size: 36px; font-weight: 720; }
 #gr-storefront .fx-banner-copy h2 em { color: #795eb6; font-style: normal; }
