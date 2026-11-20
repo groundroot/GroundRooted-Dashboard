@@ -30,6 +30,7 @@ export default function PublicFooter() {
             <a href="/#about">만드는 이야기</a>
             <a href="/#guide">제품 선택 가이드</a>
             <a href="/#faq">자주 묻는 질문</a>
+            <a href="mailto:sungchulkang@groundrooted.com">문의 · sungchulkang@groundrooted.com</a>
           </nav>
         </div>
         <div className="site-footer-bottom">

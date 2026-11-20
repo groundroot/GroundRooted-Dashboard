@@ -25,6 +25,10 @@ const faqs = [
     '세 앱을 함께 설치해야 하나요?',
     '아닙니다. 필요한 작업에 맞는 앱을 각각 선택하면 됩니다. 전자책을 읽는 뷰어, Markdown 편집기, Final Cut Pro 같은 주변 도구는 각 제품의 안내를 확인해 주세요.',
   ],
+  [
+    '문의는 어디로 하면 되나요?',
+    'GroundRooted 문의는 메일로만 받습니다. sungchulkang@groundrooted.com 으로 보내 주세요.',
+  ],
 ];
 export default function HomePage() {
   return <StorefrontShell>
