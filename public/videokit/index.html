@@ -353,6 +353,15 @@ footer .wrap{display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
 }
 .brand-for{font-weight:500;color:var(--mute,#9a9aa3);margin-left:.15em}
 @media (max-width:560px){.brand-for{display:none}}
+.reviews{list-style:none;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;border-top:1px solid var(--line)}
+.rv{padding:28px 28px 28px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:16px}
+.rv:nth-child(even){padding-left:28px;padding-right:0;border-left:1px solid var(--line)}
+.rv blockquote p{font-size:18px;line-height:1.7;color:var(--ink);letter-spacing:-.01em}
+.rv-lg blockquote p{font-size:clamp(26px,3vw,36px);line-height:1.25;font-weight:700;letter-spacing:-.03em}
+.rv blockquote p::before{content:"“";color:var(--head);margin-right:.1em}
+.rv blockquote p::after{content:"”";color:var(--head);margin-left:.05em}
+.rv .who{font-size:14px;color:var(--ink-3);font-family:var(--mono)}
+@media (max-width:760px){.reviews{grid-template-columns:1fr}.rv,.rv:nth-child(even){padding:24px 0;border-left:0}}
 .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}
 .facts>div{display:grid;grid-template-columns:7.5em 1fr;gap:16px;padding:22px 24px 22px 0;border-bottom:1px solid var(--line)}
 .facts>div:nth-child(even){padding-left:24px;border-left:1px solid var(--line)}
@@ -396,6 +405,7 @@ footer .wrap{align-items:flex-start}
     <nav class="nav" aria-label="섹션">
       <a href="#kit">키트 소개</a>
       <a href="#price">가격</a>
+      <a href="#reviews">후기</a>
       <a href="#faq">FAQ</a>
     </nav>
     <a class="btn btn-kakao btn-sm js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg><span>카톡 문의</span></a>
@@ -598,6 +608,21 @@ footer .wrap{align-items:flex-start}
           <li><b>최적화 지원</b>새 버전과 변경 사항은 <a href="https://discord.gg/4UKVEK8kmb" target="_blank" rel="noopener">디스코드 채널</a>에 공유합니다.</li>
         </ul>
       </div>
+    </div>
+  </section>
+
+  <!-- 후기 -->
+  <section id="reviews">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>강의와 키트를 써 본 분들의 이야기</h2>
+      </div>
+      <ul class="reviews">
+        <li class="rv rv-lg"><blockquote><p>신세계를 경험했습니다.</p></blockquote><span class="who">김*식</span></li>
+        <li class="rv"><blockquote><p>혼자서 토큰만 낭비했었네요. 매주 하던 업무를 이제 클로드에게 맡기게 되었습니다. 진심으로 저의 은인이십니다.</p></blockquote><span class="who">정*주</span></li>
+        <li class="rv"><blockquote><p>지속적으로 업데이트해 주시고 새로운 기능들이 추가되어서 너무 좋습니다. 바쁜 일상에 큰 도움을 받고 있습니다. 강의료와 키트 비용이 전혀 아깝지 않습니다.</p></blockquote><span class="who">이*현</span></li>
+        <li class="rv"><blockquote><p>직장에서 영상 제작을 갑자기 맡게 되면서 스트레스가 이만저만이 아니었는데, 강의를 듣고 이제 영상뿐 아니라 에이전트 사용법까지 배우면서 회사에서 AI를 가장 잘 쓰는 인재가 되었습니다.</p></blockquote><span class="who">민*석</span></li>
+      </ul>
     </div>
   </section>
 
