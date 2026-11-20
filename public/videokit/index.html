@@ -395,13 +395,13 @@ section.band{border-top:1px solid var(--line-soft)}
 .sg-claude,.ed{transform:translate3d(calc(var(--px)*var(--d)*.3px),calc(var(--py)*var(--d)*.3px),calc(var(--d)*1px));transition:transform .5s var(--ease)}
 .sg-claude .sg-in{display:flex;flex-direction:column;align-items:center;gap:12px}
 .claude-tile{width:112px;height:112px;border-radius:28px;display:grid;place-items:center;
-  background:#f3efe6;box-shadow:0 22px 40px -16px rgba(217,119,87,.55),0 2px 0 rgba(255,255,255,.6) inset}
+  background:#f3efe6;box-shadow:0 22px 40px -18px rgba(0,0,0,.7),0 2px 0 rgba(255,255,255,.6) inset}
 .claude-tile img{width:70px;height:70px}
 .sg-cap{font-size:15px;font-weight:650;color:var(--ink);letter-spacing:-.01em}
 .sg-rail{position:relative;height:1px;margin:22px 6% 0;background:linear-gradient(90deg,transparent,var(--line) 12%,var(--line) 88%,transparent)}
 .sg-rail::before{content:"";position:absolute;left:50%;bottom:0;width:1px;height:22px;background:var(--line)}
 .sg-rail i{position:absolute;top:-3px;left:0;width:7px;height:7px;border-radius:50%;background:var(--head);
-  box-shadow:0 0 0 4px color-mix(in srgb,var(--head) 22%,transparent);animation:railRun 3.2s var(--ease) infinite;animation-play-state:paused}
+  animation:railRun 3.2s var(--ease) infinite;animation-play-state:paused}
 .stage.live .sg-rail i{animation-play-state:running}
 @keyframes railRun{0%{left:0;opacity:0}12%{opacity:1}88%{opacity:1}100%{left:calc(100% - 7px);opacity:0}}
 .sg-cap2{text-align:center;margin-top:16px;color:var(--ink-2);font-weight:600}
