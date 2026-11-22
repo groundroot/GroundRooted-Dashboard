@@ -425,6 +425,43 @@ section.band{border-top:1px solid var(--line-soft)}
 }
 @media not ((hover:hover) and (pointer:fine)){.fc .claude-tile,.fc .ed-ico{transform:none}}
 
+/* ---------- 마켓 오픈 기념 할인 ---------- */
+.promo-end .p-on{display:none!important}
+html:not(.promo-end) .p-off{display:none!important}
+.btn-mail{background:var(--ink);color:#141417;box-shadow:0 6px 16px -6px rgba(0,0,0,.6)}
+.btn-mail:hover{transform:translateY(-2px);background:#fff}
+.band-launch{background:#17140f;border-top:1px solid #2c261d;border-bottom:1px solid #2c261d}
+.launch-head{text-align:center}
+.launch-tag{font-size:13px;letter-spacing:.14em;color:var(--head);margin-bottom:12px}
+.launch-head h2{font-size:clamp(32px,4.8vw,56px);line-height:1.15;letter-spacing:-.035em;font-weight:780}
+.launch-head p{margin-top:12px;color:var(--ink-2);font-size:clamp(17px,1.8vw,20px)}
+.cd{display:flex;justify-content:center;gap:clamp(8px,2vw,20px);margin:clamp(32px,4vw,48px) auto 0}
+.cd-u{display:grid;justify-items:center;gap:6px;min-width:clamp(72px,14vw,168px);padding:clamp(16px,2.4vw,26px) clamp(8px,1.6vw,16px);
+  border:1px solid #33291c;border-radius:18px;background:#1d1912}
+.cd-u b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500;font-size:clamp(44px,9vw,108px);line-height:1;letter-spacing:-.04em;color:var(--ink)}
+.cd-u span{font-size:clamp(13px,1.4vw,16px);font-weight:600;color:var(--ink-3)}
+.cd-u:first-child b{color:var(--head)}
+.launch-plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:880px;margin:clamp(32px,4vw,48px) auto 0}
+.lp{display:grid;gap:6px;padding:26px 28px;border:1px solid var(--line);border-radius:18px;background:var(--panel)}
+.lp-lec{border-color:color-mix(in srgb,var(--clip-v2) 40%,var(--line))}
+.lp h3{font-size:21px;font-weight:700;letter-spacing:-.015em}
+.lp-meta{color:var(--ink-3);font-size:15px}
+.lp-price{display:flex;align-items:baseline;gap:12px;margin-top:8px}
+.lp-price s{color:var(--ink-3);font-size:18px}
+.lp-price strong{font-size:clamp(40px,4.6vw,54px);font-weight:780;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
+.lp-price strong small{font-size:20px;font-weight:650;margin-left:2px}
+.lp-off{justify-self:start;font-size:13px;font-weight:650;color:var(--head);padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--head) 14%,transparent)}
+.claude-req{display:flex;gap:12px;align-items:flex-start;max-width:880px;margin:16px auto 0;padding:18px 22px;border-radius:14px;
+  border:1px solid color-mix(in srgb,var(--head) 45%,var(--line));background:color-mix(in srgb,var(--head) 8%,var(--panel));color:var(--ink-2);font-size:16px;line-height:1.6}
+.claude-req svg{width:22px;height:22px;flex:none;margin-top:2px;color:var(--head)}
+.claude-req b{color:var(--ink)}
+.band-launch .actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:32px}
+.band-launch .note{text-align:center;max-width:880px;margin:16px auto 0}
+.price s{display:block;color:var(--ink-3);font-size:15px;font-weight:500}
+.dock .dock-ico{flex:none;width:52px;padding:0;justify-content:center}
+@media (max-width:640px){.launch-plans{grid-template-columns:1fr}.lp{padding:22px}}
+@media (max-width:420px){.cd{gap:6px}.cd-u{min-width:0;flex:1;padding:14px 4px;border-radius:14px}.cd-u b{font-size:38px}}
+
 /* ---------- 등장 애니메이션 (스크립트가 켜질 때만 숨김) ---------- */
 .rvl{transition:opacity .7s var(--ease),transform .9s var(--ease),filter .7s var(--ease);transition-delay:calc(var(--i,0)*70ms)}
 .rv-on:not(.rv-done) .rvl:not(.in){opacity:0;transform:translateY(22px);filter:blur(6px)}
@@ -487,6 +524,7 @@ footer .wrap{align-items:flex-start}
 .maker h2{margin:0 0 8px}
 .maker p{margin:0;max-width:60ch}
 </style>
+<script>(function(){if(Date.now()>=Date.parse('2026-11-29T00:00:00+09:00'))document.documentElement.classList.add('promo-end')})();</script>
 <script>(function(){var d=document.documentElement;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('rv-on');setTimeout(function(){if(!window.__rv)d.classList.add('rv-done')},2500)})();</script>
 </head>
 <body>
@@ -495,6 +533,7 @@ footer .wrap{align-items:flex-start}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="i-chat" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3.5c-5.25 0-9.5 3.3-9.5 7.38 0 2.62 1.75 4.92 4.4 6.23l-.95 3.46c-.08.3.26.54.52.37l4.13-2.73c.46.05.93.08 1.4.08 5.25 0 9.5-3.3 9.5-7.4S17.25 3.5 12 3.5Z"/></symbol>
   <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="4.5" width="19" height="15" rx="2"/><path d="m3 6 9 7 9-7"/></symbol>
   <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
   <symbol id="i-life" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="4"/><path d="m4.93 4.93 4.24 4.24M14.83 14.83l4.24 4.24M14.83 9.17l4.24-4.24M4.93 19.07l4.24-4.24"/></symbol>
   <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17 17 7M7 7h10v10"/></symbol>
@@ -507,6 +546,7 @@ footer .wrap{align-items:flex-start}
     <a class="brand" href="#top"><i class="rec" aria-hidden="true"></i>클로드 비디오 키트 <span class="brand-for">for 파이널컷프로</span></a>
     <nav class="nav" aria-label="섹션">
       <a href="#kit">키트 소개</a>
+      <a class="p-on" href="#launch">오픈 할인</a>
       <a href="#price">가격</a>
       <a href="#reviews">후기</a>
       <a href="#faq">FAQ</a>
@@ -523,11 +563,16 @@ footer .wrap{align-items:flex-start}
         <b>클로드 비디오 키트 for 파이널컷프로</b>는 영상 제작을 클로드에게 맡기고, 검수만 파이널컷에서 하도록 만든 키트입니다.
         영상 편집 20년 차의 노하우를 담아, 반복 작업은 <b>맥에서 직접</b> 돌리고 <b>클로드 토큰 사용량</b>은 줄였습니다.
       </p>
-      <div class="actions">
+      <div class="actions p-on">
+        <a class="btn btn-mail" href="#launch"><svg><use href="#i-mail"/></svg>오픈 할인 신청하기</a>
+        <a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡 문의</a>
+      </div>
+      <p class="note p-on">마켓 오픈 기념 할인 중 · 11월 28일(토) 밤 24:00까지 이메일로 신청하신 분께 적용됩니다.</p>
+      <div class="actions p-off">
         <a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡 1:1 문의</a>
         <a class="btn btn-ghost" href="#kit">키트 살펴보기</a>
       </div>
-      <p class="note">구매 신청은 카카오톡 1:1로 받고 있습니다. 결제 방법은 상담 후 안내드립니다.</p>
+      <p class="note p-off">구매 신청은 카카오톡 1:1로 받고 있습니다. 결제 방법은 상담 후 안내드립니다.</p>
 
       <div class="tl" aria-label="키트 작업 흐름">
         <div class="tl-head">
@@ -557,6 +602,43 @@ footer .wrap{align-items:flex-start}
   </div>
 
   <!-- 클로드 비디오 키트 -->
+  <!-- 마켓 오픈 기념 할인 (2026-11-28 24:00 KST 마감, 이후 자동으로 숨김) -->
+  <section id="launch" class="band band-launch p-on" aria-labelledby="launch-h">
+    <div class="wrap">
+      <div class="launch-head">
+        <p class="launch-tag tc">MARKET OPEN SALE</p>
+        <h2 id="launch-h">마켓 오픈 기념 할인</h2>
+        <p>11월 28일(토) 밤 24:00까지 신청하신 분께만 드립니다.</p>
+      </div>
+      <div class="cd" role="timer" aria-label="할인 마감까지 남은 시간" data-deadline="2026-11-29T00:00:00+09:00">
+        <div class="cd-u"><b data-u="d">-</b><span>일</span></div>
+        <div class="cd-u"><b data-u="h">--</b><span>시간</span></div>
+        <div class="cd-u"><b data-u="m">--</b><span>분</span></div>
+        <div class="cd-u"><b data-u="s">--</b><span>초</span></div>
+      </div>
+      <div class="launch-plans">
+        <div class="lp">
+          <h3>키트</h3>
+          <p class="lp-meta">키트 파일 + 클로드 기반 사용 설명 eBook(PDF)</p>
+          <p class="lp-price"><s>30만원</s><strong>10<small>만원</small></strong></p>
+          <span class="lp-off">20만원 할인 · 기간 한정</span>
+        </div>
+        <div class="lp lp-lec">
+          <h3>키트 + 2회 강의</h3>
+          <p class="lp-meta">1:1 강의 2회 · 총 2시간 · 일정은 개별 조율</p>
+          <p class="lp-price"><s>50만원</s><strong>30<small>만원</small></strong></p>
+          <span class="lp-off">20만원 할인 · 기간 한정</span>
+        </div>
+      </div>
+      <p class="claude-req"><svg><use href="#i-card-off"/></svg><span><b>클로드 구독은 포함되어 있지 않습니다.</b> 이 키트는 <b>Claude Pro 이상 요금제</b>를 개인이 직접 구독해서 사용하는 키트입니다.</span></p>
+      <div class="actions">
+        <a class="btn btn-mail" href="mailto:sungchulkang@groundrooted.com?subject=%5B%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%20%EC%8B%A0%EC%B2%AD%5D%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8&amp;body=%EC%95%88%EB%85%95%ED%95%98%EC%84%B8%EC%9A%94.%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8%20%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%EC%9D%84%20%EC%8B%A0%EC%B2%AD%ED%95%A9%EB%8B%88%EB%8B%A4.%0A%0A1.%20%EC%9D%B4%EB%A6%84%3A%0A2.%20%EC%97%B0%EB%9D%BD%EC%B2%98%3A%0A3.%20%EC%8B%A0%EC%B2%AD%20%EA%B5%AC%EC%84%B1%20%28%ED%95%98%EB%82%98%EB%A7%8C%20%EB%82%A8%EA%B2%A8%20%EC%A3%BC%EC%84%B8%EC%9A%94%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2810%EB%A7%8C%EC%9B%90%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2B%202%ED%9A%8C%20%EA%B0%95%EC%9D%98%2C%20%EC%B4%9D%202%EC%8B%9C%EA%B0%84%20%2830%EB%A7%8C%EC%9B%90%29%0A4.%20%EC%82%AC%EC%9A%A9%ED%95%98%EB%8A%94%20%EB%A7%A5%EA%B3%BC%20%ED%8E%B8%EC%A7%91%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8%3A%0A5.%20Claude%20Pro%20%EC%9D%B4%EC%83%81%20%EC%9A%94%EA%B8%88%EC%A0%9C%20%EA%B5%AC%EB%8F%85%20%EC%97%AC%EB%B6%80%3A%0A"><svg><use href="#i-mail"/></svg>이메일로 신청하기</a>
+        <a class="btn btn-ghost" href="#how">진행 방식 보기</a>
+      </div>
+      <p class="note">신청 메일 sungchulkang@groundrooted.com · 신청 순서대로 결제와 키트 발송을 안내드립니다. 궁금한 점은 카카오톡으로 문의해 주세요.</p>
+    </div>
+  </section>
+
   <section id="kit" class="band band-kit">
     <div class="wrap">
       <div class="sec-head">
@@ -638,7 +720,19 @@ footer .wrap{align-items:flex-start}
   <section class="band band-price">
     <div class="wrap">
       <div class="course" id="price">
-        <div class="plans">
+        <div class="plans p-on">
+          <div class="plan featured">
+            <h3>키트 + 2회 강의</h3>
+            <p class="meta">1:1 강의 2회 · 총 2시간 · 키트 세팅부터 직접 제작까지 · 1년 후속지원</p>
+            <div class="price"><s>50만원</s><strong>30<small>만원</small></strong><span>오픈 기념가</span></div>
+          </div>
+          <div class="plan">
+            <h3>키트만 제공</h3>
+            <p class="meta">키트 파일 + 클로드 기반 사용 설명 eBook(PDF) · 1년 후속지원</p>
+            <div class="price"><s>30만원</s><strong>10<small>만원</small></strong><span>오픈 기념가</span></div>
+          </div>
+        </div>
+        <div class="plans p-off">
           <div class="plan featured">
             <h3>키트 + 3회 강의</h3>
             <p class="meta">3주 과정 · 키트 세팅부터 직접 제작까지 · 1년 후속지원</p>
@@ -653,12 +747,20 @@ footer .wrap{align-items:flex-start}
 
         <div>
           <div class="detail">
-            <h4>3주 커리큘럼</h4>
+            <h4><span class="p-on">강의 커리큘럼 (2회 · 총 2시간)</span><span class="p-off">3주 커리큘럼</span></h4>
             <ol class="steps">
               <li><b>클로드 기초</b>클로드와 클로드 코드를 처음 쓰는 분도 따라올 수 있게 시작합니다.</li>
               <li><b>클로드 × 파이널컷 키트 제공 및 세팅</b>내 컴퓨터에 키트를 설치하고 파이널컷과 연결합니다.</li>
               <li><b>클로드 코드로 영상 제작 직접 해보기</b>내 소스로 자동 편집을 직접 돌려봅니다.</li>
             </ol>
+          </div>
+          <div class="detail p-on">
+            <h4>강의 안내</h4>
+            <ul class="list">
+              <li><svg><use href="#i-cal"/></svg><span>강의 시간은 <b>개별로 소통하여</b> 일정을 잡습니다.</span></li>
+              <li><svg><use href="#i-check"/></svg><span>강의 포함 구성은 <b>1일차 일정이 정해지면</b> 그때 결제를 진행합니다.</span></li>
+              <li><svg><use href="#i-check"/></svg><span>강의는 일정에 따라 <b>조기 마감</b>될 수 있습니다.</span></li>
+            </ul>
           </div>
           <div class="detail">
             <h4>유튜브 학습 데이터</h4>
@@ -767,11 +869,11 @@ footer .wrap{align-items:flex-start}
       </div>
       <dl class="facts">
         <div><dt>상품명</dt><dd>클로드 비디오 키트 for 파이널컷프로</dd></div>
-        <div><dt>가격</dt><dd><b>키트만 제공 30만원</b> · <b>키트 + 3회 강의 50만원</b></dd></div>
-        <div><dt>제공 내용</dt><dd>키트 파일(빌드 코어 9단계, 플러그인 스킬 18개), 바이럴 비디오 공식을 위한 유튜브 학습 데이터, 설치 · 세팅 안내, 1년 후속지원. 강의 포함 과정은 3주 동안 1:1 강의 3회가 더해집니다.</dd></div>
-        <div><dt>지원 환경</dt><dd>맥(macOS) 전용. 검수는 파이널컷 프로 또는 캡컷에서 합니다(프리미어 프로 · 다빈치 리졸브 지원 예정). 클로드 코드를 쓸 수 있는 Claude 요금제가 별도로 필요합니다.</dd></div>
-        <div><dt>제공 방법</dt><dd>결제가 확인되면 키트 파일과 설치 안내를 카카오톡으로 보내드립니다. 강의 포함 과정은 상담으로 첫 수업 일정을 정합니다.</dd></div>
-        <div><dt>결제</dt><dd>구매 신청은 카카오톡 1:1로 받습니다. 상담 후 결제 링크를 보내드리며, 신용 · 체크카드와 간편결제로 결제할 수 있습니다.</dd></div>
+        <div><dt>가격</dt><dd><span class="p-on"><b>키트 10만원</b>(정가 30만원) · <b>키트 + 2회 강의(총 2시간) 30만원</b>(정가 50만원). 마켓 오픈 기념 할인으로, 11월 28일(토) 밤 24:00까지 신청하신 분께만 적용됩니다.</span><span class="p-off"><b>키트만 제공 30만원</b> · <b>키트 + 3회 강의 50만원</b></span></dd></div>
+        <div><dt>제공 내용</dt><dd>키트 파일(빌드 코어 9단계, 플러그인 스킬 18개), 바이럴 비디오 공식을 위한 유튜브 학습 데이터, <span class="p-on">클로드 기반 사용 설명 eBook(PDF), </span><span class="p-off">설치 · 세팅 안내, </span>1년 후속지원. <span class="p-on">강의 포함 구성은 1:1 강의 2회(총 2시간)가 더해집니다.</span><span class="p-off">강의 포함 과정은 3주 동안 1:1 강의 3회가 더해집니다.</span></dd></div>
+        <div><dt>지원 환경</dt><dd>맥(macOS) 전용. 검수는 파이널컷 프로 또는 캡컷에서 합니다(프리미어 프로 · 다빈치 리졸브 지원 예정). <b>클로드 구독은 포함되어 있지 않습니다.</b> Claude Pro 이상 요금제를 개인이 직접 구독해야 사용할 수 있습니다.</dd></div>
+        <div><dt>제공 방법</dt><dd><span class="p-on">신청 순서대로 안내드리며, 결제가 완료되면 키트 파일과 사용 설명 eBook(PDF)을 이메일로 보내드립니다. 강의 시간은 개별로 소통하여 일정을 잡고, 일정에 따라 조기 마감될 수 있습니다.</span><span class="p-off">결제가 확인되면 키트 파일과 설치 안내를 카카오톡으로 보내드립니다. 강의 포함 과정은 상담으로 첫 수업 일정을 정합니다.</span></dd></div>
+        <div><dt>결제</dt><dd><span class="p-on">신청은 이메일(sungchulkang@groundrooted.com)로 받습니다. 결제는 결제창이 열리면 그때 진행하며, 강의 포함 구성은 1일차 일정이 정해지면 결제합니다. 신용 · 체크카드와 간편결제로 결제할 수 있습니다.</span><span class="p-off">구매 신청은 카카오톡 1:1로 받습니다. 상담 후 결제 링크를 보내드리며, 신용 · 체크카드와 간편결제로 결제할 수 있습니다.</span></dd></div>
         <div id="refund"><dt>환불</dt><dd>키트 파일을 받기 전에는 전액 환불됩니다. 파일을 받은 뒤에는 디지털 콘텐츠 특성상 청약철회가 제한됩니다. 강의 포함 과정은 진행하지 않은 강의 회차만큼 환불합니다.</dd></div>
         <div><dt>업데이트</dt><dd>새 버전과 변경 사항은 디스코드 채널에 공유합니다.</dd></div>
       </dl>
@@ -783,10 +885,12 @@ footer .wrap{align-items:flex-start}
     <div class="wrap faq">
       <div class="sec-head"><h2>자주 묻는 질문</h2></div>
       <div class="faq-list">
+        <details class="p-on"><summary>오픈 할인은 언제까지인가요?</summary><p>11월 28일(토) 밤 24:00까지 이메일로 신청하신 분께만 적용됩니다. 결제는 결제창이 열린 뒤 신청 순서대로 안내드립니다.</p></details>
+        <details class="p-on"><summary>강의 일정은 어떻게 정하나요?</summary><p>강의 시간은 개별로 소통하여 정합니다. 1일차 일정이 정해지면 그때 결제를 진행하며, 강의는 일정에 따라 조기 마감될 수 있습니다.</p></details>
         <details><summary>윈도우에서도 쓸 수 있나요?</summary><p>아니요. 반복 작업을 맥에서 직접 처리하도록 만든 키트라 맥(macOS)에서만 동작합니다.</p></details>
-        <details><summary>클로드 요금은 따로 내야 하나요?</summary><p>네. 키트는 클로드 코드 위에서 동작하므로 Claude 요금제는 별도입니다. 대신 장면 분석과 타임라인 작성처럼 토큰이 많이 드는 일을 맥에서 처리하도록 만들어 사용량을 줄였습니다.</p></details>
+        <details><summary>클로드 요금은 따로 내야 하나요?</summary><p>네. 키트에는 클로드 구독이 포함되어 있지 않습니다. <b>Claude Pro 이상 요금제</b>를 개인이 직접 구독해야 사용할 수 있습니다. 대신 장면 분석과 타임라인 작성처럼 토큰이 많이 드는 일을 맥에서 처리하도록 만들어 사용량을 줄였습니다.</p></details>
         <details><summary>파이널컷 프로가 없어도 되나요?</summary><p>캡컷으로도 검수할 수 있습니다. 프리미어 프로와 다빈치 리졸브는 지원할 예정입니다.</p></details>
-        <details><summary>클로드를 한 번도 안 써 봤어요.</summary><p>키트 + 3회 강의 과정은 클로드와 클로드 코드 기초부터 시작해, 키트 세팅과 직접 제작까지 함께 진행합니다.</p></details>
+        <details><summary>클로드를 한 번도 안 써 봤어요.</summary><p><span class="p-on">키트에는 기본 제작 개념을 쉽게 풀어 쓴 클로드 기반 사용 설명 eBook(PDF)이 함께 갑니다. 직접 배우고 싶다면 키트 + 2회 강의 구성에서 클로드 기초부터 키트 세팅, 직접 제작까지 함께 진행합니다.</span><span class="p-off">키트 + 3회 강의 과정은 클로드와 클로드 코드 기초부터 시작해, 키트 세팅과 직접 제작까지 함께 진행합니다.</span></p></details>
         <details><summary>유료 구독 서비스가 꼭 있어야 하나요?</summary><p>아니요. 폰트, 음악, 효과음, 모션그래픽 등 항목마다 무료와 유료를 골라 쓸 수 있습니다. 이미 쓰는 구독이 있다면 그대로 연결하면 됩니다.</p></details>
         <details><summary>업데이트는 어떻게 받나요?</summary><p>새 버전과 변경 사항을 디스코드 채널에 공유합니다.</p></details>
       </div>
@@ -796,6 +900,17 @@ footer .wrap{align-items:flex-start}
   <!-- 진행 방식 -->
   <section id="how" class="band band-raised">
     <div class="wrap">
+      <div class="p-on">
+        <div class="sec-head">
+          <h2>신청은 이메일로</h2>
+        </div>
+        <div class="how">
+          <div><h3>1. 이메일로 신청</h3><p>원하는 구성과 쓰고 있는 맥 · 편집 프로그램을 적어 <a href="mailto:sungchulkang@groundrooted.com?subject=%5B%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%20%EC%8B%A0%EC%B2%AD%5D%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8&amp;body=%EC%95%88%EB%85%95%ED%95%98%EC%84%B8%EC%9A%94.%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8%20%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%EC%9D%84%20%EC%8B%A0%EC%B2%AD%ED%95%A9%EB%8B%88%EB%8B%A4.%0A%0A1.%20%EC%9D%B4%EB%A6%84%3A%0A2.%20%EC%97%B0%EB%9D%BD%EC%B2%98%3A%0A3.%20%EC%8B%A0%EC%B2%AD%20%EA%B5%AC%EC%84%B1%20%28%ED%95%98%EB%82%98%EB%A7%8C%20%EB%82%A8%EA%B2%A8%20%EC%A3%BC%EC%84%B8%EC%9A%94%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2810%EB%A7%8C%EC%9B%90%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2B%202%ED%9A%8C%20%EA%B0%95%EC%9D%98%2C%20%EC%B4%9D%202%EC%8B%9C%EA%B0%84%20%2830%EB%A7%8C%EC%9B%90%29%0A4.%20%EC%82%AC%EC%9A%A9%ED%95%98%EB%8A%94%20%EB%A7%A5%EA%B3%BC%20%ED%8E%B8%EC%A7%91%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8%3A%0A5.%20Claude%20Pro%20%EC%9D%B4%EC%83%81%20%EC%9A%94%EA%B8%88%EC%A0%9C%20%EA%B5%AC%EB%8F%85%20%EC%97%AC%EB%B6%80%3A%0A">sungchulkang@groundrooted.com</a>으로 보내 주세요.</p></div>
+          <div><h3>2. 순서대로 결제 안내</h3><p>결제창이 열리면 신청 순서대로 결제를 안내드립니다. 강의 포함 구성은 1일차 일정이 정해지면 결제합니다.</p></div>
+          <div><h3>3. 이메일로 키트 발송</h3><p>결제가 완료되면 키트 파일과 클로드 기반 사용 설명 eBook(PDF)을 이메일로 보내드립니다.</p></div>
+        </div>
+      </div>
+      <div class="p-off">
       <div class="sec-head">
         <h2>구매는 카톡 한 번으로</h2>
       </div>
@@ -804,12 +919,28 @@ footer .wrap{align-items:flex-start}
         <div><h3>구성 선택</h3><p>키트만 받을지, 3회 강의와 함께 세팅까지 할지 정합니다.</p></div>
         <div><h3>키트 전달</h3><p>결제 방법은 상담 후 카톡으로 안내드립니다. 결제가 확인되면 키트를 보내드립니다.</p></div>
       </div>
+      </div>
     </div>
   </section>
 
   <!-- 문의 -->
   <section id="contact" class="contact">
     <div class="wrap">
+      <div class="p-on">
+      <h2>오픈 할인 신청은 이메일로,<br>궁금한 점은 카카오톡으로 받습니다.</h2>
+      <p class="lede">11월 28일(토) 밤 24:00까지 이메일로 신청해 주세요. 결제가 완료되면 키트와 사용 설명 eBook(PDF)을 이메일로 보내드립니다.</p>
+      <div class="actions">
+        <a class="btn btn-mail" href="mailto:sungchulkang@groundrooted.com?subject=%5B%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%20%EC%8B%A0%EC%B2%AD%5D%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8&amp;body=%EC%95%88%EB%85%95%ED%95%98%EC%84%B8%EC%9A%94.%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8%20%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%EC%9D%84%20%EC%8B%A0%EC%B2%AD%ED%95%A9%EB%8B%88%EB%8B%A4.%0A%0A1.%20%EC%9D%B4%EB%A6%84%3A%0A2.%20%EC%97%B0%EB%9D%BD%EC%B2%98%3A%0A3.%20%EC%8B%A0%EC%B2%AD%20%EA%B5%AC%EC%84%B1%20%28%ED%95%98%EB%82%98%EB%A7%8C%20%EB%82%A8%EA%B2%A8%20%EC%A3%BC%EC%84%B8%EC%9A%94%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2810%EB%A7%8C%EC%9B%90%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2B%202%ED%9A%8C%20%EA%B0%95%EC%9D%98%2C%20%EC%B4%9D%202%EC%8B%9C%EA%B0%84%20%2830%EB%A7%8C%EC%9B%90%29%0A4.%20%EC%82%AC%EC%9A%A9%ED%95%98%EB%8A%94%20%EB%A7%A5%EA%B3%BC%20%ED%8E%B8%EC%A7%91%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8%3A%0A5.%20Claude%20Pro%20%EC%9D%B4%EC%83%81%20%EC%9A%94%EA%B8%88%EC%A0%9C%20%EA%B5%AC%EB%8F%85%20%EC%97%AC%EB%B6%80%3A%0A"><svg><use href="#i-mail"/></svg>이메일로 신청하기</a>
+        <a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡으로 문의하기</a>
+        <a class="btn btn-ghost" href="https://discord.gg/4UKVEK8kmb" target="_blank" rel="noopener"><svg><use href="#i-users"/></svg>디스코드 커뮤니티</a>
+      </div>
+      <div class="policy">
+        <span><svg><use href="#i-mail"/></svg>신청 · sungchulkang@groundrooted.com</span>
+        <span><svg><use href="#i-chat"/></svg>문의 · 카톡 1:1</span>
+        <span><svg><use href="#i-users"/></svg>업데이트는 디스코드에서 공유</span>
+      </div>
+      </div>
+      <div class="p-off">
       <h2>강의 신청과 키트 구입 문의는<br>카카오톡으로 받습니다.</h2>
       <p class="lede">아래 문의 버튼을 누르면 카카오톡 1:1 대화로 바로 연결됩니다. 키트 업데이트와 사용 팁은 디스코드에서 함께 나눕니다.</p>
       <div class="actions">
@@ -819,6 +950,7 @@ footer .wrap{align-items:flex-start}
       <div class="policy">
         <span><svg><use href="#i-chat"/></svg>강의 신청 · 키트 구입 문의 · 카톡 1:1</span>
         <span><svg><use href="#i-users"/></svg>업데이트는 디스코드에서 공유</span>
+      </div>
       </div>
     </div>
   </section>
@@ -842,7 +974,7 @@ footer .wrap{align-items:flex-start}
   </div>
 </footer>
 
-<div class="dock" id="dock"><a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡 1:1 문의</a></div>
+<div class="dock" id="dock"><a class="btn btn-mail p-on" href="#launch"><svg><use href="#i-mail"/></svg>오픈 할인 신청</a><a class="btn btn-kakao js-kakao dock-ico p-on" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener" aria-label="카카오톡 문의"><svg><use href="#i-chat"/></svg></a><a class="btn btn-kakao js-kakao p-off" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡 1:1 문의</a></div>
 
 <script>
 /*! vanilla-tilt.js 1.8.1 | MIT License | (c) 2017 Șandor Sergiu | https://github.com/micku7zu/vanilla-tilt.js */
@@ -912,7 +1044,7 @@ document.querySelectorAll('.js-kakao').forEach(a=>{
   if (!document.documentElement.classList.contains('rv-on')) return;
   const mark = (el, cls, i) => { el.classList.add(cls); if (i != null) el.style.setProperty('--i', Math.min(i, 6)); };
   document.querySelectorAll('section .sec-head h2, .mix-head h3, .system-head h3').forEach(el => mark(el, 'rv-h'));
-  document.querySelectorAll('.sec-head p, .for h3, .flow-lead, .flow-step, .flow-claude, .flow-rail, .flow-direct, .why blockquote, .why-body, .tok h3, .tok-note, .system-head p, .system-head .btn, .mix-head p, .mix-grid, .mix-sum, .detail h4, .contact h2, .contact .lede, .contact .actions, .policy').forEach(el => mark(el, 'rvl'));
+  document.querySelectorAll('.sec-head p, .launch-head, .cd, .launch-plans, .claude-req, .band-launch .actions, .for h3, .flow-lead, .flow-step, .flow-claude, .flow-rail, .flow-direct, .why blockquote, .why-body, .tok h3, .tok-note, .system-head p, .system-head .btn, .mix-head p, .mix-grid, .mix-sum, .detail h4, .contact h2, .contact .lede, .contact .actions, .policy').forEach(el => mark(el, 'rvl'));
   document.querySelectorAll('.system-frame').forEach(el => mark(el, 'rv-clip'));
   ['.for > ul', '.eds', '.caps', '.reviews', '.facts', '.faq-list', '.how', '.steps', '.detail .list', '.promise ul', '.plans'].forEach(sel =>
     document.querySelectorAll(sel).forEach(list => [...list.children].forEach((c, i) => mark(c, 'rvl', i))));
@@ -932,6 +1064,24 @@ document.querySelectorAll('.js-kakao').forEach(a=>{
     if (e.target.classList.contains('tok-row')) count(e.target);
   }), { threshold: 0, rootMargin: '0px 0px -10% 0px' });
   document.querySelectorAll('.rvl, .rv-h, .rv-clip').forEach(el => io.observe(el));
+})();
+
+/* 오픈 할인 카운트다운: 마감되면 정가 화면으로 바뀐다 */
+(()=>{
+  const cd = document.querySelector('.cd'); if (!cd) return;
+  const end = Date.parse(cd.dataset.deadline);
+  const el = u => cd.querySelector('[data-u="' + u + '"]');
+  const pad = n => String(n).padStart(2, '0');
+  const tick = () => {
+    const left = end - Date.now();
+    if (left <= 0) { document.documentElement.classList.add('promo-end'); clearInterval(t); return; }
+    const sec = Math.floor(left / 1000);
+    el('d').textContent = Math.floor(sec / 86400);
+    el('h').textContent = pad(Math.floor(sec % 86400 / 3600));
+    el('m').textContent = pad(Math.floor(sec % 3600 / 60));
+    el('s').textContent = pad(sec % 60);
+  };
+  const t = setInterval(tick, 1000); tick();
 })();
 
 /* 제작 흐름 카드: 마우스를 올린 카드만 3D로 기운다 (vanilla-tilt) */
