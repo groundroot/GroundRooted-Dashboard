@@ -3,6 +3,8 @@ import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
 import { authToken } from '../lib/auth.ts';
 import { editorialPublicPaths, paperMotionPath } from '../products/editorial-media.ts';
+import { priceOf, tierAt } from '../products/videokit.ts';
+const won = n => `${new Intl.NumberFormat('ko-KR').format(n)}원`;
 
 async function withServer({ port, password, preview }, run) {
   const server = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', String(port)], {
@@ -30,7 +32,7 @@ await withServer({port:3035,password,preview:true}, async request => {
     const html=await r.text(); assert.ok(!html.includes('오늘 매출') && !html.includes('AI 에이전트 비용'), `HQ data in ${path}`);
     if(path==='/') for(const href of ['/pdf-to-md','/youtube-to-md','https://groundroot.github.io/typecut-pro/','/videokit']) assert.ok(html.includes(`href="${href}"`));
   }
-  for (const [path, text] of [['/videokit/terms', '이용약관'], ['/videokit/privacy', '개인정보처리방침'], ['/price', '결제 링크를 확인해 주세요'], ['/price?plan=kit', '300,000원'], ['/price?plan=lesson', '500,000원'], ['/price?plan=toString', '결제 링크를 확인해 주세요'], ['/price/fail?code=PAY_PROCESS_CANCELED', '결제를 취소했습니다'], ['/price/success', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-x&amount=1&paymentKey=p', '결제를 확인하지 못했습니다']]) {
+  for (const [path, text] of [['/videokit/terms', '이용약관'], ['/videokit/privacy', '개인정보처리방침'], ['/price', '결제 링크를 확인해 주세요'], ['/price?plan=kit', won(priceOf('kit', tierAt()))], ['/price?plan=lesson', won(priceOf('lesson', tierAt()))], ['/price?plan=toString', '결제 링크를 확인해 주세요'], ['/price/fail?code=PAY_PROCESS_CANCELED', '결제를 취소했습니다'], ['/price/success', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-x&amount=1&paymentKey=p', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-s-00000000-0000-0000-0000-000000000000&amount=100000&paymentKey=p', '결제를 확인하지 못했습니다']]) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.ok((await r.text()).includes(text), `${path} should include ${text}`);
   }
   for (const path of ['/price/other', '/videokit/secret.html', '/videokit/instructor']) { const r = await request(path); assert.equal(r.status, 307, path); }

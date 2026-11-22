@@ -1,7 +1,8 @@
 import { randomUUID } from 'node:crypto';
 import Shell, { KAKAO_URL, won } from './Shell';
 import Checkout from './Checkout';
-import { isPlanId, makeOrderId, plans, tossKeys } from '@/products/videokit';
+import { isPlanId, makeOrderId, nameOf, plans, priceOf, tierAt, tossKeys } from '@/products/videokit';
+import { deliveryConfigured } from '@/products/videokit-delivery';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: '결제 | 클로드 비디오 키트 for 파이널컷프로', robots: { index: false, follow: false } };
@@ -22,12 +23,19 @@ export default async function PricePage({ searchParams }: { searchParams: Promis
       <a className="btn btn-kakao" href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1 문의</a></Shell>;
   }
   const item = plans[plan];
+  const tier = tierAt();
+  const amount = priceOf(plan, tier);
+  const name = nameOf(plan, tier);
   return <Shell>
     <h1>결제하기</h1>
     <p className="lede">상담하신 상품을 확인하고 결제해 주세요.</p>
     {!keys.live && <p className="test" role="note">테스트 결제 화면입니다. 실제로 돈이 빠져나가지 않습니다.</p>}
-    <div className="order"><b>{item.name}</b><span>결제 확인 후 키트 파일과 설치 안내를 카카오톡 또는 이메일로 보내드립니다.</span><div className="amt">{won(item.amount)}</div></div>
-    <Checkout clientKey={keys.clientKey} orderId={makeOrderId(plan, randomUUID())} orderName={item.name} amount={item.amount} />
+    <div className="order"><b>{name}</b><span>{deliveryConfigured()
+      ? '결제가 확인되면 아래에 적은 이메일로 키트 다운로드 링크와 설치 안내를 바로 보내드립니다.'
+      : '결제가 확인되면 키트 파일과 설치 안내를 이메일로 보내드립니다.'}{plan === 'lesson' && ' 강의 일정은 따로 조율합니다.'}</span>
+      <div className="amt">{tier === 's' && <s className="was">{won(item.regular)}</s>}{won(amount)}</div>
+      {tier === 's' && <span className="sale">마켓 오픈 할인 · 11월 28일(토) 밤 24:00까지</span>}</div>
+    <Checkout clientKey={keys.clientKey} orderId={makeOrderId(plan, tier, randomUUID())} orderName={name} amount={amount} />
     <p className="small">결제하면 <a href="/videokit/terms">이용약관</a>과 <a href="/videokit#refund">환불 안내</a>에 동의하는 것으로 봅니다. 개인정보는 <a href="/videokit/privacy">개인정보처리방침</a>에 따라 처리합니다.</p>
   </Shell>;
 }

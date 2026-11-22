@@ -5,7 +5,7 @@ type Widgets = {
   setAmount(a: { currency: 'KRW'; value: number }): Promise<void>;
   renderPaymentMethods(o: { selector: string; variantKey: string }): Promise<unknown>;
   renderAgreement(o: { selector: string; variantKey: string }): Promise<unknown>;
-  requestPayment(o: Record<string, string>): Promise<void>;
+  requestPayment(o: Record<string, unknown>): Promise<void>;
 };
 declare global {
   interface Window { TossPayments?: ((key: string) => { widgets(o: { customerKey: string }): Widgets }) & { ANONYMOUS: string } }
@@ -53,6 +53,8 @@ export default function Checkout({ clientKey, orderId, orderName, amount }: { cl
         orderId, orderName,
         customerName: String(f.get('name')).trim(),
         customerEmail: String(f.get('email')).trim(),
+        // 결제 승인 후 서버가 이 값으로 키트 메일을 보낸다 (토스 결제 객체에 이메일·이름이 돌아오지 않음)
+        metadata: { email: String(f.get('email')).trim().slice(0, 254), name: String(f.get('name')).trim().slice(0, 100) },
         customerMobilePhone: String(f.get('phone')).replace(/\D/g, ''),
         successUrl: `${location.origin}/price/success`,
         failUrl: `${location.origin}/price/fail`,
@@ -67,7 +69,7 @@ export default function Checkout({ clientKey, orderId, orderName, amount }: { cl
       <legend>받는 분 정보</legend>
       <label>이름<input name="name" required autoComplete="name" /></label>
       <label>휴대전화번호<input name="phone" required inputMode="tel" autoComplete="tel" pattern="[0-9\- ]{10,13}" placeholder="010-0000-0000" /></label>
-      <label>이메일<input name="email" type="email" required autoComplete="email" /></label>
+      <label>이메일 <small>키트 다운로드 링크를 받을 주소</small><input name="email" type="email" required autoComplete="email" maxLength={254} /></label>
     </fieldset>
     <div className="widget"><div id="payment-method" /><div id="agreement" /></div>
     <button className="pay-btn" disabled={!ready || busy}>{busy ? '결제 진행 중…' : `${new Intl.NumberFormat('ko-KR').format(amount)}원 결제하기`}</button>
