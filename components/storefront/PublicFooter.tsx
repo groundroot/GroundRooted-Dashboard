@@ -18,6 +18,7 @@ export default function PublicFooter() {
           </div>
           <nav aria-label="푸터 제품">
             <h2>제품</h2>
+            <a href="/videokit">클로드 비디오 키트</a>
             {appCatalog.map((app) => (
               <a key={app.id} href={app.href} translate="no">
                 {app.name}
@@ -32,6 +33,24 @@ export default function PublicFooter() {
             <a href="/#faq">자주 묻는 질문</a>
             <a href="mailto:sungchulkang@groundrooted.com">문의 · sungchulkang@groundrooted.com</a>
           </nav>
+        </div>
+        <div className="site-footer-biz">
+          <p>
+            <strong>그라운드루티드 (GroundRooted)</strong>
+            <span>대표 강성철</span>
+            <span>사업자등록번호 543-09-03526</span>
+            <span>통신판매업 신고번호 2026-울산북구-0322</span>
+          </p>
+          <p>
+            <span>울산광역시 북구 상방로 160</span>
+            <span>전화 010-2153-1713</span>
+            <span>sungchulkang@groundrooted.com</span>
+          </p>
+          <p className="site-footer-policy">
+            <a href="/videokit/terms">이용약관</a>
+            <a href="/videokit/privacy">개인정보처리방침</a>
+            <a href="/videokit#refund">환불 안내</a>
+          </p>
         </div>
         <div className="site-footer-bottom">
           <span>© 2026 GroundRooted</span>

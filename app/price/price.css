@@ -32,3 +32,6 @@
 .vk-pay .btn-ghost{border:1px solid #2e2e37}
 .vk-pay .plans{display:grid;gap:12px}
 .vk-pay .plans a{display:flex;justify-content:space-between;padding:18px 20px;border:1px solid #2e2e37;border-radius:14px;text-decoration:none}
+.vk-pay-foot{border-top:1px solid #26262d;margin-top:56px;padding:24px 0 40px;font-size:12px;line-height:1.7;color:#8a8880}
+.vk-pay-foot p{margin:0}
+.vk-pay-foot p:last-child{margin-top:6px}
