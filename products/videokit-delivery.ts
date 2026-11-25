@@ -4,7 +4,7 @@
 // - 키트 파일: Supabase Storage 비공개 버킷의 zip 하나(개인정보 없음). 메일에는 7일 동안 열리는 서명 링크를 넣는다.
 // - 메일 발송: Resend API.
 // 필요한 환경변수: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, VIDEOKIT_MAIL_FROM
-// 선택: VIDEOKIT_BUCKET(videokit), VIDEOKIT_KIT_PATH(kit/claude-video-kit.zip), VIDEOKIT_MAIL_REPLY_TO, VIDEOKIT_MAIL_BCC, VIDEOKIT_DISCORD_URL
+// 선택: VIDEOKIT_BUCKET(videokit), VIDEOKIT_KIT_PATH(kit/claude-video-kit.zip), VIDEOKIT_MAIL_REPLY_TO, VIDEOKIT_MAIL_BCC, VIDEOKIT_NOTICE_URL(공지 오픈카톡방 주소)
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 type PlanId = 'kit' | 'lesson';
@@ -32,7 +32,7 @@ const kstDate = (ms: number) => new Intl.DateTimeFormat('ko-KR', { timeZone: 'As
 export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amount' | 'name'>, link: string, expiresAt: number) {
   const item = o.itemName;
   const lesson = o.plan === 'lesson';
-  const discord = env('VIDEOKIT_DISCORD_URL', 'https://discord.gg/4UKVEK8kmb');
+  const notice = env('VIDEOKIT_NOTICE_URL', '');
   const reply = env('VIDEOKIT_MAIL_REPLY_TO', 'sungchulkang@groundrooted.com');
   const subject = '[클로드 비디오 키트] 키트 다운로드 안내';
   const steps = [
@@ -63,7 +63,7 @@ export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amoun
 <ol style="margin:0 0 20px;padding-left:20px;font-size:14px;line-height:1.7">${steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
 ${lesson ? `<p style="margin:0 0 20px;padding:12px 14px;background:#fdf0ea;border-radius:8px;font-size:14px">강의 일정은 개별로 조율합니다. 곧 연락드리겠습니다.</p>` : ''}
 <ul style="margin:0 0 20px;padding-left:20px;font-size:13px;line-height:1.7;color:#5d6270">${notes.map(s => `<li>${esc(s)}</li>`).join('')}</ul>
-<p style="margin:0;font-size:14px;line-height:1.7">궁금한 점은 이 메일에 답장하거나 카카오톡 1:1 문의로 알려 주세요.${discord ? ` 업데이트 소식은 <a href="${esc(discord)}" style="color:#e8622c">디스코드 채널</a>에서 전해 드립니다.` : ''} 후속지원은 구매일로부터 1년입니다.</p>
+<p style="margin:0;font-size:14px;line-height:1.7">궁금한 점은 이 메일에 답장하거나 카카오톡 1:1 문의로 알려 주세요. 새 버전이 나오면 업데이트 파일을 이 메일 주소로 보내드리고, 공지는 ${notice ? `<a href="${esc(notice)}" style="color:#e8622c">오픈카톡방</a>` : '오픈카톡방'}에 올립니다. 후속지원은 구매일로부터 1년입니다.</p>
 </div>
 <p style="font-size:11px;color:#8a8f9c;line-height:1.6;margin:16px 4px 0">그라운드루티드 (GroundRooted) · 대표 강성철 · 사업자등록번호 543-09-03526 · ${esc(reply)}</p>
 </div></body></html>`;
@@ -74,7 +74,7 @@ ${lesson ? `<p style="margin:0 0 20px;padding:12px 14px;background:#fdf0ea;borde
     '시작하기', ...steps.map((s, i) => `${i + 1}. ${s}`), '',
     ...(lesson ? ['강의 일정은 개별로 조율합니다. 곧 연락드리겠습니다.', ''] : []),
     ...notes.map(s => `- ${s}`), '',
-    `궁금한 점은 이 메일에 답장하거나 카카오톡 1:1 문의로 알려 주세요.${discord ? ` 업데이트 소식: ${discord}` : ''} 후속지원은 구매일로부터 1년입니다.`,
+    `궁금한 점은 이 메일에 답장하거나 카카오톡 1:1 문의로 알려 주세요. 새 버전이 나오면 업데이트 파일을 이 메일 주소로 보내드리고, 공지는 오픈카톡방${notice ? `(${notice})` : ''}에 올립니다. 후속지원은 구매일로부터 1년입니다.`,
     '', `그라운드루티드 (GroundRooted) · ${reply}`,
   ].join('\n');
   return { subject, html, text };
