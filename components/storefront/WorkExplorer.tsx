@@ -34,7 +34,8 @@ export default function WorkExplorer({ guide = false }: { guide?: boolean }) {
       {choices.map((choice, index) => <div role="tabpanel" key={choice.label} id={`${uid}-panel-${index}`}
         aria-labelledby={`${uid}-tab-${index}`} hidden={index !== active} tabIndex={0} className={`gr-work-panel gr-scene-${choice.image}`}>
         {index === active && <>
-          {!guide && index === 0 ? <MotionScene priority /> : <EditorialImage name={choice.image} priority={!guide} />}
+          {/* 가이드는 위 장면과 같은 이미지를 반복하지 않도록 글만 보여 준다. */}
+          {!guide && (index === 0 ? <MotionScene priority /> : <EditorialImage name={choice.image} priority />)}
           <div className="gr-work-caption">
             <span className="gr-work-product">0{index + 1} / {appCatalog[index].name}</span>
             <h3>{choice.title}</h3>
@@ -43,7 +44,7 @@ export default function WorkExplorer({ guide = false }: { guide?: boolean }) {
             <a href={appCatalog[index].href}>{appCatalog[index].name} {index === 2 ? '공식 사이트' : '살펴보기'}
               {index === 2 ? <ArrowUpRight size={16} aria-hidden="true" /> : <ArrowRight size={16} aria-hidden="true" />}
             </a>
-            <small>AI로 제작한 콘셉트 이미지 · 제품의 쓰임을 표현했습니다.</small>
+            {!guide && <small>AI로 제작한 콘셉트 이미지 · 제품의 쓰임을 표현했습니다.</small>}
           </div>
         </>}
       </div>)}

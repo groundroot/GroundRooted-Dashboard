@@ -36,7 +36,7 @@
 .gr-public .gr-work-guide .gr-work-tabs button { padding: 24px; justify-content: flex-start; text-align: left; background: #fff; color: #455570; font-size: 15px; line-height: 1.6; }
 .gr-public .gr-work-guide .gr-work-tabs button[aria-selected="true"] { background: #244d9c; color: #fff; }
 .gr-public .gr-work-guide .gr-work-tabs button > svg:last-child { margin-left: auto; }
-.gr-public .gr-work-guide .gr-work-panel { display: grid; grid-template-columns: .8fr 1fr; border-radius: 16px; overflow: hidden; }
+.gr-public .gr-work-guide .gr-work-panel { display: grid; grid-template-columns: 1fr; border-radius: 16px; overflow: hidden; }
 .gr-public .gr-work-guide .gr-work-panel[hidden] { display: none; }
 .gr-public .gr-work-guide .gr-editorial-image { height: 100%; object-fit: cover; }
 .gr-public .gr-work-guide .gr-work-caption { padding: 28px 24px; }

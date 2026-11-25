@@ -4,7 +4,7 @@ import { ArrowRight } from 'lucide-react';
 import EditorialImage from './EditorialImage';
 
 const scenes = {
-  readymd: { image: 'reading', source: '다시 읽으려고 모아 둔 PDF', result: '눈에 맞춰 읽고, 다음 작업에 꺼내 쓰세요.', files: ['읽기용 EPUB', 'Markdown', '연결된 이미지'] },
+  readymd: { image: 'origin', source: '다시 읽으려고 모아 둔 PDF', result: '눈에 맞춰 읽고, 다음 작업에 꺼내 쓰세요.', files: ['읽기용 EPUB', 'Markdown', '연결된 이미지'] },
   'youtube-to-md': { image: 'transcript', source: '자막이 제공되는 강의와 인터뷰', result: '원문과 출처를 나란히 보관하세요.', files: ['영상 제목·채널', '원본 주소', '자막 원문'] },
   'typecut-pro': { image: 'editing', source: '말을 중심으로 구성한 영상과 대본', result: '문장에서 고른 흐름을 편집으로 이어가세요.', files: ['대본', '자막', 'Final Cut Pro 편집'] },
 } as const;
