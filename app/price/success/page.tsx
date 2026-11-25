@@ -1,11 +1,12 @@
 import Shell, { KAKAO_URL, won } from '../Shell';
-import { checkOrder, nameOf, tossKeys } from '@/products/videokit';
-import { deliverKit, type DeliveryResult } from '@/products/videokit-delivery';
+import { bankName, checkOrder, nameOf, paymentSecret } from '@/products/videokit';
+import { deliverKit, deliveryConfigured, type DeliveryResult } from '@/products/videokit-delivery';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: '결제 결과 | 클로드 비디오 키트 for 파이널컷프로', robots: { index: false, follow: false } };
 
-type Payment = { status?: string; orderId?: string; totalAmount?: number; code?: string; message?: string; metadata?: Record<string, string> | null };
+type Payment = { status?: string; orderId?: string; totalAmount?: number; code?: string; message?: string; metadata?: Record<string, string> | null;
+  virtualAccount?: { accountNumber?: string; bankCode?: string; customerName?: string; dueDate?: string } | null };
 
 async function toss(path: string, secretKey: string, body?: object): Promise<{ ok: boolean; data: Payment }> {
   const res = await fetch(`https://api.tosspayments.com/v1/payments${path}`, {
@@ -19,19 +20,23 @@ async function toss(path: string, secretKey: string, body?: object): Promise<{ o
 
 // 승인: 주문번호·금액을 서버 가격표로 검증한 뒤 토스에 승인을 요청한다.
 // 새로고침 등으로 이미 승인된 결제는 조회해서 같은 주문·금액인지 확인한다.
-async function confirm(paymentKey: string, orderId: string, amount: number) {
-  const { secretKey, consistent } = tossKeys();
-  if (!consistent) return false;
-  const first = await toss('/confirm', secretKey, { paymentKey, orderId, amount });
+// allowNew=false: 할인 마감이 지난 할인가 주문. 새 승인은 하지 않고, 이미 승인된 결제(입금 계좌 다시 보기 등)만 보여 준다.
+async function confirm(paymentKey: string, orderId: string, amount: number, allowNew = true) {
+  const { secretKey, consistent } = paymentSecret();
+  if (!consistent) return null;
+  const first = allowNew ? await toss('/confirm', secretKey, { paymentKey, orderId, amount }) : { ok: false, data: { code: 'ALREADY_PROCESSED_PAYMENT' } as Payment };
   const p = first.ok ? first.data : first.data.code === 'ALREADY_PROCESSED_PAYMENT' ? (await toss(`/${encodeURIComponent(paymentKey)}`, secretKey)).data : null;
   // fresh: 이번 요청에서 승인된 결제. 새로고침(이미 승인됨)이면 false라서 메일을 다시 보내지 않는다.
-  return !!p && p.status === 'DONE' && p.orderId === orderId && p.totalAmount === amount ? { payment: p, fresh: first.ok } : null;
+  // 가상계좌는 승인 직후 WAITING_FOR_DEPOSIT(입금 대기). 입금되면 웹훅(/api/webhooks/toss)이 키트 메일을 보낸다.
+  const okStatus = p?.status === 'DONE' || p?.status === 'WAITING_FOR_DEPOSIT';
+  return !!p && okStatus && p.orderId === orderId && p.totalAmount === amount ? { payment: p, fresh: first.ok } : null;
 }
 
 export default async function SuccessPage({ searchParams }: { searchParams: Promise<Record<string, string | undefined>> }) {
   const { paymentKey, orderId, amount } = await searchParams;
-  const order = checkOrder(orderId, amount);
-  const paid = order.ok && typeof paymentKey === 'string' && paymentKey.length > 0 ? await confirm(paymentKey, orderId!, order.amount) : null;
+  const order = checkOrder(orderId, amount, Date.now(), { anyTime: true });
+  const inTime = checkOrder(orderId, amount).ok;
+  const paid = order.ok && typeof paymentKey === 'string' && paymentKey.length > 0 ? await confirm(paymentKey, orderId!, order.amount, inTime) : null;
   if (!paid || !order.ok) {
     return <Shell>
       <h1>결제를 확인하지 못했습니다</h1>
@@ -40,9 +45,26 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
       <a className="btn btn-kakao" href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1 문의</a>
     </Shell>;
   }
-  // 결제가 확인되면 결제할 때 적은 이메일로 키트 다운로드 링크를 보낸다. 새로고침해도 24시간 안에는 한 번만 간다.
   const meta = paid.payment.metadata ?? {};
   const itemName = nameOf(order.plan, order.tier);
+  const va = paid.payment.virtualAccount;
+  if (paid.payment.status === 'WAITING_FOR_DEPOSIT' && va) {
+    const due = va.dueDate ? new Intl.DateTimeFormat('ko-KR', { month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Seoul' }).format(new Date(`${va.dueDate}+09:00`)) : '';
+    return <Shell>
+      <h1>아래 계좌로 입금해 주세요</h1>
+      <p className="lede">{itemName}</p>
+      <div className="order va">
+        <b>입금 계좌</b><span>{bankName(va.bankCode)} <strong className="acct-no">{va.accountNumber}</strong></span>
+        <b>입금액</b><span><strong>{won(order.amount)}</strong> (정확히 이 금액으로 보내 주세요)</span>
+        {due && <><b>입금 기한</b><span>{due}까지</span></>}
+        <b>주문번호</b><span>{orderId}</span>
+      </div>
+      <p className="lede">입금이 확인되면 {meta.email ? <b>{meta.email}</b> : '결제할 때 적은 이메일'}로 키트 다운로드 링크와 설치 안내를 {deliveryConfigured() ? '자동으로 보내드립니다' : '보내드립니다'}. 이 계좌는 이 주문에만 쓰입니다.</p>
+      {order.plan === 'lesson' && <p className="lede">강의 일정은 입금 확인 후 개별로 조율합니다.</p>}
+      <a className="btn btn-kakao" href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1 문의</a>
+    </Shell>;
+  }
+  // 결제가 확인되면 결제할 때 적은 이메일로 키트 다운로드 링크를 보낸다. 새로고침해도 24시간 안에는 한 번만 간다.
   let mail: DeliveryResult | null = null;
   if (paid.fresh) {
     try {

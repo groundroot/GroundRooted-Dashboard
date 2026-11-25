@@ -35,3 +35,12 @@
 .vk-pay-foot{border-top:1px solid #26262d;margin-top:56px;padding:24px 0 40px;font-size:12px;line-height:1.7;color:#8a8880}
 .vk-pay-foot p{margin:0}
 .vk-pay-foot p:last-child{margin-top:6px}
+.vk-pay .methods{display:grid;gap:10px;margin-top:20px}
+.vk-pay .method{display:flex;gap:12px;align-items:flex-start;padding:14px 16px;border-radius:12px;background:#1b1b20;color:#ecebe6;cursor:pointer}
+.vk-pay .method input{margin-top:5px;accent-color:#ff6b3d;width:18px;height:18px;flex:none}
+.vk-pay .method b{display:block;font-size:16px}
+.vk-pay .method small{display:block;color:#8a8880;font-size:13px;font-weight:400;margin:2px 0 0}
+.vk-pay .method:has(input:checked){outline:2px solid #ff6b3d;outline-offset:-2px}
+.vk-pay .order.va{display:grid;grid-template-columns:auto 1fr;gap:10px 18px;align-items:baseline}
+.vk-pay .order.va .acct-no{font-family:"JetBrains Mono",ui-monospace,monospace;font-size:20px;letter-spacing:.01em;font-variant-numeric:tabular-nums}
+.vk-pay .order.va span{color:#ecebe6;font-size:15px}

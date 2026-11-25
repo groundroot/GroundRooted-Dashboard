@@ -24,11 +24,12 @@ export const makeOrderId = (plan: PlanId, tier: Tier, uuid: string) => `vk-${pla
 
 // 승인 요청 전에 주문번호와 금액이 서버 가격표와 맞는지 확인한다.
 // 할인가 주문(s)은 마감 + 30분까지만 받는다.
-export function checkOrder(orderId: unknown, amount: unknown, now = Date.now()):
+// anyTime: 가상계좌 입금 웹훅처럼, 할인 기간 안에 만든 주문이 나중에 입금되는 경우(마감 검사를 건너뛴다).
+export function checkOrder(orderId: unknown, amount: unknown, now = Date.now(), { anyTime = false } = {}):
   { ok: true; plan: PlanId; tier: Tier; amount: number } | { ok: false } {
   if (typeof orderId !== 'string' || !ORDER_ID.test(orderId)) return { ok: false };
   const [, plan, tier] = orderId.split('-') as [string, PlanId, Tier];
-  if (tier === 's' && now >= SALE_ENDS + SALE_GRACE_MS) return { ok: false };
+  if (tier === 's' && !anyTime && now >= SALE_ENDS + SALE_GRACE_MS) return { ok: false };
   const value = Number(amount);
   if (!Number.isInteger(value) || value !== priceOf(plan, tier)) return { ok: false };
   return { ok: true, plan, tier, amount: value };
@@ -44,4 +45,37 @@ export function tossKeys() {
   // 실제 키와 테스트 키를 섞어 쓰지 않는다.
   const consistent = live === secretKey.startsWith('live_');
   return { clientKey, secretKey, live, consistent };
+}
+
+// 결제창(카드 · 가상계좌)용 API 개별 연동 키. 둘 다 있으면 결제 페이지가 결제위젯 대신 결제창을 쓴다.
+// 가상계좌 입금은 /api/webhooks/toss (DEPOSIT_CALLBACK)로 알림을 받아 키트 메일을 보낸다.
+export function tossApiKeys() {
+  const clientKey = process.env.TOSS_API_CLIENT_KEY || '';
+  const secretKey = process.env.TOSS_API_SECRET_KEY || '';
+  if (!clientKey || !secretKey) return null;
+  const live = clientKey.startsWith('live_');
+  const consistent = live === secretKey.startsWith('live_') && /_ck_/.test(clientKey) && /_sk_/.test(secretKey);
+  return { clientKey, secretKey, live, consistent };
+}
+// 결제 승인 · 조회에 쓰는 시크릿 키: 결제창 키가 있으면 그것, 없으면 결제위젯 키.
+export const paymentSecret = () => { const api = tossApiKeys(); return api ? api : tossKeys(); };
+
+// 가상계좌 은행 코드(토스페이먼츠 2자리) → 이름. 없는 코드는 코드 그대로 보여 준다.
+const BANKS: Record<string, string> = {
+  '39': '경남은행', '34': '광주은행', '12': '단위농협', '32': '부산은행', '45': '새마을금고', '64': '산림조합', '88': '신한은행',
+  '48': '신협', '27': '씨티은행', '20': '우리은행', '71': '우체국', '50': '저축은행', '37': '전북은행', '35': '제주은행',
+  '90': '카카오뱅크', '89': '케이뱅크', '92': '토스뱅크', '81': '하나은행', '54': '홍콩상하이은행', '03': 'IBK기업은행',
+  '06': 'KB국민은행', '31': 'iM뱅크(대구)', '02': 'KDB산업은행', '11': 'NH농협은행', '23': 'SC제일은행', '07': 'Sh수협은행',
+};
+export const bankName = (code: unknown) => (typeof code === 'string' && BANKS[code]) || String(code ?? '');
+
+// 가상계좌 입금 웹훅(DEPOSIT_CALLBACK) 판정. 웹훅 본문은 믿지 않고, 토스에서 다시 조회한 결제(payment)로 판단한다.
+// 본문의 secret이 결제의 secret과 같고, 입금 완료(DONE)이며, 주문번호 · 금액이 가격표와 맞을 때만 보낸다.
+export type TossPayment = { status?: string; orderId?: string; totalAmount?: number; secret?: string | null; method?: string; metadata?: Record<string, string> | null };
+export function depositReady(body: { orderId?: unknown; secret?: unknown; status?: unknown }, payment: TossPayment | null) {
+  if (!payment || typeof body.secret !== 'string' || !body.secret || payment.secret !== body.secret) return { ok: false as const, reason: 'secret' };
+  if (payment.orderId !== body.orderId) return { ok: false as const, reason: 'order' };
+  if (payment.status !== 'DONE') return { ok: false as const, reason: `status ${payment.status}` };
+  const order = checkOrder(payment.orderId, payment.totalAmount, Date.now(), { anyTime: true });
+  return order.ok ? { ok: true as const, order } : { ok: false as const, reason: 'amount' };
 }

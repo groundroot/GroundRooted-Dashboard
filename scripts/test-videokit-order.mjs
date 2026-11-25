@@ -41,3 +41,20 @@ for (const v of ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'RESEND_API_KEY', 
 assert.equal(deliveryConfigured(), false);
 assert.deepEqual(await deliverKit({ orderId: kitS, plan: 'kit', itemName: plans.kit.name, amount: 100000, email: 'a@b.co', name: '김' }), { status: 'off' });
 console.log('PASS: videokit kit email');
+
+// 가상계좌 입금 웹훅 판정
+{
+  const { depositReady } = await import('../products/videokit.ts');
+  const id = makeOrderId('kit', 's', '123e4567-e89b-42d3-a456-426614174000');
+  const pay = { status: 'DONE', orderId: id, totalAmount: 100000, secret: 'ps_abc', metadata: { email: 'a@b.co', name: '김' } };
+  const body = { orderId: id, secret: 'ps_abc', status: 'DONE' };
+  assert.equal(depositReady(body, pay).ok, true);                                       // 할인 마감 뒤 입금도 받는다
+  assert.equal(depositReady({ ...body, secret: 'x' }, pay).ok, false);                    // secret 불일치
+  assert.equal(depositReady({ ...body, secret: undefined }, { ...pay, secret: undefined }).ok, false);
+  assert.equal(depositReady(body, { ...pay, status: 'WAITING_FOR_DEPOSIT' }).ok, false); // 아직 입금 전
+  assert.equal(depositReady(body, { ...pay, totalAmount: 1000 }).ok, false);            // 금액 불일치
+  assert.equal(depositReady({ ...body, orderId: 'other' }, pay).ok, false);              // 주문 불일치
+  assert.equal(depositReady(body, null).ok, false);                                      // 조회 실패
+  assert.equal(checkOrder(id, 100000, SALE_ENDS + 86400_000, { anyTime: true }).ok, true);
+  console.log('PASS: videokit deposit webhook checks');
+}

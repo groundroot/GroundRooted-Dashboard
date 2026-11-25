@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import Shell, { KAKAO_URL, won } from './Shell';
 import Checkout from './Checkout';
-import { isPlanId, makeOrderId, nameOf, plans, priceOf, tierAt, tossKeys } from '@/products/videokit';
+import { isPlanId, makeOrderId, nameOf, plans, priceOf, tierAt, tossApiKeys, tossKeys } from '@/products/videokit';
 import { deliveryConfigured } from '@/products/videokit-delivery';
 
 export const dynamic = 'force-dynamic';
@@ -9,7 +9,9 @@ export const metadata = { title: '결제 | 클로드 비디오 키트 for 파이
 
 export default async function PricePage({ searchParams }: { searchParams: Promise<{ plan?: string }> }) {
   const { plan } = await searchParams;
-  const keys = tossKeys();
+  // 결제창 키(카드 · 가상계좌)가 있으면 결제창, 없으면 결제위젯.
+  const keys = tossApiKeys() ?? tossKeys();
+  const mode = tossApiKeys() ? 'window' : 'widget';
   if (!isPlanId(plan)) {
     return <Shell>
       <h1>결제 링크를 확인해 주세요</h1>
@@ -35,7 +37,7 @@ export default async function PricePage({ searchParams }: { searchParams: Promis
       : '결제가 확인되면 키트 파일과 설치 안내를 이메일로 보내드립니다.'}{plan === 'lesson' && ' 강의 일정은 따로 조율합니다.'}</span>
       <div className="amt">{tier === 's' && <s className="was">{won(item.regular)}</s>}{won(amount)}</div>
       {tier === 's' && <span className="sale">마켓 오픈 할인 · 11월 28일(토) 밤 24:00까지</span>}</div>
-    <Checkout clientKey={keys.clientKey} orderId={makeOrderId(plan, tier, randomUUID())} orderName={name} amount={amount} />
+    <Checkout mode={mode} autoMail={deliveryConfigured()} clientKey={keys.clientKey} orderId={makeOrderId(plan, tier, randomUUID())} orderName={name} amount={amount} />
     <p className="small">결제하면 <a href="/videokit/terms">이용약관</a>과 <a href="/videokit#refund">환불 안내</a>에 동의하는 것으로 봅니다. 개인정보는 <a href="/videokit/privacy">개인정보처리방침</a>에 따라 처리합니다.</p>
   </Shell>;
 }
