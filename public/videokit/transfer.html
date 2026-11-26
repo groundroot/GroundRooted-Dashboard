@@ -410,6 +410,15 @@ html:not(.p-end) .p-off{display:none!important}
 .after h2{font-size:20px;letter-spacing:-.02em}
 .after ol{margin-top:12px;padding-left:1.3em;display:grid;gap:10px;color:var(--ink-2)}
 .after ol b{color:var(--ink)}
+.pay .refund{margin-top:36px;padding:22px 22px 20px;border:1px solid color-mix(in srgb,var(--head) 45%,var(--line));border-radius:16px;background:color-mix(in srgb,var(--head) 7%,var(--panel))}
+.refund h2{font-size:20px;letter-spacing:-.02em}
+.refund-key{margin-top:10px;font-size:16px;line-height:1.55;color:var(--ink-2)}
+.refund-key b{color:var(--head)}
+.refund dl{margin-top:16px;display:grid;gap:12px}
+.refund dt{font-size:15px;font-weight:700;color:var(--ink)}
+.refund dd{margin:2px 0 0;font-size:15px;color:var(--ink-2);line-height:1.6}
+.refund .law{margin-top:14px;font-size:13px;line-height:1.6;color:var(--ink-3)}
+.refund .law a{color:var(--ink-2)}
 .notes{margin-top:28px;padding-left:1.2em;display:grid;gap:6px;font-size:14px;color:var(--ink-3)}
 </style>
 </head>
@@ -473,10 +482,22 @@ html:not(.p-end) .p-off{display:none!important}
     </ol>
   </section>
 
+  <section class="refund" id="refund" aria-labelledby="refund-h">
+    <h2 id="refund-h">환불 안내</h2>
+    <p class="refund-key"><b>키트가 발송되면 환불할 수 없는 상품입니다.</b> 키트는 받는 즉시 내려받아 복제할 수 있는 디지털 콘텐츠이기 때문입니다.</p>
+    <dl>
+      <div><dt>키트를 받기 전</dt><dd>결제일로부터 7일 안에 요청하시면 전액 환불해 드립니다.</dd></div>
+      <div><dt>키트를 받은 뒤</dt><dd>환불(청약철회)이 제한됩니다. 이메일로 키트 다운로드 링크를 보낸 때가 기준입니다.</dd></div>
+      <div><dt>예외</dt><dd>받은 키트가 안내된 내용과 다르거나 정상적으로 동작하지 않으면, 받은 날부터 3개월 안에, 그 사실을 안 날부터 30일 안에 환불을 요청할 수 있습니다.</dd></div>
+      <div><dt>환불 방법</dt><dd>카카오톡 1:1이나 이메일로 요청해 주세요. 요청을 받은 날부터 3영업일 안에 입금하신 계좌로 돌려드립니다.</dd></div>
+    </dl>
+    <p class="law">근거: 「전자상거래 등에서의 소비자보호에 관한 법률」 제17조 제2항 제5호(디지털콘텐츠의 제공이 시작된 경우 청약철회 제한), 같은 조 제3항(내용이 표시 · 광고와 다른 경우의 청약철회). 자세한 내용은 <a href="/videokit/terms">이용약관</a> 제8조를 확인해 주세요.</p>
+  </section>
+
   <ul class="notes">
     <li>Claude 구독은 포함되어 있지 않습니다. Claude Pro 이상 요금제를 직접 구독해서 사용합니다.</li>
     <li>macOS 전용입니다.</li>
-    <li>환불은 <a href="/videokit#refund">환불 안내</a>와 <a href="/videokit/terms">이용약관</a>을 따릅니다.</li>
+    <li>환불은 위 <a href="#refund">환불 안내</a>와 <a href="/videokit/terms">이용약관</a>을 따릅니다.</li>
   </ul>
 </main>
 
@@ -489,7 +510,7 @@ html:not(.p-end) .p-off{display:none!important}
     </div>
     <nav class="foot-links" aria-label="안내">
       <a href="/videokit#buy">구매 안내</a>
-      <a href="/videokit#refund">환불 안내</a>
+      <a href="#refund">환불 안내</a>
       <a href="/videokit/terms">이용약관</a>
       <a href="/videokit/privacy">개인정보처리방침</a>
       <a href="/">groundrooted.com</a>
