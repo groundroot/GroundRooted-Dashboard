@@ -29,6 +29,13 @@ const esc = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt
 const won = (n: number) => `${new Intl.NumberFormat('ko-KR').format(n)}원`;
 const kstDate = (ms: number) => new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', weekday: 'short', hour: '2-digit', minute: '2-digit' }).format(ms);
 
+// 키트 zip 안의 구성 (dist/ClaudeVideoKit-*.zip 기준). 스킬 개수처럼 빌드마다 바뀌는 숫자는 적지 않는다.
+const MANUAL_DIR = '0. 클로드 비디오키트 사용설명서';
+const CONTENTS = [
+  '키트 파일: 영상 제작 스킬, 빌드 스크립트, 스타일 프리셋, 유튜브 학습 데이터, 설치 스크립트',
+  `클로드 기반 사용 설명서: PDF · EPUB (zip 안 「${MANUAL_DIR}」 폴더)`,
+];
+
 // 메일 본문. 테스트에서 직접 부른다.
 export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amount' | 'name'>, link: string, expiresAt: number) {
   const item = o.itemName;
@@ -37,9 +44,9 @@ export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amoun
   const reply = env('VIDEOKIT_MAIL_REPLY_TO', 'sungchulkang@groundrooted.com');
   const subject = '[클로드 비디오 키트] 키트 다운로드 안내';
   const steps = [
-    '다운로드한 zip 파일을 더블클릭해 압축을 풉니다. 홈 폴더처럼 오래 둘 곳으로 옮겨 두세요.',
-    '폴더 안 docs/manual 의 사용 설명서(PDF 또는 EPUB)를 엽니다. EPUB은 Apple Books 앱에서 열립니다.',
-    '설명서 3부 "설치"를 따라 Claude Code와 키트를 설치합니다. 막히면 10장 "설치 오류 해결"을 보세요.',
+    '다운로드한 zip 파일을 더블클릭해 압축을 풀고, 나온 Claude Video Kit 폴더를 동영상 폴더(~/Movies)로 옮깁니다.',
+    `폴더 맨 위의 「${MANUAL_DIR}」 폴더에 있는 사용 설명서(PDF 또는 EPUB)를 먼저 읽어 주세요. EPUB은 Apple Books 앱에서 열립니다.`,
+    '같은 위치의 INSTALL.md를 따라 설치합니다. 설치 첫 단계(install.sh --check)를 꼭 실행해 주세요.',
   ];
   const notes = [
     '이 키트는 Claude Pro 이상 요금제를 직접 구독해서 사용합니다. Claude 구독은 포함되어 있지 않습니다.',
@@ -57,8 +64,8 @@ export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amoun
 <p style="margin:10px 0 24px;font-size:12px;color:#5d6270;text-align:center">링크는 ${esc(kstDate(expiresAt))}까지 열립니다. 기간이 지나면 이 메일에 답장해 주시면 새 링크를 보내드립니다.</p>
 <h2 style="font-size:15px;margin:0 0 8px">들어 있는 것</h2>
 <ul style="margin:0 0 20px;padding-left:20px;font-size:14px;line-height:1.7">
-<li>키트 파일: 스킬 29개, 빌드 스크립트, 스타일 프리셋, 유튜브 학습 데이터, 설치 스크립트</li>
-<li>클로드 기반 사용 설명서: PDF · EPUB (zip 안 docs/manual)</li>
+<li>${esc(CONTENTS[0])}</li>
+<li>${esc(CONTENTS[1])}</li>
 </ul>
 <h2 style="font-size:15px;margin:0 0 8px">시작하기</h2>
 <ol style="margin:0 0 20px;padding-left:20px;font-size:14px;line-height:1.7">${steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
@@ -71,7 +78,7 @@ ${lesson ? `<p style="margin:0 0 20px;padding:12px 14px;background:#fdf0ea;borde
   const text = [
     `${o.name}님, 결제가 확인되었습니다.`, '', item, `결제 금액 ${won(o.amount)} · 주문번호 ${o.orderId}`, '',
     `키트 내려받기 (zip): ${link}`, `링크는 ${kstDate(expiresAt)}까지 열립니다. 기간이 지나면 이 메일에 답장해 주세요.`, '',
-    '들어 있는 것', '- 키트 파일: 스킬 29개, 빌드 스크립트, 스타일 프리셋, 유튜브 학습 데이터, 설치 스크립트', '- 클로드 기반 사용 설명서: PDF · EPUB (zip 안 docs/manual)', '',
+    '들어 있는 것', ...CONTENTS.map(s => `- ${s}`), '',
     '시작하기', ...steps.map((s, i) => `${i + 1}. ${s}`), '',
     ...(lesson ? ['강의 일정은 개별로 조율합니다. 곧 연락드리겠습니다.', ''] : []),
     ...notes.map(s => `- ${s}`), '',

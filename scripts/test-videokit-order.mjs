@@ -43,6 +43,7 @@ assert.ok(m.html.includes('300,000원') && m.html.includes('1:1 강의 2회') &&
 assert.ok(nameOf('lesson', 'r').includes('3회 강의') && nameOf('lesson', 's').includes('2회'));
 const k = kitEmail({ orderId: kitS, plan: 'kit', itemName: plans.kit.name, amount: 100000, name: '김' }, 'https://l', SALE_ENDS);
 assert.ok(!k.html.includes('강의 일정은 개별로'), 'kit mail has no lesson line');
+assert.ok(k.html.includes('0. 클로드 비디오키트 사용설명서') && k.html.includes('INSTALL.md') && !k.html.includes('docs/manual') && k.text.includes('INSTALL.md'), 'kit mail matches kit layout');
 // 발송 설정이 없으면 아무것도 보내지 않고 off
 for (const v of ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'RESEND_API_KEY', 'VIDEOKIT_MAIL_FROM']) delete process.env[v];
 assert.equal(deliveryConfigured(), false);

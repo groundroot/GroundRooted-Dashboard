@@ -17,11 +17,15 @@
 1. **Supabase**
    - 프로젝트를 고르고(대시보드용 프로젝트를 써도 됩니다) SQL Editor에서 `sql/videokit-storage.sql`을 실행합니다. 비공개 버킷 `videokit`이 생깁니다.
    - Project Settings → API에서 `SUPABASE_URL`과 `service_role` 키를 확인합니다. service_role 키는 서버 전용이라 어디에도 공개하지 않습니다.
-2. **키트 zip 올리기** (키트를 새로 만들 때마다 반복)
+2. **키트 zip 올리기** (키트를 새로 만들 때마다 반복). 원본 빌드(`dist/ClaudeVideoKit-YYYY.MM.DD.HHMM.zip`)를 올립니다. 메일 첨부용 zip(`ClaudeVideoKit-YYYY.MM.DD.zip`)이 아닙니다. 아래 명령은 시각이 붙은 가장 최근 빌드만 고릅니다.
+   이 저장소 폴더에서 한 줄로 실행합니다(운영 Supabase 키를 Vercel에서 받아 쓰고 바로 지움, 가장 최근 빌드를 올림):
    ```bash
-   SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node scripts/videokit-upload-kit.mjs "$HOME/코딩/FCP claude editing/dist/fcp-ai-kit-20261122.zip"
+   vercel env pull /tmp/vk.env --environment=production --yes --scope groundroots-projects >/dev/null && (set -a; . /tmp/vk.env; set +a; rm -f /tmp/vk.env; node scripts/videokit-upload-kit.mjs "$(ls -t "$HOME/코딩/FCP claude editing/dist"/ClaudeVideoKit-*.*.*.*.zip | head -1)")
    ```
-   같은 경로에 덮어쓰므로, 이미 보낸 링크가 유효한 동안에는 새 파일이 내려받아집니다.
+   (vercel CLI가 이 프로젝트에 연결돼 있어야 합니다: 처음 한 번 `vercel link --yes --project groundrooted-dashboard --scope groundroots-projects`.)
+   같은 경로(`videokit/kit/claude-video-kit.zip`)에 덮어쓰므로, 이미 보낸 링크가 유효한 동안에는 새 파일이 내려받아집니다.
+   올린 뒤 메일 본문(`products/videokit-delivery.ts`의 `MANUAL_DIR` · 시작하기 단계)이 키트 구성과 맞는지 확인합니다.
+   - 2026-11-26: 운영 Supabase에 비공개 버킷 `videokit` 생성(sql/videokit-storage.sql과 같은 설정), `ClaudeVideoKit-2026.11.26.1802.zip`(2,822,597 bytes, sha256 `ebeecf8c…c71f7c6`) 올림. 7일 서명 링크로 내려받아 크기 · sha256 일치, 서명 없는 주소는 막힘 확인.
 3. **Resend**
    - resend.com에 가입하고 Domains에서 `groundrooted.com`을 추가합니다. 안내되는 DNS 레코드(SPF · DKIM)를 도메인 DNS에 넣고 인증이 끝날 때까지 기다립니다.
    - API Keys에서 발송 전용(Sending access) 키를 만듭니다.
