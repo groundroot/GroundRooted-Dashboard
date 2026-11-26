@@ -33,7 +33,8 @@ export async function POST(req: Request) {
   // 사람에게 보이지 않는 칸이 채워져 있으면 스팸 봇이다. 받은 척만 한다.
   if (text(body.website, 200)) return Response.json({ ok: true });
 
-  const name = text(body.name, 50), email = text(body.email, 254), phone = text(body.phone, 20);
+  // 이름은 한 줄로 (줄바꿈으로 메일 본문에 가짜 '영수증:' 줄을 끼워 넣지 못하게)
+  const name = text(body.name, 50).replace(/\s+/g, ' '), email = text(body.email, 254), phone = text(body.phone, 20);
   const plan = text(body.plan, 10) as Plan;
   if (!name || !isEmail(email) || !/^[0-9\- ]{10,13}$/.test(phone) || !(plan in PLANS)) return Response.json({ error: 'bad' }, { status: 400 });
   // 영수증 요청 (없으면 '필요 없음'). 형식이 틀리면 받지 않는다.
