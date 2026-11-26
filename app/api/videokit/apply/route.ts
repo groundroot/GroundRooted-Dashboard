@@ -11,7 +11,21 @@ type Plan = keyof typeof PLANS;
 const text = (v: unknown, max: number) => (typeof v === 'string' ? v.trim() : '').slice(0, max);
 const esc = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 
+// 같은 IP에서 10분에 5번까지만 받는다 (메일함 폭주 · Resend 사용량 소진 방지).
+// 서버 인스턴스 메모리에 두므로 인스턴스마다 따로 센다. 완벽한 차단이 아니라 반복 호출을 늦추는 장치다.
+const WINDOW_MS = 10 * 60 * 1000, LIMIT = 5;
+const hits = new Map<string, number[]>();
+function tooMany(ip: string, now = Date.now()) {
+  const recent = (hits.get(ip) ?? []).filter(t => now - t < WINDOW_MS);
+  recent.push(now);
+  hits.set(ip, recent);
+  if (hits.size > 5000) for (const [k, v] of hits) if (now - v[v.length - 1] >= WINDOW_MS) hits.delete(k);
+  return recent.length > LIMIT;
+}
+
 export async function POST(req: Request) {
+  const ip = req.headers.get('x-real-ip') || req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown';
+  if (tooMany(ip)) return Response.json({ error: 'busy' }, { status: 429, headers: { 'Retry-After': '600' } });
   const body = await req.json().catch(() => null) as Record<string, unknown> | null;
   if (!body) return Response.json({ error: 'bad' }, { status: 400 });
   // 사람에게 보이지 않는 칸이 채워져 있으면 스팸 봇이다. 받은 척만 한다.

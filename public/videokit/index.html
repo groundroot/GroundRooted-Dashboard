@@ -635,6 +635,8 @@ footer .wrap{align-items:flex-start}
 .apply-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
 .apply-err{font-size:14px;color:#ff8a6b;line-height:1.6}
 .apply-err a{color:inherit}
+.apply-privacy{font-size:12.5px;line-height:1.6;color:var(--ink-3)}
+.apply-privacy a{color:var(--ink-2);text-underline-offset:2px}
 .apply .btn{width:100%;justify-content:center;border:0;cursor:pointer;font-family:var(--sans)}
 .apply .btn[disabled]{opacity:.6;cursor:default}
 .apply-done p{font-size:15px;line-height:1.7;color:var(--ink-2)}
@@ -1232,6 +1234,7 @@ footer .wrap{align-items:flex-start}
     </fieldset>
     <label class="apply-hp" aria-hidden="true">웹사이트<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
     <p class="apply-err" id="apply-err" role="alert" hidden></p>
+    <p class="apply-privacy">이름 · 이메일 · 전화번호는 결제 안내와 키트 발송, 강의 일정 안내에만 쓰고, 거래가 끝나면 법령이 정한 기간만 보관합니다. 자세한 내용은 <a href="/videokit/privacy" target="_blank" rel="noopener">개인정보처리방침</a>을 확인해 주세요.</p>
     <button class="btn btn-mail" type="submit">신청 보내기</button>
   </form>
   <div class="apply-done" id="apply-done" hidden>
