@@ -157,3 +157,12 @@
 .vk-pay .placed .steps{margin:20px 0 8px;padding-left:20px;color:#b4b2aa;display:grid;gap:6px}
 .vk-pay .placed .steps b{color:#ecebe6}
 .vk-pay .order .amt{min-width:7em;text-align:right}
+/* 영수증 선택 */
+.vk-pay .receipt{margin-top:4px}
+.vk-pay .receipt legend{margin-bottom:4px}
+.vk-pay .receipt .hint{margin:0;color:#8a8880;font-size:14px;line-height:1.6}
+.vk-pay .receipt .choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}
+.vk-pay .receipt .choices .method{align-items:center;padding:12px 14px}
+.vk-pay .receipt .choices .method input{margin-top:0}
+.vk-pay .receipt .choices .method b{font-size:15px}
+@media (max-width:480px){.vk-pay .receipt .choices{grid-template-columns:1fr}}

@@ -3,6 +3,7 @@
 // 선택: VIDEOKIT_APPLY_TO (받는 주소, 기본 sungchulkang@groundrooted.com)
 import { isEmail } from '@/products/videokit-delivery';
 import { priceOf, tierAt } from '@/products/videokit';
+import { parseReceipt, receiptRows } from '@/products/videokit-receipt';
 
 export const dynamic = 'force-dynamic';
 
@@ -35,6 +36,9 @@ export async function POST(req: Request) {
   const name = text(body.name, 50), email = text(body.email, 254), phone = text(body.phone, 20);
   const plan = text(body.plan, 10) as Plan;
   if (!name || !isEmail(email) || !/^[0-9\- ]{10,13}$/.test(phone) || !(plan in PLANS)) return Response.json({ error: 'bad' }, { status: 400 });
+  // 영수증 요청 (없으면 '필요 없음'). 형식이 틀리면 받지 않는다.
+  const receipt = parseReceipt(body.receipt, name);
+  if (!receipt) return Response.json({ error: 'receipt' }, { status: 400 });
 
   const key = process.env.RESEND_API_KEY, from = process.env.VIDEOKIT_MAIL_FROM;
   if (!key || !from) {
@@ -44,7 +48,7 @@ export async function POST(req: Request) {
   const to = process.env.VIDEOKIT_APPLY_TO || 'sungchulkang@groundrooted.com';
   const at = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'medium', timeStyle: 'short' }).format(Date.now());
   const amount = `${new Intl.NumberFormat('ko-KR').format(priceOf(plan, tierAt()))}원`;
-  const rows: [string, string][] = [['이름', name], ['이메일', email], ['전화번호', phone], ['상품', PLANS[plan]], ['금액', amount], ['신청 시각', at]];
+  const rows: [string, string][] = [['이름', name], ['이메일', email], ['전화번호', phone], ['상품', PLANS[plan]], ['금액', amount], ['신청 시각', at], ...receiptRows(receipt)];
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',

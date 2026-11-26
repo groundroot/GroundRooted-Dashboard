@@ -84,3 +84,32 @@ console.log('PASS: videokit kit email');
   for (const k of ['TOSS_CLIENT_KEY', 'TOSS_SECRET_KEY', 'TOSS_API_CLIENT_KEY', 'TOSS_API_SECRET_KEY', 'VIDEOKIT_CARD_PENDING']) delete process.env[k];
   console.log('PASS: videokit test-mode kit mail guard');
 }
+
+// 영수증 요청 (판매자 메일 세 줄 — 운영봇이 읽는 형식)
+{
+  const { parseReceipt, receiptRows, formatPhone, formatBizNo } = await import('../products/videokit-receipt.ts');
+  const { sellerNotice } = await import('../products/videokit-delivery.ts');
+  const lines = (r) => receiptRows(r).map(([k, v]) => `${k}: ${v}`).join('\n');
+  assert.equal(lines(parseReceipt(undefined, '홍길동')), '영수증: 필요 없음\n영수증 받는 분: -\n영수증 번호: -');
+  assert.equal(lines(parseReceipt({ kind: 'none', to: 'x', no: 'y' }, '홍길동')), '영수증: 필요 없음\n영수증 받는 분: -\n영수증 번호: -');
+  assert.equal(lines(parseReceipt({ kind: 'simple', to: '', no: '' }, '홍길동')), '영수증: 간이영수증\n영수증 받는 분: 홍길동\n영수증 번호: -');
+  assert.equal(lines(parseReceipt({ kind: 'simple', to: '대영교회', no: '1234567890' }, '홍길동')), '영수증: 간이영수증\n영수증 받는 분: 대영교회\n영수증 번호: 123-45-67890');
+  assert.equal(lines(parseReceipt({ kind: 'cash-income', no: '01012345678' }, '홍길동')), '영수증: 현금영수증(소득공제)\n영수증 받는 분: 홍길동\n영수증 번호: 010-1234-5678');
+  assert.equal(lines(parseReceipt({ kind: 'cash-expense', to: '그라운드 단체', no: '000-00-00000' }, '홍길동')), '영수증: 현금영수증(지출증빙)\n영수증 받는 분: 그라운드 단체\n영수증 번호: 000-00-00000');
+  // 형식 오류는 받지 않는다
+  for (const r of [{ kind: 'bogus' }, { kind: 'simple', no: '12345' }, { kind: 'cash-income', no: '011-1234-5678' }, { kind: 'cash-income', no: '' },
+    { kind: 'cash-expense', to: '단체', no: '123-45-6789' }, { kind: 'cash-expense', to: '', no: '1234567890' }])
+    assert.equal(parseReceipt(r, '홍길동'), null, JSON.stringify(r));
+  // 카드 · 간편결제는 현금영수증을 받지 않는다 (카드 매출전표)
+  assert.equal(parseReceipt({ kind: 'cash-income', no: '01012345678' }, '김', { card: true }), null);
+  assert.equal(parseReceipt({ kind: 'simple' }, '김', { card: true }).kind, 'simple');
+  // 줄바꿈으로 가짜 줄을 끼워 넣지 못한다
+  const inj = parseReceipt({ kind: 'cash-expense', to: '단체\n영수증 번호: 999-99-99999', no: '1234567890' }, '김');
+  assert.equal(lines(inj).split('\n').length, 3); assert.ok(!lines(inj).includes('\n영수증 번호: 999'));
+  assert.equal(formatPhone('010 1234 5678'), '010-1234-5678'); assert.equal(formatBizNo('123 45 67890'), '123-45-67890');
+  // 카드 결제 판매자 알림: 제목은 [결제 완료], 본문에 같은 세 줄
+  const n = sellerNotice({ orderId: kitS, plan: 'kit', amount: 100000, email: 'a@b.co', name: '홍길동' }, receiptRows(parseReceipt({ kind: 'simple' }, '홍길동')), '자동 발송함');
+  assert.equal(n.subject, '[결제 완료] 키트 · 홍길동');
+  assert.ok(n.text.includes('\n영수증: 간이영수증\n영수증 받는 분: 홍길동\n영수증 번호: -'));
+  console.log('PASS: videokit receipt request');
+}

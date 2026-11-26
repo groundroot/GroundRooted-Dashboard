@@ -1,6 +1,7 @@
 import Shell, { KAKAO_URL, won } from '../Shell';
 import { bankName, checkOrder, hasKit, hasLesson, kitMailAllowed, nameOf, paymentSecret } from '@/products/videokit';
-import { deliverKit, deliveryConfigured, type DeliveryResult } from '@/products/videokit-delivery';
+import { deliverKit, deliveryConfigured, notifySeller, type DeliveryResult } from '@/products/videokit-delivery';
+import { parseReceipt, receiptRows } from '@/products/videokit-receipt';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: '결제 결과 | 클로드 비디오 키트 for 파이널컷프로', robots: { index: false, follow: false } };
@@ -75,6 +76,13 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
       console.error('[videokit] kit mail exception', orderId, e);
       mail = { status: 'failed', reason: 'exception' };
     }
+  }
+  // 판매자 알림 (영수증 요청 포함). 실제 결제에만, 승인 직후 한 번.
+  if (paid.fresh && !testPay) {
+    const receipt = parseReceipt((() => { try { return JSON.parse(String(meta.receipt ?? '')); } catch { return null; } })(), String(meta.name ?? ''), { card: true });
+    const kit = !hasKit(order.plan) ? '해당 없음' : mail?.status === 'sent' ? '자동 발송함' : `발송 안 됨(${mail?.status === 'failed' ? mail.reason : mail?.status ?? '-'}) — 직접 보내야 함`;
+    await notifySeller({ orderId: orderId!, plan: order.plan, amount: order.amount, email: String(meta.email ?? ''), name: String(meta.name ?? '구매자') },
+      receipt ? receiptRows(receipt) : [['영수증', '확인 필요(형식 오류)'], ['영수증 받는 분', '-'], ['영수증 번호', '-']], kit).catch(() => false);
   }
   const sentTo = mail?.status === 'sent' ? mail.email : '';
   return <Shell>

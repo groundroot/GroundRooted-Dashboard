@@ -120,3 +120,31 @@ export async function deliverKit(order: Order, { force = false } = {}): Promise<
   if (!sent.ok) console.error('[videokit] kit mail failed', order.orderId, sent.reason);
   return sent.ok ? { status: 'sent', email: order.email } : { status: 'failed', reason: sent.reason };
 }
+
+// 카드 · 간편결제(실제 키) 승인 뒤 판매자에게 보내는 주문 알림. 계좌이체 주문 메일(/api/videokit/apply)과 같은 '라벨: 값' 본문에
+// 영수증 세 줄을 넣는다. 제목은 '[결제 완료]'로 계좌이체의 '[구매 신청]'(입금 확인 대기)과 구분한다 — 결제가 끝났고 키트 메일은 자동으로 갔다.
+// 같은 주문은 Resend 멱등 키로 24시간 안에 한 번만 간다. 받는 주소: VIDEOKIT_APPLY_TO(기본 sungchulkang@groundrooted.com).
+const PLAN_MAIL: Record<PlanId, string> = { kit: '키트', lesson: '키트 + 1:1 강의', pass: '1:1 강의권 2회' };
+export function sellerNotice(o: Pick<Order, 'orderId' | 'plan' | 'amount' | 'email' | 'name'>, receiptRows: [string, string][], kit: string, at = Date.now()) {
+  const when = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'medium', timeStyle: 'short' }).format(at);
+  const rows: [string, string][] = [['이름', o.name], ['이메일', o.email], ['상품', PLAN_MAIL[o.plan]], ['금액', won(o.amount)], ['결제', '카드 · 간편결제(토스페이먼츠)'],
+    ['주문번호', o.orderId], ['결제 시각', when], ['키트 메일', kit], ...receiptRows];
+  const line = (s: string) => s.replace(/[\r\n]+/g, ' ');
+  return {
+    subject: `[결제 완료] ${PLAN_MAIL[o.plan]} · ${line(o.name)}`,
+    text: rows.map(([k, v]) => `${k}: ${line(v)}`).join('\n'),
+    html: `<table style="font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;font-size:15px;border-collapse:collapse">${rows.map(([k, v]) => `<tr><td style="padding:6px 16px 6px 0;color:#666">${k}</td><td style="padding:6px 0"><b>${esc(v)}</b></td></tr>`).join('')}</table>`,
+  };
+}
+export async function notifySeller(o: Pick<Order, 'orderId' | 'plan' | 'amount' | 'email' | 'name'>, receiptRows: [string, string][], kit: string) {
+  const key = env('RESEND_API_KEY'), from = env('VIDEOKIT_MAIL_FROM');
+  if (!key || !from) return false;
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'Idempotency-Key': `vk-seller-${o.orderId}` },
+    body: JSON.stringify({ from, to: [env('VIDEOKIT_APPLY_TO', 'sungchulkang@groundrooted.com')], ...(isEmail(o.email) ? { reply_to: o.email } : {}), ...sellerNotice(o, receiptRows, kit) }),
+    cache: 'no-store',
+  }).catch(() => null);
+  if (!res?.ok) console.error('[videokit] seller notice failed', o.orderId, res?.status);
+  return !!res?.ok;
+}
