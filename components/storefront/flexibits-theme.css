@@ -48,7 +48,8 @@
 #gr-storefront .fx-kit-plans li { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 13px 0; border-top: 1px solid #2c2f37; font-size: 15px; font-weight: 600; }
 #gr-storefront .fx-kit-plans li:last-child { border-bottom: 1px solid #2c2f37; }
 #gr-storefront .fx-kit-price { display: inline-flex; align-items: baseline; gap: 10px; font-variant-numeric: tabular-nums; }
-#gr-storefront .fx-kit-price s { color: #8d8a82; font-size: 14px; font-weight: 500; }
+#gr-storefront .fx-kit-price s { color: #c9c6bd; font-size: 16px; font-weight: 600; text-decoration: line-through 2px #ff6b3d; text-decoration-skip-ink: none; }
+#gr-storefront .fx-kit-price s::before { content: "정가 "; display: inline-block; white-space: pre; margin-right: 2px; font-size: .8em; font-weight: 550; color: #8d8a82; }
 #gr-storefront .fx-kit-price b { font-size: 20px; font-weight: 720; color: #fff; }
 #gr-storefront .fx-kit-note { margin-top: 12px; font-size: 13px; line-height: 1.6; color: #a7a49b; }
 #gr-storefront .fx-kit-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 20px; margin-top: 24px; }

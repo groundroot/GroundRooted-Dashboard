@@ -462,6 +462,11 @@ html:not(.promo-end) .p-off{display:none!important}
 .band-launch .actions{display:flex;flex-wrap:wrap;justify-content:center;gap:12px;margin-top:32px}
 .band-launch .note{text-align:center;max-width:880px;margin:16px auto 0}
 .price s{display:block;color:var(--ink-3);font-size:15px;font-weight:500}
+/* 정가(취소선): 읽히는 밝기 + 브랜드색 굵은 취소선 */
+.price s,.lp-price s{color:var(--ink-2);font-weight:600;font-variant-numeric:tabular-nums;text-decoration:line-through 2px var(--head);text-decoration-skip-ink:none}
+.price s{font-size:18px;margin-bottom:2px}
+.lp-price s{font-size:21px}
+.price s::before,.lp-price s::before{content:"정가 ";display:inline-block;white-space:pre;margin-right:2px;font-size:.78em;font-weight:550;color:var(--ink-3)}
 .dock .dock-ico{flex:none;width:52px;padding:0;justify-content:center}
 /* ---------- 상품 박스 (키트 / 키트 + 1:1 강의) ---------- */
 .lp{gap:8px;padding:28px 28px 30px;border-radius:22px}

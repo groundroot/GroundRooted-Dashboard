@@ -14,7 +14,8 @@
 .vk-pay .order b{font-weight:650}
 .vk-pay .order .amt{font-size:24px;font-weight:750;font-variant-numeric:tabular-nums;grid-row:1/3;grid-column:2;align-self:center}
 .vk-pay .order span{color:#8a8880;font-size:14px}
-.vk-pay .order .amt .was{display:block;font-size:14px;font-weight:500;color:#8a8880;text-align:right}
+.vk-pay .order .amt .was{display:block;font-size:17px;font-weight:600;color:#b4b2aa;text-align:right;font-variant-numeric:tabular-nums;text-decoration:line-through 2px #ff6b3d;text-decoration-skip-ink:none}
+.vk-pay .order .amt .was::before{content:"정가 ";display:inline-block;white-space:pre;margin-right:2px;font-size:.8em;font-weight:550;color:#8a8880}
 .vk-pay .order span.sale{color:#ff9b6d;font-weight:600}
 .vk-pay label small{color:#8a8880;font-weight:400;font-size:12px;margin-left:4px}
 .vk-pay fieldset{border:0;padding:0;margin:0 0 24px;display:grid;gap:14px}
