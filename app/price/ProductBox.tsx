@@ -48,7 +48,7 @@ export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier })
       <h2>{lec ? '키트 + 1:1 강의' : '키트'}</h2>
       <p className="meta">{lec
         ? '클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행합니다. 일정은 개별 조율합니다.'
-        : '키트 파일과 사용 설명 eBook을 받아 직접 설치하고 세팅합니다.'}</p>
+        : '키트 파일과 사용 설명 eBook을 받아 직접 설치하고 세팅합니다. 강의는 들어 있지 않으며, 필요하면 1:1 강의권을 따로 구입합니다.'}</p>
       <ul className="inc">
         <li>키트 파일</li>
         <li>사용 설명 eBook (PDF · EPUB)</li>
