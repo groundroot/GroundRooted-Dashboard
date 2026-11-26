@@ -38,9 +38,9 @@ export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier })
         <circle cx="60" cy="60" r="58" fill="#ff6b3d" />
         <circle cx="60" cy="60" r="51" fill="none" stroke="#131316" strokeOpacity=".35" strokeWidth="1.2" />
         <circle cx="60" cy="60" r="33" fill="#131316" />
-        <text fontFamily="JetBrains Mono, ui-monospace, monospace" fontSize="8" fontWeight="700" fill="#131316"><textPath href="#vb-ring-pay" textLength="272" lengthAdjust="spacing">365 DAYS · 1:1 SUPPORT · 365 DAYS · 1:1 SUPPORT · </textPath></text>
+        <text fontFamily="JetBrains Mono, ui-monospace, monospace" fontSize="8" fontWeight="700" fill="#131316"><textPath href="#vb-ring-pay" textLength="272" lengthAdjust="spacing">365 DAYS · 1:1 CHAT · 365 DAYS · 1:1 CHAT · </textPath></text>
         <text x="60" y="63" textAnchor="middle" fontFamily="Pretendard Variable, Pretendard, sans-serif" fontSize="25" fontWeight="800" letterSpacing="-1" fill="#ff6b3d">365</text>
-        <text x="60" y="78" textAnchor="middle" fontFamily="Pretendard Variable, Pretendard, sans-serif" fontSize="10" fontWeight="700" fill="#ecebe6">일 1:1 지원</text>
+        <text x="60" y="78" textAnchor="middle" fontFamily="Pretendard Variable, Pretendard, sans-serif" fontSize="9.5" fontWeight="700" fill="#ecebe6">1:1 채팅지원</text>
       </svg></div>}
     </div></div>
     <div className="vk-prod-copy">
@@ -52,7 +52,7 @@ export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier })
       <ul className="inc">
         <li>키트 파일</li>
         <li>사용 설명 eBook (PDF · EPUB)</li>
-        {lec && <><li>클로드 코드 사용법</li><li>키트 설치 원격 지원</li><li>{sessions}</li><li className="hl">365일 1:1 지원</li></>}
+        {lec && <><li>클로드 코드 사용법</li><li>키트 설치 원격 지원</li><li>{sessions}</li><li className="hl">365일 1:1 채팅 지원</li></>}
       </ul>
     </div>
   </section>;
