@@ -91,7 +91,7 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
     <div className="order"><b>주문번호</b><span>{orderId}</span></div>
     {testPay && <p className="test" role="note">테스트 결제라 실제로 돈이 빠져나가지 않았고, 키트도 보내지 않습니다. 구매하시려면 <a href={`/price?plan=${order.plan}`}>결제 화면</a>에서 계좌이체로 주문해 주세요.</p>}
     {!hasKit(order.plan) || testPay ? null : sentTo
-      ? <p className="lede"><b>{sentTo}</b>로 키트 다운로드 링크와 설치 안내를 보냈습니다. 메일이 보이지 않으면 스팸함과 프로모션함을 확인해 주세요. 몇 분이 지나도 없으면 카카오톡으로 주문번호를 알려 주세요.</p>
+      ? <p className="lede"><b>{sentTo}</b>로 키트 다운로드 링크(맥용 · 윈도우용)와 설치 안내를 보냈습니다. 메일이 보이지 않으면 스팸함과 프로모션함을 확인해 주세요. 몇 분이 지나도 없으면 카카오톡으로 주문번호를 알려 주세요.</p>
       : !paid.fresh
         ? <p className="lede">이미 결제가 확인된 주문입니다. 키트 메일을 받지 못하셨다면 카카오톡으로 주문번호를 알려 주세요. 바로 다시 보내드리겠습니다.</p>
         : <p className="lede">결제는 정상으로 확인되었습니다. 키트 메일 발송을 확인하고 있으니, 카카오톡으로 주문번호를 남겨 주시면 바로 보내드리겠습니다.</p>}

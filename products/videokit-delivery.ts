@@ -1,10 +1,10 @@
 // 결제가 승인되면 구매자 이메일로 키트 다운로드 링크를 보낸다 (서버 전용).
 // - 주문·구매자 정보는 자체 DB에 저장하지 않는다(토스 상점관리자에서 확인). 같은 주문에 두 번 보내지 않는 것은
 //   Resend의 Idempotency-Key(주문번호, 24시간 유지)로 막는다.
-// - 키트 파일: Supabase Storage 비공개 버킷의 zip 하나(개인정보 없음). 메일에는 7일 동안 열리는 서명 링크를 넣는다.
+// - 키트 파일: Supabase Storage 비공개 버킷의 zip 두 개(맥용 · 윈도우용, 개인정보 없음). 메일에는 7일 동안 열리는 서명 링크를 둘 다 넣는다.
 // - 메일 발송: Resend API.
 // 필요한 환경변수: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, VIDEOKIT_MAIL_FROM
-// 선택: VIDEOKIT_BUCKET(videokit), VIDEOKIT_KIT_PATH(kit/claude-video-kit.zip), VIDEOKIT_MAIL_REPLY_TO, VIDEOKIT_MAIL_BCC, VIDEOKIT_NOTICE_URL(공지 오픈카톡방 주소)
+// 선택: VIDEOKIT_BUCKET(videokit), VIDEOKIT_KIT_PATH(kit/claude-video-kit.zip), VIDEOKIT_KIT_PATH_WINDOWS(kit/claude-video-kit-windows.zip), VIDEOKIT_MAIL_REPLY_TO, VIDEOKIT_MAIL_BCC, VIDEOKIT_NOTICE_URL(공지 오픈카톡방 주소)
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
 type PlanId = 'kit' | 'lesson' | 'pass';
@@ -32,25 +32,34 @@ const kstDate = (ms: number) => new Intl.DateTimeFormat('ko-KR', { timeZone: 'As
 // 키트 zip 안의 구성 (dist/ClaudeVideoKit-*.zip 기준). 스킬 개수처럼 빌드마다 바뀌는 숫자는 적지 않는다.
 const MANUAL_DIR = '0. 클로드 비디오키트 사용설명서';
 const CONTENTS = [
-  '키트 파일: 영상 제작 스킬, 빌드 스크립트, 스타일 프리셋, 유튜브 학습 데이터, 설치 스크립트',
-  `클로드 기반 사용 설명서: PDF · EPUB (zip 안 「${MANUAL_DIR}」 폴더)`,
+  '키트 파일: 영상 제작 스킬, 빌드 스크립트, 스타일 프리셋, 유튜브 학습 데이터, 설치 스크립트 (맥용 · 윈도우용)',
+  `클로드 기반 사용 설명서: PDF · EPUB (zip 안 「${MANUAL_DIR}」 폴더, 윈도우용 zip에는 윈도우판 설명서)`,
 ];
+export type KitLinks = { mac: string; windows: string };
 
 // 메일 본문. 테스트에서 직접 부른다.
-export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amount' | 'name'>, link: string, expiresAt: number) {
+export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amount' | 'name'>, links: KitLinks, expiresAt: number) {
   const item = o.itemName;
   const lesson = o.plan === 'lesson';
   const notice = env('VIDEOKIT_NOTICE_URL', '');
   const reply = env('VIDEOKIT_MAIL_REPLY_TO', 'sungchulkang@groundrooted.com');
   const subject = '[클로드 비디오 키트] 키트 다운로드 안내';
-  const steps = [
-    '다운로드한 zip 파일을 더블클릭해 압축을 풀고, 나온 Claude Video Kit 폴더를 동영상 폴더(~/Movies)로 옮깁니다.',
-    `폴더 맨 위의 「${MANUAL_DIR}」 폴더에 있는 사용 설명서(PDF 또는 EPUB)를 먼저 읽어 주세요. EPUB은 Apple Books 앱에서 열립니다.`,
-    '같은 위치의 INSTALL.md를 따라 설치합니다. 설치 첫 단계(install.sh --check)를 꼭 실행해 주세요.',
+  // 맥과 윈도우는 옮길 폴더와 설치 점검 명령이 다르다 (각 zip의 INSTALL.md 기준).
+  const guides = [
+    { os: '맥', link: links.mac, button: '맥용 내려받기 (zip)', steps: [
+      '맥용 zip을 더블클릭해 압축을 풀고, 나온 Claude Video Kit 폴더를 동영상 폴더(~/Movies)로 옮깁니다.',
+      `폴더 맨 위의 「${MANUAL_DIR}」 폴더에 있는 사용 설명서(PDF 또는 EPUB)를 먼저 읽어 주세요. EPUB은 Apple Books 앱에서 열립니다.`,
+      '같은 위치의 INSTALL.md를 따라 설치합니다. 설치 첫 단계(install.sh --check)를 꼭 실행해 주세요.',
+    ] },
+    { os: '윈도우', link: links.windows, button: '윈도우용 내려받기 (zip)', steps: [
+      '윈도우용 zip의 압축을 풀고, 나온 Claude Video Kit 폴더를 동영상 폴더(C:\\Users\\<이름>\\Videos)로 옮깁니다.',
+      `폴더 맨 위의 「${MANUAL_DIR}」 폴더에 있는 윈도우판 사용 설명서(PDF 또는 EPUB)를 먼저 읽어 주세요.`,
+      '같은 위치의 INSTALL.md를 따라 설치합니다. 설치 첫 단계(install.ps1 -Check)를 꼭 실행해 주세요.',
+    ] },
   ];
   const notes = [
     '이 키트는 Claude Pro 이상 요금제를 직접 구독해서 사용합니다. Claude 구독은 포함되어 있지 않습니다.',
-    'macOS(Apple Silicon) 전용입니다.',
+    '맥(macOS, Apple Silicon)과 윈도우(Windows 10/11 64비트)를 지원합니다. 맥은 파이널컷 프로 · 캡컷, 윈도우는 캡컷 · 다빈치 리졸브 Studio(유료판)로 결과를 넘깁니다. 캡컷 · 다빈치 리졸브 연동은 베타입니다.',
     '키트는 구매자 본인의 영상 제작에 쓸 수 있으며, 다른 사람에게 복제·배포·판매·공유할 수 없습니다.',
   ];
   const html = `<!doctype html><html lang="ko"><body style="margin:0;background:#f4f5f8;font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;color:#1b1d22;word-break:keep-all">
@@ -60,15 +69,15 @@ export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amoun
 <h1 style="font-size:22px;line-height:1.4;margin:10px 0 18px">${esc(o.name)}님, 결제가 확인되었습니다</h1>
 <p style="margin:0 0 6px;font-size:15px">${esc(item)}</p>
 <p style="margin:0 0 22px;font-size:13px;color:#5d6270">결제 금액 ${won(o.amount)} · 주문번호 ${esc(o.orderId)}</p>
-<a href="${esc(link)}" style="display:block;text-align:center;background:#e8622c;color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:15px;border-radius:10px">키트 내려받기 (zip)</a>
-<p style="margin:10px 0 24px;font-size:12px;color:#5d6270;text-align:center">링크는 ${esc(kstDate(expiresAt))}까지 열립니다. 기간이 지나면 이 메일에 답장해 주시면 새 링크를 보내드립니다.</p>
+${guides.map(g => `<a href="${esc(g.link)}" style="display:block;text-align:center;background:#e8622c;color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:15px;border-radius:10px;margin:0 0 10px">${esc(g.button)}</a>`).join('\n')}
+<p style="margin:0 0 24px;font-size:12px;color:#5d6270;text-align:center">쓰시는 컴퓨터에 맞는 파일 하나를 받으면 됩니다. 두 링크 모두 ${esc(kstDate(expiresAt))}까지 열립니다. 기간이 지나면 이 메일에 답장해 주시면 새 링크를 보내드립니다.</p>
 <h2 style="font-size:15px;margin:0 0 8px">들어 있는 것</h2>
 <ul style="margin:0 0 20px;padding-left:20px;font-size:14px;line-height:1.7">
 <li>${esc(CONTENTS[0])}</li>
 <li>${esc(CONTENTS[1])}</li>
 </ul>
-<h2 style="font-size:15px;margin:0 0 8px">시작하기</h2>
-<ol style="margin:0 0 20px;padding-left:20px;font-size:14px;line-height:1.7">${steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+${guides.map(g => `<h2 style="font-size:15px;margin:0 0 8px">시작하기 · ${g.os}</h2>
+<ol style="margin:0 0 20px;padding-left:20px;font-size:14px;line-height:1.7">${g.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>`).join('\n')}
 ${lesson ? `<p style="margin:0 0 20px;padding:12px 14px;background:#fdf0ea;border-radius:8px;font-size:14px">강의 일정은 개별로 조율합니다. 곧 연락드리겠습니다.</p>` : ''}
 <ul style="margin:0 0 20px;padding-left:20px;font-size:13px;line-height:1.7;color:#5d6270">${notes.map(s => `<li>${esc(s)}</li>`).join('')}</ul>
 <p style="margin:0;font-size:14px;line-height:1.7">궁금한 점은 이 메일에 답장하거나 카카오톡 1:1 문의로 알려 주세요. 새 버전이 나오면 업데이트 파일을 이 메일 주소로 보내드리고, 공지는 ${notice ? `<a href="${esc(notice)}" style="color:#e8622c">오픈카톡방</a>` : '오픈카톡방'}에 올립니다. 후속지원은 구매일로부터 1년입니다.</p>
@@ -77,9 +86,9 @@ ${lesson ? `<p style="margin:0 0 20px;padding:12px 14px;background:#fdf0ea;borde
 </div></body></html>`;
   const text = [
     `${o.name}님, 결제가 확인되었습니다.`, '', item, `결제 금액 ${won(o.amount)} · 주문번호 ${o.orderId}`, '',
-    `키트 내려받기 (zip): ${link}`, `링크는 ${kstDate(expiresAt)}까지 열립니다. 기간이 지나면 이 메일에 답장해 주세요.`, '',
+    ...guides.map(g => `${g.button}: ${g.link}`), `쓰시는 컴퓨터에 맞는 파일 하나를 받으면 됩니다. 두 링크 모두 ${kstDate(expiresAt)}까지 열립니다. 기간이 지나면 이 메일에 답장해 주세요.`, '',
     '들어 있는 것', ...CONTENTS.map(s => `- ${s}`), '',
-    '시작하기', ...steps.map((s, i) => `${i + 1}. ${s}`), '',
+    ...guides.flatMap(g => [`시작하기 · ${g.os}`, ...g.steps.map((s, i) => `${i + 1}. ${s}`), '']),
     ...(lesson ? ['강의 일정은 개별로 조율합니다. 곧 연락드리겠습니다.', ''] : []),
     ...notes.map(s => `- ${s}`), '',
     `궁금한 점은 이 메일에 답장하거나 카카오톡 1:1 문의로 알려 주세요. 새 버전이 나오면 업데이트 파일을 이 메일 주소로 보내드리고, 공지는 오픈카톡방${notice ? `(${notice})` : ''}에 올립니다. 후속지원은 구매일로부터 1년입니다.`,
@@ -111,11 +120,16 @@ export async function deliverKit(order: Order, { force = false } = {}): Promise<
   if (!deliveryConfigured()) return { status: 'off' };
   if (!isEmail(order.email)) { console.error('[videokit] no valid email in payment metadata', order.orderId); return { status: 'failed', reason: 'invalid email' }; }
   const bucket = env('VIDEOKIT_BUCKET', 'videokit');
-  const path = env('VIDEOKIT_KIT_PATH', 'kit/claude-video-kit.zip');
-  const signed = await db().storage.from(bucket).createSignedUrl(path, LINK_DAYS * 86400, { download: 'claude-video-kit.zip' });
-  if (signed.error || !signed.data?.signedUrl) { console.error('[videokit] signed url failed', order.orderId, signed.error?.message); return { status: 'failed', reason: 'signed url' }; }
+  const files = [
+    [env('VIDEOKIT_KIT_PATH', 'kit/claude-video-kit.zip'), 'claude-video-kit.zip'],
+    [env('VIDEOKIT_KIT_PATH_WINDOWS', 'kit/claude-video-kit-windows.zip'), 'claude-video-kit-windows.zip'],
+  ] as const;
+  const storage = db().storage.from(bucket);
+  const signed = await Promise.all(files.map(([path, download]) => storage.createSignedUrl(path, LINK_DAYS * 86400, { download })));
+  const bad = signed.findIndex(s => s.error || !s.data?.signedUrl);
+  if (bad >= 0) { console.error('[videokit] signed url failed', order.orderId, files[bad][0], signed[bad].error?.message); return { status: 'failed', reason: 'signed url' }; }
   const expiresAt = Date.now() + LINK_DAYS * 86400 * 1000;
-  const mail = kitEmail({ ...order, name: order.name.slice(0, 100) }, signed.data.signedUrl, expiresAt);
+  const mail = kitEmail({ ...order, name: order.name.slice(0, 100) }, { mac: signed[0].data!.signedUrl, windows: signed[1].data!.signedUrl }, expiresAt);
   const sent = await sendMail(order.email, mail, force ? `vk-mail-${order.orderId}-${Date.now()}` : `vk-mail-${order.orderId}`);
   if (!sent.ok) console.error('[videokit] kit mail failed', order.orderId, sent.reason);
   return sent.ok ? { status: 'sent', email: order.email } : { status: 'failed', reason: sent.reason };

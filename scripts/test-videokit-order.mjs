@@ -36,14 +36,17 @@ console.log('PASS: videokit order/amount checks');
 
 // 키트 메일
 assert.ok(isEmail('a.b@groundrooted.com') && !isEmail('a b@x.com') && !isEmail('<x>@y.com') && !isEmail('no-at') && !isEmail(undefined));
-const m = kitEmail({ orderId: kitS, plan: 'lesson', itemName: nameOf('lesson', 's'), amount: 300000, name: '<b>홍길동</b>' }, 'https://x.supabase.co/sign?a=1&b=2', SALE_ENDS);
+const m = kitEmail({ orderId: kitS, plan: 'lesson', itemName: nameOf('lesson', 's'), amount: 300000, name: '<b>홍길동</b>' }, { mac: 'https://x.supabase.co/sign?a=1&b=2', windows: 'https://x.supabase.co/win?c=3&d=4' }, SALE_ENDS);
 assert.ok(m.html.includes('&lt;b&gt;홍길동&lt;/b&gt;') && !m.html.includes('<b>홍길동'), 'name escaped');
 assert.ok(m.html.includes('href="https://x.supabase.co/sign?a=1&amp;b=2"'), 'link escaped');
+assert.ok(m.html.includes('href="https://x.supabase.co/win?c=3&amp;d=4"') && m.text.includes('https://x.supabase.co/win?c=3&d=4'), 'windows link in mail');
+assert.ok(m.html.includes('맥용 내려받기') && m.html.includes('윈도우용 내려받기') && !m.html.includes('전용입니다'), 'mac + windows buttons, no mac-only line');
 assert.ok(m.html.includes('300,000원') && m.html.includes('1:1 강의 2회') && m.html.includes('강의 일정은 개별로') && m.text.includes('https://x.supabase.co/sign?a=1&b=2'));
 assert.ok(nameOf('lesson', 'r').includes('3회 강의') && nameOf('lesson', 's').includes('2회'));
-const k = kitEmail({ orderId: kitS, plan: 'kit', itemName: plans.kit.name, amount: 100000, name: '김' }, 'https://l', SALE_ENDS);
+const k = kitEmail({ orderId: kitS, plan: 'kit', itemName: plans.kit.name, amount: 100000, name: '김' }, { mac: 'https://l', windows: 'https://w' }, SALE_ENDS);
 assert.ok(!k.html.includes('강의 일정은 개별로'), 'kit mail has no lesson line');
 assert.ok(k.html.includes('0. 클로드 비디오키트 사용설명서') && k.html.includes('INSTALL.md') && !k.html.includes('docs/manual') && k.text.includes('INSTALL.md'), 'kit mail matches kit layout');
+assert.ok(k.html.includes('install.sh --check') && k.html.includes('install.ps1 -Check') && k.html.includes('C:\\Users\\&lt;이름&gt;\\Videos') && k.text.includes('시작하기 · 윈도우'), 'kit mail has mac and windows setup steps');
 // 발송 설정이 없으면 아무것도 보내지 않고 off
 for (const v of ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'RESEND_API_KEY', 'VIDEOKIT_MAIL_FROM']) delete process.env[v];
 assert.equal(deliveryConfigured(), false);

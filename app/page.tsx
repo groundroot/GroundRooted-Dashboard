@@ -53,6 +53,7 @@ export default function HomePage() {
           <p className="fx-kit-status"><span aria-hidden="true" />지금 판매 중</p>
           <h2 id="kit-heading">클로드 비디오 키트 <em>for 파이널컷프로</em></h2>
           <p className="fx-kit-lede">영상 제작은 클로드에게, 검수는 파이널컷에서. 편집 프로그램이 없다면 MP4 · MOV 파일로 바로 받을 수 있습니다.</p>
+          <p className="fx-kit-new"><b>NEW</b><span>2026.11.26 업데이트 · 윈도우 버전 배포 · 다빈치 리졸브(베타) 버전 공개 — 윈도우판</span></p>
           <ul className="fx-kit-plans">
             {kitPlans.map((p) => <li key={p.id}>
               <span>{p.label}</span>
@@ -60,12 +61,12 @@ export default function HomePage() {
               <a className="fx-kit-buy" href={`/price?plan=${p.id}`}>결제하기<span className="fx-sr-only"> — {p.label}</span></a>
             </li>)}
           </ul>
-          <p className="fx-kit-note">{sale && <>오픈기념가 · 11월 28일(토) 24:00까지<br /></>}Claude 구독 미포함 (Claude Pro 이상 별도 구독) · macOS 전용</p>
+          <p className="fx-kit-note">{sale && <>오픈기념가 · 11월 28일(토) 24:00까지<br /></>}Claude 구독 미포함 (Claude Pro 이상 별도 구독) · macOS · Windows 지원</p>
           <div className="fx-kit-actions">
             <a href="/videokit" className="fx-pill fx-pill-videokit">상품 자세히 보기 <ArrowRight size={18} aria-hidden="true" /></a>
             <a href="/videokit#buy" className="fx-kit-link">구매 안내 · 환불</a>
           </div>
-          <p className="fx-kit-note">결제하기에서 계좌이체 또는 카드 · 간편결제로 구매합니다. 결제(입금)가 확인되면 이메일로 키트 다운로드 링크를 보내드립니다.</p>
+          <p className="fx-kit-note">결제하기에서 계좌이체 또는 카드 · 간편결제로 구매합니다. 결제(입금)가 확인되면 이메일로 키트 다운로드 링크(맥용 · 윈도우용)를 보내드립니다.</p>
         </div>
       </article>
       <article className="fx-typecut-banner">

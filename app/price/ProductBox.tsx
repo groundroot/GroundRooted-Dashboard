@@ -29,7 +29,7 @@ export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier })
         <p className="vb-title">클로드<br />비디오 키트<small>for 파이널컷프로</small></p>
         {lec && <p className="vb-tags"><span>+ 1:1 강의</span><span>원격 설치</span></p>}
         <div className="vb-lanes"><i /><i /><i /></div>
-        <p className="vb-ed"><span>{lec ? 'VIDEO KIT + 1:1' : 'VIDEO KIT'}</span><b>macOS</b></p>
+        <p className="vb-ed"><span>{lec ? 'VIDEO KIT + 1:1' : 'VIDEO KIT'}</span><b>macOS · Windows</b></p>
       </div>
       <div className="vb-f vb-side"><p><i />{lec ? '키트 + 1:1 강의' : '클로드 비디오 키트'}</p></div>
       <div className="vb-f vb-top" />

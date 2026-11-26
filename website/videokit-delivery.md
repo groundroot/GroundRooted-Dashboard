@@ -10,12 +10,12 @@
   영수증 번호: <010-0000-0000 또는 000-00-00000, 없으면 ->
   ```
   카드 · 간편결제는 영수증 요청을 토스 metadata `receipt`(JSON)로 넘기고, 실제(live) 키로 승인되면 판매자에게 `[결제 완료] <구성> · <이름>` 메일(같은 세 줄 포함, Reply-To 구매자)이 갑니다. 테스트 키 결제에는 가지 않습니다.
-- **카드 · 간편결제(토스페이먼츠)**: 실제(live) 키로 승인되면 결제 화면에 적은 이메일로 키트 다운로드 링크(7일 유효)와 설치 안내가 자동으로 갑니다.
+- **카드 · 간편결제(토스페이먼츠)**: 실제(live) 키로 승인되면 결제 화면에 적은 이메일로 키트 다운로드 링크(맥용 · 윈도우용 두 개, 7일 유효)와 OS별 설치 안내가 자동으로 갑니다.
 - **테스트 키로 승인된 결제에는 키트 메일을 보내지 않습니다**(결제 완료 화면 · 가상계좌 웹훅 모두). 테스트 키이거나 `VIDEOKIT_CARD_PENDING=1`이면 결제 화면이 카드 · 간편결제를 '심사 중 · 곧 열립니다'로 표시하고 계좌이체를 기본으로 둡니다. 결제창 진입은 심사자를 위해 남깁니다. 실제 키를 넣고 `VIDEOKIT_CARD_PENDING`이 없으면 카드 · 간편결제가 기본이 됩니다(코드 수정 없음).
 
 - 코드: `products/videokit-delivery.ts`(발송), `app/price/success/page.tsx`(승인 직후 호출), `products/videokit.ts`(가격·주문 검증)
 - 주문·구매자 정보는 자체 DB에 저장하지 않습니다. 결제 내역은 토스 상점관리자에서 봅니다. 같은 주문에 두 번 보내지 않는 것은 Resend의 Idempotency-Key(주문번호, 24시간)로 막습니다.
-- 키트 zip은 Supabase Storage **비공개** 버킷 `videokit`에 파일 하나로 둡니다(개인정보 없음).
+- 키트 zip은 Supabase Storage **비공개** 버킷 `videokit`에 두 파일로 둡니다(개인정보 없음): 맥용 `kit/claude-video-kit.zip`, 윈도우용 `kit/claude-video-kit-windows.zip`(2026-11-26부터). 메일에는 두 링크가 다 들어가며, 하나라도 서명 링크를 못 만들면 메일을 보내지 않습니다(결제 완료 화면이 카카오톡 안내).
 - 가격: 2026-11-28(토) 24:00 KST까지 연 결제 화면은 오픈 할인가(키트 10만원, 키트 + 1:1 강의 2회 30만원), 그 뒤로는 정가(30만원 · 50만원). 마감 직전에 연 화면은 30분 안에 결제를 마쳐야 합니다.
 - 발송 설정(환경변수 4개)이 없으면 메일을 보내지 않고, 결제 완료 화면이 카카오톡으로 주문번호를 남기도록 안내합니다. 결제 자체는 그대로 됩니다.
 
@@ -24,15 +24,16 @@
 1. **Supabase**
    - 프로젝트를 고르고(대시보드용 프로젝트를 써도 됩니다) SQL Editor에서 `sql/videokit-storage.sql`을 실행합니다. 비공개 버킷 `videokit`이 생깁니다.
    - Project Settings → API에서 `SUPABASE_URL`과 `service_role` 키를 확인합니다. service_role 키는 서버 전용이라 어디에도 공개하지 않습니다.
-2. **키트 zip 올리기** (키트를 새로 만들 때마다 반복). 원본 빌드(`dist/ClaudeVideoKit-YYYY.MM.DD.HHMM.zip`)를 올립니다. 메일 첨부용 zip(`ClaudeVideoKit-YYYY.MM.DD.zip`)이 아닙니다. 아래 명령은 시각이 붙은 가장 최근 빌드만 고릅니다.
-   이 저장소 폴더에서 한 줄로 실행합니다(운영 Supabase 키를 Vercel에서 받아 쓰고 바로 지움, 가장 최근 빌드를 올림):
+2. **키트 zip 올리기** (키트를 새로 만들 때마다 반복). 원본 빌드 두 개를 올립니다: 맥용 `dist/ClaudeVideoKit-YYYY.MM.DD.HHMM.zip`, 윈도우용 `dist/ClaudeVideoKit-Windows-YYYY.MM.DD.HHMM.zip`. 메일 첨부용 zip(`ClaudeVideoKit-YYYY.MM.DD.zip`)이 아닙니다. 아래 명령은 시각이 붙은 가장 최근 빌드를 OS별로 따로 고릅니다(맥은 `ClaudeVideoKit-[0-9]*`, 윈도우는 `ClaudeVideoKit-Windows-*` — 한 패턴으로 고르면 같은 시각의 윈도우 zip이 맥 경로에 올라갈 수 있습니다).
+   이 저장소 폴더에서 한 줄로 실행합니다(운영 Supabase 키를 Vercel에서 받아 쓰고 바로 지움, 맥 · 윈도우 최신 빌드를 각각 올림):
    ```bash
-   vercel env pull /tmp/vk.env --environment=production --yes --scope groundroots-projects >/dev/null && (set -a; . /tmp/vk.env; set +a; rm -f /tmp/vk.env; node scripts/videokit-upload-kit.mjs "$(ls -t "$HOME/코딩/FCP claude editing/dist"/ClaudeVideoKit-*.*.*.*.zip | head -1)")
+   D="$HOME/코딩/FCP claude editing/dist"; vercel env pull /tmp/vk.env --environment=production --yes --scope groundroots-projects >/dev/null && (set -a; . /tmp/vk.env; set +a; rm -f /tmp/vk.env; node scripts/videokit-upload-kit.mjs "$(ls -t "$D"/ClaudeVideoKit-[0-9]*.*.*.*.zip | head -1)" && VIDEOKIT_KIT_PATH=kit/claude-video-kit-windows.zip node scripts/videokit-upload-kit.mjs "$(ls -t "$D"/ClaudeVideoKit-Windows-*.*.*.*.zip | head -1)")
    ```
    (vercel CLI가 이 프로젝트에 연결돼 있어야 합니다: 처음 한 번 `vercel link --yes --project groundrooted-dashboard --scope groundroots-projects`.)
-   같은 경로(`videokit/kit/claude-video-kit.zip`)에 덮어쓰므로, 이미 보낸 링크가 유효한 동안에는 새 파일이 내려받아집니다.
+   같은 경로(`videokit/kit/claude-video-kit.zip`, `videokit/kit/claude-video-kit-windows.zip`)에 덮어쓰므로, 이미 보낸 링크가 유효한 동안에는 새 파일이 내려받아집니다.
    올린 뒤 메일 본문(`products/videokit-delivery.ts`의 `MANUAL_DIR` · 시작하기 단계)이 키트 구성과 맞는지 확인합니다.
    - 2026-11-26: 운영 Supabase에 비공개 버킷 `videokit` 생성(sql/videokit-storage.sql과 같은 설정), `ClaudeVideoKit-2026.11.26.1802.zip`(2,822,597 bytes, sha256 `ebeecf8c…c71f7c6`) 올림. 7일 서명 링크로 내려받아 크기 · sha256 일치, 서명 없는 주소는 막힘 확인.
+   - 2026-11-26 (윈도우 버전 출시): 맥용 `ClaudeVideoKit-2026.11.26.2225.zip`(2,834,350 bytes, sha256 `c2aad1d9…6a870686`) → `kit/claude-video-kit.zip`, 윈도우용 `ClaudeVideoKit-Windows-2026.11.26.2225.zip`(2,721,661 bytes, sha256 `79db224b…a54b62`) → `kit/claude-video-kit-windows.zip`. 두 파일 모두 7일 서명 링크로 내려받아 크기 · sha256 일치, 서명 없는 주소는 막힘(400) 확인.
 3. **Resend**
    - resend.com에 가입하고 Domains에서 `groundrooted.com`을 추가합니다. 안내되는 DNS 레코드(SPF · DKIM)를 도메인 DNS에 넣고 인증이 끝날 때까지 기다립니다.
    - API Keys에서 발송 전용(Sending access) 키를 만듭니다.

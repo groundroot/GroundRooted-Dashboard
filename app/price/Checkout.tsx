@@ -248,7 +248,7 @@ export default function Checkout(p: Props) {
     <ProductBox plan={plan.id} tier={p.tier} />
     <div className="order">
       <b>{plan.orderName}</b>
-      <span>{plan.kit ? `결제가 확인되면 적어 주신 이메일로 키트 다운로드 링크(${p.linkDays}일 동안 열림)와 사용 설명서를 보내드립니다.` : '키트를 이미 구입하신 분을 위한 강의권입니다. 키트 파일은 들어 있지 않습니다.'}{plan.lesson && ' 강의 일정은 카카오톡으로 따로 조율합니다.'}</span>
+      <span>{plan.kit ? `결제가 확인되면 적어 주신 이메일로 키트 다운로드 링크(맥용 · 윈도우용, ${p.linkDays}일 동안 열림)와 사용 설명서를 보내드립니다.` : '키트를 이미 구입하신 분을 위한 강의권입니다. 키트 파일은 들어 있지 않습니다.'}{plan.lesson && ' 강의 일정은 카카오톡으로 따로 조율합니다.'}</span>
       <div className="amt" aria-live="polite"><span className="sr">결제 금액 </span>{sale && <s className="was">{won(plan.regular)}</s>}{won(plan.amount)}</div>
       {sale && <span className="sale">마켓 오픈 할인 · 11월 28일(토) 밤 24:00까지</span>}
     </div>
@@ -282,8 +282,9 @@ export default function Checkout(p: Props) {
 
     <dl className="terms-box">
       <div><dt>제공 방법</dt><dd>{plan.kit
-        ? <>결제(입금)가 확인되면 적어 주신 이메일로 키트 다운로드 링크({p.linkDays}일 동안 열림)와 사용 설명 eBook(PDF · EPUB), 설치 안내를 보내드립니다.{plan.lesson && ' 강의는 카카오톡으로 일정을 조율합니다.'} 업데이트 파일도 같은 이메일로 보내드리며, 후속지원은 구매일로부터 1년입니다.</>
+        ? <>결제(입금)가 확인되면 적어 주신 이메일로 키트 다운로드 링크(맥용 · 윈도우용, {p.linkDays}일 동안 열림)와 사용 설명 eBook(PDF · EPUB), 설치 안내를 보내드립니다.{plan.lesson && ' 강의는 카카오톡으로 일정을 조율합니다.'} 업데이트 파일도 같은 이메일로 보내드리며, 후속지원은 구매일로부터 1년입니다.</>
         : '결제(입금)가 확인되면 카카오톡으로 1:1 강의 일정(2회 · 총 2시간)을 조율합니다. 키트 파일은 들어 있지 않습니다.'}</dd></div>
+      {plan.kit && <div><dt>지원 환경</dt><dd>macOS · Windows (맥용 · 윈도우용을 함께 받습니다). 편집 프로그램은 Final Cut Pro(정식) · CapCut(베타) · DaVinci Resolve(베타, 윈도우판). Claude Pro 이상 구독이 필요합니다. 자세한 조건은 <a href="/videokit#env">지원 환경</a>을 확인해 주세요.</dd></div>}
       <div><dt>영수증</dt><dd>간이영수증 또는 현금영수증을 결제 화면에서 신청할 수 있습니다.</dd></div>
       <div><dt>환불</dt><dd>키트 파일을 받기 전에는 결제일로부터 7일 안에 요청하시면 전액 환불됩니다. 파일을 받은 뒤에는 디지털 콘텐츠 특성상 청약철회가 제한됩니다. 자세한 내용은 <a href="/videokit#refund">환불 안내</a>와 <a href="/videokit/terms">이용약관</a> 제8조를 확인해 주세요.</dd></div>
     </dl>

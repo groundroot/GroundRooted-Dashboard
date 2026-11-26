@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>클로드 비디오 키트 for 파이널컷프로</title>
-<meta name="description" content="클로드 코드로 파이널컷 프로 편집을 자동화하는 비디오 키트. 20년 차 편집 노하우를 담아 반복 작업은 맥에서 처리하고 클로드 토큰 사용량을 줄였습니다.">
+<meta name="description" content="클로드 코드로 파이널컷 프로 편집을 자동화하는 비디오 키트. macOS · Windows 지원. 20년 차 편집 노하우를 담아 반복 작업은 내 컴퓨터에서 처리하고 클로드 토큰 사용량을 줄였습니다.">
 <meta property="og:title" content="클로드 비디오 키트 for 파이널컷프로">
 <meta property="og:description" content="클로드 코드로 파이널컷 프로 편집을 자동화하는 비디오 키트. 결제하기에서 계좌이체 또는 카드 · 간편결제로 구매할 수 있습니다.">
 <meta property="og:url" content="https://groundrooted.com/videokit">
@@ -94,6 +94,13 @@ a{color:inherit;text-underline-offset:.22em;text-decoration-thickness:1px}
 .hero .lede b{color:var(--ink);font-weight:600}
 .hero .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
 .note{margin-top:16px;font-size:14px;color:var(--ink-3)}
+/* 업데이트 공지 (2026.11.26) — 기간 할인(p-on)과 무관하게 계속 보인다 */
+.news{margin-top:28px;display:inline-grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;row-gap:6px;align-items:center;padding:14px 20px 14px 14px;border-radius:12px;background:color-mix(in srgb,var(--head) 8%,var(--panel));border:1px solid color-mix(in srgb,var(--head) 32%,var(--line))}
+.news-tag{grid-row:1/3;align-self:start;font:500 12px/1 var(--mono);letter-spacing:.08em;color:#120600;background:var(--head);padding:6px 8px;border-radius:6px}
+.news-date{font:500 13px/1.4 var(--mono);color:#ffb27e}
+.news ul{list-style:none;display:flex;flex-wrap:wrap;column-gap:22px;row-gap:2px;font-size:16px;line-height:1.55;font-weight:600;color:var(--ink)}
+.news li{display:flex;align-items:baseline;gap:9px}
+.news li::before{content:"";flex:none;width:7px;height:7px;border-radius:2px;background:var(--head);transform:translateY(-2px)}
 
 /* ---------- timeline (signature) ---------- */
 .tl{
@@ -410,6 +417,7 @@ section.band{border-top:1px solid var(--line-soft)}
 .ed.soon b{color:var(--ink-3)}
 .ed.soon .ed-ico img{filter:grayscale(1);opacity:.42}
 .ed.soon small{background:var(--line-soft);color:var(--ink-3);border:1px dashed var(--line)}
+.ed.beta small{background:color-mix(in srgb,var(--head) 20%,transparent);color:#ffb27e}
 .flow-direct{margin-top:16px}
 .direct{grid-template-columns:auto minmax(0,1fr);justify-items:start;align-items:center;gap:22px;padding:22px 28px;border-style:dashed}
 .files{display:flex;gap:10px}
@@ -515,7 +523,8 @@ html:not(.promo-end) .p-off{display:none!important}
 .vb-lanes i:nth-child(1){background:linear-gradient(90deg,var(--clip-v2) 0 34%,transparent 34% 37%,var(--clip-v2) 37% 78%,transparent 78%)}
 .vb-lanes i:nth-child(2){background:linear-gradient(90deg,var(--clip-v1) 0 26%,transparent 26% 28%,var(--clip-v1) 28% 100%)}
 .vb-lanes i:nth-child(3){background:var(--clip-a1);opacity:.85}
-.vb-ed{margin-top:12px;display:flex;justify-content:space-between;align-items:center;font:600 9.5px var(--mono);color:rgba(236,235,230,.6);letter-spacing:.06em}
+.vb-ed{margin-top:12px;display:flex;flex-wrap:wrap;gap:4px 8px;justify-content:space-between;align-items:center;font:600 9.5px var(--mono);color:rgba(236,235,230,.6);letter-spacing:.06em}
+.vb-ed span,.vb-ed b{white-space:nowrap}
 .vb-ed b{font-weight:600;color:var(--ink);background:rgba(255,255,255,.1);padding:3px 6px;border-radius:4px}
 .vb-side p{transform:rotate(90deg);font-size:12px;font-weight:700;letter-spacing:-.01em;color:rgba(236,235,230,.86);white-space:nowrap;display:flex;align-items:center;gap:8px}
 .vb-side p i{width:6px;height:6px;border-radius:50%;background:var(--head)}
@@ -575,8 +584,8 @@ html:not(.promo-end) .p-off{display:none!important}
 .hero h1 .ln>span{display:inline-block}
 .rv-on .hero h1 .ln>span{animation:lnUp 1s var(--ease) both}
 .rv-on .hero h1 .ln:nth-child(2)>span{animation-delay:.12s}
-.rv-on .hero .lede,.rv-on .hero .actions,.rv-on .hero .note{animation:fadeUp .9s var(--ease) both}
-.rv-on .hero .lede{animation-delay:.32s}.rv-on .hero .actions{animation-delay:.44s}.rv-on .hero .note{animation-delay:.52s}
+.rv-on .hero .lede,.rv-on .hero .news,.rv-on .hero .actions,.rv-on .hero .note{animation:fadeUp .9s var(--ease) both}
+.rv-on .hero .lede{animation-delay:.32s}.rv-on .hero .news{animation-delay:.38s}.rv-on .hero .actions{animation-delay:.44s}.rv-on .hero .note{animation-delay:.52s}
 .rv-on .hero .tl{animation:tlIn 1.2s var(--ease) .55s both}
 @keyframes lnUp{from{transform:translateY(105%)}to{transform:none}}
 @keyframes fadeUp{from{opacity:0;transform:translateY(18px);filter:blur(6px)}to{opacity:1;transform:none;filter:none}}
@@ -657,8 +666,13 @@ footer .wrap{align-items:flex-start}
       <h1><span class="ln"><span>영상편집 노가다,</span></span><span class="ln"><span>이제 끝낼 때가 되었습니다<em class="bang">!</em></span></span></h1>
       <p class="lede">
         <b>클로드 비디오 키트 for 파이널컷프로</b>는 영상 제작을 클로드에게 맡기고, 검수만 파이널컷에서 하도록 만든 키트입니다.
-        영상 편집 20년 차의 노하우를 담아, 반복 작업은 <b>맥에서 직접</b> 돌리고 <b>클로드 토큰 사용량</b>은 줄였습니다.
+        영상 편집 20년 차의 노하우를 담아, 반복 작업은 <b>내 컴퓨터에서 직접</b> 돌리고 <b>클로드 토큰 사용량</b>은 줄였습니다.
       </p>
+      <div class="news" role="note" aria-label="2026.11.26 업데이트">
+        <span class="news-tag">NEW</span>
+        <p class="news-date">2026.11.26 업데이트</p>
+        <ul><li>윈도우 버전 배포</li><li>다빈치 리졸브(베타) 버전 공개 — 윈도우판</li></ul>
+      </div>
       <div class="actions p-on">
         <a class="btn btn-buy" href="/price">결제하기</a>
         <a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡 문의</a>
@@ -689,7 +703,7 @@ footer .wrap{align-items:flex-start}
             <a class="clip v1" href="#system" style="left:60%;width:40%"><b>파이널컷 타임라인</b><small>검수는 파이널컷에서</small></a>
           </div></div>
           <div class="track"><span class="tag">A1</span><div class="lane">
-            <a class="clip a1" href="#tok" style="left:0;width:45%"><b>음성 인식 · 음악 분석</b><small>맥에서 로컬 처리</small></a>
+            <a class="clip a1" href="#tok" style="left:0;width:45%"><b>음성 인식 · 음악 분석</b><small>내 컴퓨터에서 로컬 처리</small></a>
           </div></div>
           <div class="playhead" id="ph" aria-hidden="true"></div>
         </div>
@@ -721,7 +735,7 @@ footer .wrap{align-items:flex-start}
             <p class="vb-title">클로드<br>비디오 키트<small>for 파이널컷프로</small></p>
             
             <div class="vb-lanes"><i></i><i></i><i></i></div>
-            <p class="vb-ed"><span>VIDEO KIT</span><b>macOS</b></p>
+            <p class="vb-ed"><span>VIDEO KIT</span><b>macOS · Windows</b></p>
           </div>
           <div class="vb-f vb-side"><p><i></i>클로드 비디오 키트</p></div>
           <div class="vb-f vb-top"></div>
@@ -743,7 +757,7 @@ footer .wrap{align-items:flex-start}
             <p class="vb-title">클로드<br>비디오 키트<small>for 파이널컷프로</small></p>
             <p class="vb-tags"><span>+ 1:1 강의</span><span>원격 설치</span></p>
             <div class="vb-lanes"><i></i><i></i><i></i></div>
-            <p class="vb-ed"><span>VIDEO KIT + 1:1</span><b>macOS</b></p>
+            <p class="vb-ed"><span>VIDEO KIT + 1:1</span><b>macOS · Windows</b></p>
           </div>
           <div class="vb-f vb-side"><p><i></i>키트 + 1:1 강의</p></div>
           <div class="vb-f vb-top"></div>
@@ -816,11 +830,11 @@ footer .wrap{align-items:flex-start}
         <div class="flow-rail" aria-hidden="true"></div>
         <p class="flow-step"><span class="tc">02</span>검수 · 후반 보정</p>
         <ul class="eds" aria-label="검수·후반 보정용 편집 프로그램">
-          <li class="ed ok"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/final-cut-pro-subscription.png" alt="" width="116" height="116" loading="lazy"></span><b>파이널컷 프로</b><span class="ed-sub">구독형</span><small>지원</small></div></li>
-          <li class="ed ok"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/final-cut-pro.png" alt="" width="116" height="116" loading="lazy"></span><b>파이널컷 프로</b><span class="ed-sub">스탠드얼론</span><small>지원</small></div></li>
-          <li class="ed ok"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/capcut.svg" alt="" width="116" height="116" loading="lazy"></span><b>캡컷</b><span class="ed-sub" aria-hidden="true"></span><small>지원</small></div></li>
+          <li class="ed ok"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/final-cut-pro-subscription.png" alt="" width="116" height="116" loading="lazy"></span><b>파이널컷 프로</b><span class="ed-sub">구독형 · 맥</span><small>정식 지원</small></div></li>
+          <li class="ed ok"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/final-cut-pro.png" alt="" width="116" height="116" loading="lazy"></span><b>파이널컷 프로</b><span class="ed-sub">스탠드얼론 · 맥</span><small>정식 지원</small></div></li>
+          <li class="ed beta"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/capcut.svg" alt="" width="116" height="116" loading="lazy"></span><b>캡컷</b><span class="ed-sub">맥 · 윈도우</span><small>베타</small></div></li>
+          <li class="ed beta"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/davinci-resolve.svg" alt="" width="116" height="116" loading="lazy"></span><b>다빈치 리졸브</b><span class="ed-sub">윈도우 · Studio</span><small>베타</small></div></li>
           <li class="ed soon"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/premiere-pro.svg" alt="" width="116" height="116" loading="lazy"></span><b>프리미어 프로</b><span class="ed-sub" aria-hidden="true"></span><small>지원 예정</small></div></li>
-          <li class="ed soon"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/davinci-resolve.svg" alt="" width="116" height="116" loading="lazy"></span><b>다빈치 리졸브</b><span class="ed-sub" aria-hidden="true"></span><small>지원 예정</small></div></li>
         </ul>
         <div class="flow-direct"><div class="fc direct"><div class="files" aria-hidden="true"><span>MP4</span><span>MOV</span></div><div><b>편집 프로그램이 없어도 괜찮습니다</b><p>클로드가 완성본을 MP4 · MOV 파일로 바로 만들어 드립니다.</p></div></div></div>
       </div>
@@ -834,7 +848,7 @@ footer .wrap{align-items:flex-start}
         <blockquote>
           <p>클로드는 모든 것을 할 수 있습니다.<br>하지만 <em>내가 원하는 방향대로</em> 할 수 있는가는 완전히 다른 이야기입니다.</p>
         </blockquote>
-        <p class="why-body">이 키트에는 <b>영상 편집 20년 차의 노하우</b>가 담겨 있습니다. 판단이 필요한 일만 클로드가 맡고, 반복 작업은 가능한 한 <b>로컬 맥에서</b> 돌아가도록 만들어 <b>클로드 코드 토큰 사용량을 최소화</b>했습니다.</p>
+        <p class="why-body">이 키트에는 <b>영상 편집 20년 차의 노하우</b>가 담겨 있습니다. 판단이 필요한 일만 클로드가 맡고, 반복 작업은 가능한 한 <b>내 컴퓨터(맥 · 윈도우)에서</b> 돌아가도록 만들어 <b>클로드 코드 토큰 사용량을 최소화</b>했습니다.</p>
 
         <div class="tok" id="tok">
           <h3>키트를 쓸 때와 클로드에게 그냥 시킬 때</h3>
@@ -898,7 +912,7 @@ footer .wrap{align-items:flex-start}
             <p class="vb-title">클로드<br>비디오 키트<small>for 파이널컷프로</small></p>
             
             <div class="vb-lanes"><i></i><i></i><i></i></div>
-            <p class="vb-ed"><span>VIDEO KIT</span><b>macOS</b></p>
+            <p class="vb-ed"><span>VIDEO KIT</span><b>macOS · Windows</b></p>
           </div>
           <div class="vb-f vb-side"><p><i></i>클로드 비디오 키트</p></div>
           <div class="vb-f vb-top"></div>
@@ -919,7 +933,7 @@ footer .wrap{align-items:flex-start}
             <p class="vb-title">클로드<br>비디오 키트<small>for 파이널컷프로</small></p>
             <p class="vb-tags"><span>+ 1:1 강의</span><span>원격 설치</span></p>
             <div class="vb-lanes"><i></i><i></i><i></i></div>
-            <p class="vb-ed"><span>VIDEO KIT + 1:1</span><b>macOS</b></p>
+            <p class="vb-ed"><span>VIDEO KIT + 1:1</span><b>macOS · Windows</b></p>
           </div>
           <div class="vb-f vb-side"><p><i></i>키트 + 1:1 강의</p></div>
           <div class="vb-f vb-top"></div>
@@ -1015,11 +1029,11 @@ footer .wrap{align-items:flex-start}
         </div>
         <ul class="caps">
           <li><b>장면 분석</b>촬영본 전체를 한눈에 보는 시트로 정리해 필요한 장면을 고릅니다.</li>
-          <li><b>음성 인식</b>한국어 · 영어 인터뷰를 맥에서 자동으로 받아 적습니다.</li>
+          <li><b>음성 인식</b>한국어 · 영어 인터뷰를 내 컴퓨터에서 자동으로 받아 적습니다.</li>
           <li><b>음악 · 효과음</b>장면 길이와 박자에 맞춰 곡을 고르고 다듬습니다.</li>
           <li><b>소스 가져오기</b>사이트에서 받아 오거나 편집 프로그램 안에서 골라 바로 씁니다.</li>
           <li><b>타이틀 · 모션그래픽</b>구독 템플릿을 쓰거나 직접 만들어 넣습니다.</li>
-          <li><b>파이널컷 · 캡컷 연동</b>타임라인과 이벤트, 키워드까지 정리된 프로젝트로 넘깁니다.</li>
+          <li><b>파이널컷 · 캡컷 · 다빈치 리졸브 연동</b>타임라인과 이벤트, 키워드까지 정리된 프로젝트로 넘깁니다. 캡컷 · 다빈치 리졸브 연동은 베타이며, 다빈치 리졸브는 윈도우판에서 씁니다.</li>
         </ul>
       </div>
 
@@ -1050,7 +1064,7 @@ footer .wrap{align-items:flex-start}
         <div class="mix-grid" role="group" aria-label="무료·유료 구성 선택">
           <div class="mix-cols" aria-hidden="true"><span></span><span>무료</span><span>유료 · 구독</span></div>
           <div class="mix-group">빌드 코어 <small>매번 실행</small></div>
-          <div class="mix-row fixed" data-pick="free"><span class="mix-k">장면 분석 · 음성 인식</span><span class="opt free on">맥에서 로컬 처리</span><span class="opt na">항상 무료</span></div>
+          <div class="mix-row fixed" data-pick="free"><span class="mix-k">장면 분석 · 음성 인식</span><span class="opt free on">내 컴퓨터에서 로컬 처리</span><span class="opt na">항상 무료</span></div>
           <div class="mix-row fixed" data-pick="paid"><span class="mix-k">콘티 · 편집 판단</span><span class="opt na">—</span><span class="opt paid on">Claude 요금제 (필수)</span></div>
           <div class="mix-row" data-pick="paid"><span class="mix-k">편집 프로그램</span><button type="button" class="opt free">캡컷 · 파이널컷 일반 구매</button><button type="button" class="opt paid">파이널컷 프로 구독제</button></div>
           <div class="mix-group">플러그인 <small>필요할 때만</small></div>
@@ -1101,9 +1115,9 @@ footer .wrap{align-items:flex-start}
         <div><dt>상품명</dt><dd>클로드 비디오 키트 for 파이널컷프로</dd></div>
         <div><dt>가격</dt><dd><span class="p-on"><b>키트 10만원</b>(정가 30만원) · <b>키트 + 2회 강의(총 2시간) 30만원</b>(정가 50만원). 마켓 오픈 기념 할인으로, 11월 28일(토) 밤 24:00까지 결제(계좌이체 주문 포함)하신 분께만 적용됩니다.</span><span class="p-off"><b>키트만 제공 30만원</b> · <b>키트 + 3회 강의 50만원</b></span> 키트를 이미 구입한 분의 <b>1:1 강의권 2회는 30만원</b>이며 할인 기간에도 같은 가격입니다.</dd></div>
         <div><dt>제공 내용</dt><dd>키트 파일(빌드 코어 9단계, 플러그인 스킬 18개), 바이럴 비디오 공식을 위한 유튜브 학습 데이터, <span class="p-on">클로드 기반 사용 설명 eBook(PDF · EPUB), </span><span class="p-off">설치 · 세팅 안내, </span>업데이트 파일. <span class="p-on">강의 포함 구성은 클로드 코드 사용법, 키트 설치 원격 지원, 1:1 강의 2회(총 2시간), 365일 1:1 채팅 지원이 더해집니다.</span><span class="p-off">강의 포함 과정은 클로드 코드 사용법, 키트 설치 원격 지원, 3주 동안 1:1 강의 3회, 365일 1:1 채팅 지원이 더해집니다.</span> 키트만 구입하는 구성은 클로드 코드에 익숙한 분께 권장하며 1:1 지원은 포함되지 않습니다. 키트를 먼저 구입한 분은 1:1 강의권 2회(클로드 코드 사용법 · 키트 설치 원격 지원 포함)로 강의를 따로 신청할 수 있습니다.</dd></div>
-        <div><dt>지원 환경</dt><dd>맥(macOS) 전용. 검수는 파이널컷 프로 또는 캡컷에서 합니다(프리미어 프로 · 다빈치 리졸브 지원 예정). <b>클로드 구독은 포함되어 있지 않습니다.</b> Claude Pro 이상 요금제를 개인이 직접 구독해야 사용할 수 있습니다.</dd></div>
+        <div id="env"><dt>지원 환경</dt><dd><b>운영체제</b>: macOS · Windows (맥용 · 윈도우용을 함께 받습니다)<br><b>편집 프로그램</b>: Final Cut Pro(정식) · CapCut(베타) · DaVinci Resolve(베타, 윈도우판)<br><b>Claude Pro 이상 구독 필요</b> — 클로드 구독은 포함되어 있지 않으며, Claude Pro 이상 요금제를 개인이 직접 구독해야 사용할 수 있습니다.<br>파이널컷 프로는 맥판, 다빈치 리졸브는 윈도우판에서 쓰며 키트가 조종하려면 유료판(Studio)이 필요합니다. 캡컷은 맥판 · 윈도우판 모두 됩니다. 윈도우는 Windows 10/11 64비트, NVIDIA 그래픽카드를 권장합니다(없으면 음성 인식이 느립니다). 프리미어 프로는 지원 예정입니다.</dd></div>
         <div><dt>결제</dt><dd>상품마다 있는 <b>결제하기</b>를 누르면 결제 화면으로 이동합니다. 결제 화면에서 상품과 금액을 확인하고 <b>계좌이체</b>(토스뱅크, 예금주 그라운드루티드) 또는 <b>카드 · 간편결제</b>(토스페이먼츠)를 고릅니다. 계좌이체는 주문 후 안내된 계좌로 입금하시면 판매자가 확인합니다. 카카오톡은 문의용입니다.</dd></div>
-        <div><dt>제공 방법</dt><dd>결제(입금)가 확인되면 결제 화면에 적은 이메일로 키트 다운로드 링크(7일 동안 열림)와 사용 설명 eBook(PDF · EPUB), 설치 안내를 보내드립니다. 링크 기간이 지나면 메일에 답장해 주시면 새 링크를 보내드립니다. 업데이트 파일도 같은 이메일로 보내드리며, 후속지원은 구매일로부터 1년입니다. 강의 포함 상품과 강의권은 결제 후 카카오톡으로 일정을 잡고, 일정에 따라 조기 마감될 수 있습니다.</dd></div>
+        <div><dt>제공 방법</dt><dd>결제(입금)가 확인되면 결제 화면에 적은 이메일로 키트 다운로드 링크(맥용 · 윈도우용, 7일 동안 열림)와 사용 설명 eBook(PDF · EPUB), 설치 안내를 보내드립니다. 링크 기간이 지나면 메일에 답장해 주시면 새 링크를 보내드립니다. 업데이트 파일도 같은 이메일로 보내드리며, 후속지원은 구매일로부터 1년입니다. 강의 포함 상품과 강의권은 결제 후 카카오톡으로 일정을 잡고, 일정에 따라 조기 마감될 수 있습니다.</dd></div>
         <div id="refund"><dt>환불</dt><dd>키트 파일을 받기 전에는 결제일로부터 7일 안에 요청하시면 전액 환불됩니다. 파일을 받은 뒤에는 디지털 콘텐츠 특성상 청약철회가 제한됩니다. 자세한 내용은 <a href="/videokit/terms">이용약관</a> 제8조를 확인해 주세요.</dd></div>
         <div><dt>영수증</dt><dd>간이영수증 또는 현금영수증을 결제 화면에서 신청할 수 있습니다.</dd></div>
         <div><dt>업데이트</dt><dd>새 버전과 변경 사항은 오픈카톡방 공지로 알려 드리고, 업데이트 파일은 이메일로 보내드립니다.</dd></div>
@@ -1118,9 +1132,9 @@ footer .wrap{align-items:flex-start}
       <div class="faq-list">
         <details class="p-on"><summary>오픈 할인은 언제까지인가요?</summary><p>11월 28일(토) 밤 24:00까지 결제하기에서 결제하거나 계좌이체로 주문하신 분께 적용됩니다.</p></details>
         <details class="p-on"><summary>강의 일정은 어떻게 정하나요?</summary><p>강의 시간은 개별로 소통하여 정합니다. 강의는 일정에 따라 조기 마감될 수 있습니다.</p></details>
-        <details><summary>윈도우에서도 쓸 수 있나요?</summary><p>아니요. 반복 작업을 맥에서 직접 처리하도록 만든 키트라 맥(macOS)에서만 동작합니다.</p></details>
-        <details><summary>클로드 요금은 따로 내야 하나요?</summary><p>네. 키트에는 클로드 구독이 포함되어 있지 않습니다. <b>Claude Pro 이상 요금제</b>를 개인이 직접 구독해야 사용할 수 있습니다. 대신 장면 분석과 타임라인 작성처럼 토큰이 많이 드는 일을 맥에서 처리하도록 만들어 사용량을 줄였습니다.</p></details>
-        <details><summary>파이널컷 프로가 없어도 되나요?</summary><p>캡컷으로도 검수할 수 있습니다. 프리미어 프로와 다빈치 리졸브는 지원할 예정입니다.</p></details>
+        <details><summary>윈도우에서도 쓸 수 있나요?</summary><p>네. 2026년 11월 26일 윈도우 버전을 배포했습니다. 구매하시면 맥용과 윈도우용을 함께 받습니다. 윈도우에서는 결과를 캡컷 또는 다빈치 리졸브 Studio(유료판)로 넘기며, 파이널컷 프로는 맥에서만 쓸 수 있습니다. Windows 10/11 64비트, NVIDIA 그래픽카드를 권장합니다.</p></details>
+        <details><summary>클로드 요금은 따로 내야 하나요?</summary><p>네. 키트에는 클로드 구독이 포함되어 있지 않습니다. <b>Claude Pro 이상 요금제</b>를 개인이 직접 구독해야 사용할 수 있습니다. 대신 장면 분석과 타임라인 작성처럼 토큰이 많이 드는 일을 내 컴퓨터에서 처리하도록 만들어 사용량을 줄였습니다.</p></details>
+        <details><summary>파이널컷 프로가 없어도 되나요?</summary><p>캡컷(맥 · 윈도우)이나 다빈치 리졸브 Studio(윈도우)로도 검수할 수 있습니다. 두 프로그램 연동은 베타입니다. 프리미어 프로는 지원할 예정입니다.</p></details>
         <details><summary>클로드를 한 번도 안 써 봤어요.</summary><p><span class="p-on">키트에는 기본 제작 개념을 쉽게 풀어 쓴 클로드 기반 사용 설명 eBook(PDF · EPUB)이 함께 갑니다. 직접 배우고 싶다면 키트 + 2회 강의 구성에서 클로드 기초부터 키트 세팅, 직접 제작까지 함께 진행합니다.</span><span class="p-off">키트 + 3회 강의 과정은 클로드와 클로드 코드 기초부터 시작해, 키트 세팅과 직접 제작까지 함께 진행합니다.</span></p></details>
         <details><summary>유료 구독 서비스가 꼭 있어야 하나요?</summary><p>아니요. 폰트, 음악, 효과음, 모션그래픽 등 항목마다 무료와 유료를 골라 쓸 수 있습니다. 이미 쓰는 구독이 있다면 그대로 연결하면 됩니다.</p></details>
         <details><summary>업데이트는 어떻게 받나요?</summary><p>새 버전과 변경 사항은 오픈카톡방 공지로 알려 드리고, 업데이트 파일은 이메일로 보내드립니다.</p></details>

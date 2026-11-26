@@ -76,7 +76,8 @@
 .vk-pay .vb-lanes i:nth-child(1){background:linear-gradient(90deg,#a46cf0 0 34%,transparent 34% 37%,#a46cf0 37% 78%,transparent 78%)}
 .vk-pay .vb-lanes i:nth-child(2){background:linear-gradient(90deg,#5b6cf0 0 26%,transparent 26% 28%,#5b6cf0 28% 100%)}
 .vk-pay .vb-lanes i:nth-child(3){background:#2fb39a;opacity:.85}
-.vk-pay .vb-ed{margin-top:12px;display:flex;justify-content:space-between;align-items:center;font:600 9.5px "JetBrains Mono",ui-monospace,monospace;color:rgba(236,235,230,.6);letter-spacing:.06em}
+.vk-pay .vb-ed{margin-top:12px;display:flex;flex-wrap:wrap;gap:4px 8px;justify-content:space-between;align-items:center;font:600 9.5px "JetBrains Mono",ui-monospace,monospace;color:rgba(236,235,230,.6);letter-spacing:.06em}
+.vk-pay .vb-ed span,.vk-pay .vb-ed b{white-space:nowrap}
 .vk-pay .vb-ed b{font-weight:600;color:#ecebe6;background:rgba(255,255,255,.1);padding:3px 6px;border-radius:4px}
 .vk-pay .vb-side p{transform:rotate(90deg);font-size:12px;font-weight:700;letter-spacing:-.01em;color:rgba(236,235,230,.86);white-space:nowrap;display:flex;align-items:center;gap:8px}
 .vk-pay .vb-side p i{width:6px;height:6px;border-radius:50%;background:#ff6b3d}

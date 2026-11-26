@@ -1,6 +1,7 @@
 // 판매용 키트 zip을 Supabase Storage 비공개 버킷에 올린다. 키트를 새로 만들 때마다 다시 실행한다.
 // 이미 보낸 메일의 링크도 같은 경로를 가리키므로, 링크가 유효한 동안에는 새 파일이 내려받아진다.
 // 실행: SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... node scripts/videokit-upload-kit.mjs <키트.zip>
+// 윈도우용은 경로를 바꿔 올린다: VIDEOKIT_KIT_PATH=kit/claude-video-kit-windows.zip node scripts/videokit-upload-kit.mjs <윈도우 키트.zip>
 import { readFile, stat } from 'node:fs/promises';
 import { createClient } from '@supabase/supabase-js';
 
