@@ -31,17 +31,28 @@ export default function Checkout({ clientKey, orderId, orderName, amount, mode =
   return <WidgetCheckout clientKey={clientKey} orderId={orderId} orderName={orderName} amount={amount} kit={kit} />;
 }
 
+const sameEmail = (a: string, b: string) => a.trim().toLowerCase() === b.trim().toLowerCase();
+
+// 이메일을 두 번 받아 철자가 다르면 제출이 막힌다 (setCustomValidity → 브라우저가 폼 제출을 멈춤).
 function Buyer({ kit }: { kit: boolean }) {
+  const [email, setEmail] = useState('');
+  const [email2, setEmail2] = useState('');
+  const confirm = useRef<HTMLInputElement>(null);
+  const mismatch = email2 !== '' && !sameEmail(email, email2);
+  useEffect(() => { confirm.current?.setCustomValidity(mismatch ? '두 이메일 주소가 다릅니다. 철자를 확인해 주세요.' : ''); }, [mismatch]);
   return <fieldset>
     <legend>받는 분 정보</legend>
     <label>이름<input name="name" required autoComplete="name" /></label>
     <label>휴대전화번호<input name="phone" required inputMode="tel" autoComplete="tel" pattern="[0-9\- ]{10,13}" placeholder="010-0000-0000" /></label>
-    <label>이메일 <small>{kit ? '키트 다운로드 링크를 받을 주소' : '강의 일정 안내를 받을 주소'}</small><input name="email" type="email" required autoComplete="email" maxLength={254} /></label>
+    <label>이메일 <small>{kit ? '비디오 키트를 받으실 주소' : '강의 일정 안내를 받을 주소'}</small><input name="email" type="email" required autoComplete="email" maxLength={254} value={email} onChange={(e) => setEmail(e.target.value)} /></label>
+    <label>이메일 확인 <small>같은 주소를 한 번 더 입력해 주세요</small><input ref={confirm} name="email2" type="email" required autoComplete="off" maxLength={254} value={email2} onChange={(e) => setEmail2(e.target.value)} aria-invalid={mismatch} aria-describedby="email-mismatch" /></label>
+    {mismatch && <p id="email-mismatch" className="err" role="alert">두 이메일 주소가 다릅니다. 철자를 확인해 주세요.</p>}
   </fieldset>;
 }
 
 function buyer(f: FormData) {
   const name = String(f.get('name')).trim(), email = String(f.get('email')).trim();
+  if (!sameEmail(email, String(f.get('email2') ?? ''))) throw new Error('email-mismatch');
   return {
     customerName: name, customerEmail: email,
     customerMobilePhone: String(f.get('phone')).replace(/\D/g, ''),
