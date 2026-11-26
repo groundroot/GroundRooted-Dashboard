@@ -10,7 +10,13 @@ const SALE_GRACE_MS = 30 * 60 * 1000;
 export const plans = {
   kit: { name: '클로드 비디오 키트 for 파이널컷프로 — 키트', saleName: '클로드 비디오 키트 for 파이널컷프로 — 키트', sale: 100_000, regular: 300_000 },
   lesson: { name: '클로드 비디오 키트 for 파이널컷프로 — 키트 + 3회 강의(3주 과정)', saleName: '클로드 비디오 키트 for 파이널컷프로 — 키트 + 1:1 강의 2회(총 2시간)', sale: 300_000, regular: 500_000 },
+  // 키트를 먼저 산 분이 나중에 신청하는 강의권. 키트 파일은 들어 있지 않고, 할인 기간에도 가격이 같다.
+  pass: { name: '클로드 비디오 키트 for 파이널컷프로 — 1:1 강의권 2회(키트 구매자용)', saleName: '클로드 비디오 키트 for 파이널컷프로 — 1:1 강의권 2회(키트 구매자용)', sale: 300_000, regular: 300_000 },
 } as const;
+// 강의 일정을 따로 조율하는 상품
+export const hasLesson = (plan: PlanId) => plan === 'lesson' || plan === 'pass';
+// 키트 파일을 보내는 상품
+export const hasKit = (plan: PlanId) => plan !== 'pass';
 export type PlanId = keyof typeof plans;
 export type Tier = 's' | 'r'; // s = 오픈 할인가, r = 정가
 
@@ -19,7 +25,7 @@ export const tierAt = (now = Date.now()): Tier => (now < SALE_ENDS ? 's' : 'r');
 export const priceOf = (plan: PlanId, tier: Tier) => (tier === 's' ? plans[plan].sale : plans[plan].regular);
 export const nameOf = (plan: PlanId, tier: Tier) => (tier === 's' ? plans[plan].saleName : plans[plan].name);
 
-const ORDER_ID = /^vk-(kit|lesson)-(s|r)-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
+const ORDER_ID = /^vk-(kit|lesson|pass)-(s|r)-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 export const makeOrderId = (plan: PlanId, tier: Tier, uuid: string) => `vk-${plan}-${tier}-${uuid}`;
 
 // 승인 요청 전에 주문번호와 금액이 서버 가격표와 맞는지 확인한다.

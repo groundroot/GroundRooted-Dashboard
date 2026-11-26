@@ -2,6 +2,23 @@ import type { PlanId, Tier } from '@/products/videokit';
 
 // 상품 페이지(/videokit)의 상품 박스와 같은 모양. 결제 화면에서 무엇을 사는지 보여 준다.
 export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier }) {
+  if (plan === 'pass') return <section className="vk-prod" aria-label="구매 상품">
+    <div className="vt-stage" aria-hidden="true"><div className="vt">
+      <div className="vt-main">
+        <p className="vb-brand"><i />GroundRooted</p>
+        <p className="vt-kind">1:1 LESSON PASS</p>
+        <p className="vt-title">1:1 강의권<small>클로드 비디오 키트 구매자용</small></p>
+        <p className="vt-meta">2회 · 총 2시간</p>
+      </div>
+      <div className="vt-stub"><b>×2</b><span>SESSIONS</span></div>
+    </div></div>
+    <div className="vk-prod-copy">
+      <p className="for lec">이미 키트를 구입하셨다면</p>
+      <h2>1:1 강의권 2회</h2>
+      <p className="meta">키트를 먼저 구입한 뒤 강의가 필요해졌을 때 신청합니다. 키트 파일은 들어 있지 않습니다. 일정은 개별 조율합니다.</p>
+      <ul className="inc"><li>1:1 강의 2회 · 총 2시간</li><li>클로드 코드 사용법</li><li>키트 설치 원격 지원</li></ul>
+    </div>
+  </section>;
   const lec = plan === 'lesson';
   const sessions = tier === 's' ? '1:1 강의 2회 · 총 2시간' : '1:1 강의 3회 · 3주';
   return <section className="vk-prod" aria-label="구매 상품">

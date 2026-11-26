@@ -103,6 +103,29 @@
 .vk-pay .vk-prod .inc{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:2px 0 0;padding:0}
 .vk-pay .vk-prod .inc li{font-size:13px;font-weight:600;color:#b4b2aa;padding:5px 10px;border-radius:999px;background:#22222a;line-height:1.5}
 .vk-pay .vk-prod .inc .hl{color:#e5d6ff;background:color-mix(in srgb,#a46cf0 24%,transparent)}
+/* 강의권 티켓 */
+.vk-pay .vt-stage{height:230px;display:grid;place-items:center;position:relative}
+.vk-pay .vt-stage::after{content:"";position:absolute;left:16%;right:16%;bottom:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.5);filter:blur(14px)}
+.vk-pay .vt{position:relative;z-index:1;display:flex;width:min(300px,100%);height:150px;transform:rotate(-5deg)}
+.vk-pay .vt-main{flex:1;min-width:0;display:flex;flex-direction:column;padding:16px 18px 14px;border-radius:12px 0 0 12px;
+  background:radial-gradient(120% 90% at 100% 0%,rgba(164,108,240,.5),transparent 60%),linear-gradient(160deg,#33215a,#1a1131 75%);
+  -webkit-mask:radial-gradient(circle at 100% 0,transparent 9px,#000 9.5px) top/100% 51% no-repeat,radial-gradient(circle at 100% 100%,transparent 9px,#000 9.5px) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle at 100% 0,transparent 9px,#000 9.5px) top/100% 51% no-repeat,radial-gradient(circle at 100% 100%,transparent 9px,#000 9.5px) bottom/100% 51% no-repeat}
+.vk-pay .vt-stub{flex:none;width:78px;display:grid;place-content:center;justify-items:center;gap:4px;border-radius:0 12px 12px 0;color:#131316;
+  background:linear-gradient(160deg,#ff8250,#e8551f);border-left:2px dashed rgba(19,19,22,.4);
+  -webkit-mask:radial-gradient(circle at 0 0,transparent 9px,#000 9.5px) top/100% 51% no-repeat,radial-gradient(circle at 0 100%,transparent 9px,#000 9.5px) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle at 0 0,transparent 9px,#000 9.5px) top/100% 51% no-repeat,radial-gradient(circle at 0 100%,transparent 9px,#000 9.5px) bottom/100% 51% no-repeat}
+.vk-pay .vt-stub b{font-size:32px;line-height:1;font-weight:800;letter-spacing:-.04em}
+.vk-pay .vt-stub span{font:700 8.5px ui-monospace,monospace;letter-spacing:.12em}
+.vk-pay .vt-kind{margin-top:12px;font:600 9.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;color:rgba(236,235,230,.6)}
+.vk-pay .vt-title{margin-top:3px;font-size:22px;line-height:1.15;font-weight:780;letter-spacing:-.03em;color:#ecebe6}
+.vk-pay .vt-title small{display:block;margin-top:3px;font-size:11.5px;font-weight:550;letter-spacing:-.01em;color:rgba(236,235,230,.66)}
+.vk-pay .vt-meta{margin-top:auto;font:600 10px "JetBrains Mono",ui-monospace,monospace;color:rgba(236,235,230,.72)}
+.vk-pay .vk-prod .vt-stage{height:210px}
+.vk-pay .vk-prod .vt{width:250px;height:140px}
+.vk-pay .vk-prod .vt-kind{margin-top:10px}
+.vk-pay .vk-prod .vt-title{margin-top:3px;font-size:20px}
+.vk-pay .vk-prod .vt-meta{margin-top:auto}
 @media (max-width:640px){
   .vk-pay .vk-prod{grid-template-columns:1fr;padding:18px}
   .vk-pay .vk-prod .vb-stage{height:310px}

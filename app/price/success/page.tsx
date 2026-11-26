@@ -1,5 +1,5 @@
 import Shell, { KAKAO_URL, won } from '../Shell';
-import { bankName, checkOrder, nameOf, paymentSecret } from '@/products/videokit';
+import { bankName, checkOrder, hasKit, hasLesson, nameOf, paymentSecret } from '@/products/videokit';
 import { deliverKit, deliveryConfigured, type DeliveryResult } from '@/products/videokit-delivery';
 
 export const dynamic = 'force-dynamic';
@@ -59,8 +59,8 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
         {due && <><b>입금 기한</b><span>{due}까지</span></>}
         <b>주문번호</b><span>{orderId}</span>
       </div>
-      <p className="lede">입금이 확인되면 {meta.email ? <b>{meta.email}</b> : '결제할 때 적은 이메일'}로 키트 다운로드 링크와 설치 안내를 {deliveryConfigured() ? '자동으로 보내드립니다' : '보내드립니다'}. 이 계좌는 이 주문에만 쓰입니다.</p>
-      {order.plan === 'lesson' && <p className="lede">강의 일정은 입금 확인 후 개별로 조율합니다.</p>}
+      {hasKit(order.plan) && <p className="lede">입금이 확인되면 {meta.email ? <b>{meta.email}</b> : '결제할 때 적은 이메일'}로 키트 다운로드 링크와 설치 안내를 {deliveryConfigured() ? '자동으로 보내드립니다' : '보내드립니다'}. 이 계좌는 이 주문에만 쓰입니다.</p>}
+      {hasLesson(order.plan) && <p className="lede">강의 일정은 입금 확인 후 개별로 조율합니다.</p>}
       <a className="btn btn-kakao" href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1 문의</a>
     </Shell>;
   }
@@ -79,12 +79,12 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
     <h1>결제가 완료되었습니다</h1>
     <p className="lede">{itemName} · {won(order.amount)}</p>
     <div className="order"><b>주문번호</b><span>{orderId}</span></div>
-    {sentTo
+    {!hasKit(order.plan) ? null : sentTo
       ? <p className="lede"><b>{sentTo}</b>로 키트 다운로드 링크와 설치 안내를 보냈습니다. 메일이 보이지 않으면 스팸함과 프로모션함을 확인해 주세요. 몇 분이 지나도 없으면 카카오톡으로 주문번호를 알려 주세요.</p>
       : !paid.fresh
         ? <p className="lede">이미 결제가 확인된 주문입니다. 키트 메일을 받지 못하셨다면 카카오톡으로 주문번호를 알려 주세요. 바로 다시 보내드리겠습니다.</p>
         : <p className="lede">결제는 정상으로 확인되었습니다. 키트 메일 발송을 확인하고 있으니, 카카오톡으로 주문번호를 남겨 주시면 바로 보내드리겠습니다.</p>}
-    {order.plan === 'lesson' && <p className="lede">강의 일정은 개별로 조율합니다. 곧 연락드리겠습니다.</p>}
+    {hasLesson(order.plan) && <p className="lede">강의 일정은 개별로 조율합니다. 곧 연락드리겠습니다.</p>}
     <a className="btn btn-kakao" href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1 문의</a>
     <a className="btn btn-ghost" href="/videokit">상품 페이지로</a>
   </Shell>;

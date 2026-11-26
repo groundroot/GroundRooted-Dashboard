@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { checkOrder, makeOrderId, plans, isPlanId, priceOf, nameOf, tierAt, SALE_ENDS } from '../products/videokit.ts';
+import { checkOrder, makeOrderId, plans, isPlanId, priceOf, nameOf, tierAt, SALE_ENDS, hasKit, hasLesson } from '../products/videokit.ts';
 import { kitEmail, isEmail, deliverKit, deliveryConfigured } from '../products/videokit-delivery.ts';
 
 const before = SALE_ENDS - 3600_000, after = SALE_ENDS + 3600_000;
@@ -25,6 +25,13 @@ for (const id of ['vk-pro-s-' + randomUUID(), 'vk-kit-' + randomUUID(), 'vk-kit-
   assert.equal(checkOrder(id, 100000, before).ok, false, String(id));
 assert.ok(isPlanId('kit') && isPlanId('lesson') && !isPlanId('toString') && !isPlanId(undefined));
 assert.equal(plans.kit.sale, 100000); assert.equal(plans.lesson.regular, 500000);
+// 강의권: 할인 기간에도 30만원, 키트 없음, 강의 있음
+assert.equal(priceOf('pass', 's'), 300000); assert.equal(priceOf('pass', 'r'), 300000);
+const passS = makeOrderId('pass', 's', randomUUID()), passR = makeOrderId('pass', 'r', randomUUID());
+assert.deepEqual(checkOrder(passS, 300000, before), { ok: true, plan: 'pass', tier: 's', amount: 300000 });
+assert.deepEqual(checkOrder(passR, 300000, after), { ok: true, plan: 'pass', tier: 'r', amount: 300000 });
+assert.equal(checkOrder(passS, 100000, before).ok, false); assert.equal(checkOrder(passR, 200000, after).ok, false);
+assert.ok(isPlanId('pass') && !hasKit('pass') && hasLesson('pass') && hasKit('kit') && !hasLesson('kit') && hasKit('lesson') && hasLesson('lesson'));
 console.log('PASS: videokit order/amount checks');
 
 // 키트 메일
@@ -40,6 +47,7 @@ assert.ok(!k.html.includes('강의 일정은 개별로'), 'kit mail has no lesso
 for (const v of ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY', 'RESEND_API_KEY', 'VIDEOKIT_MAIL_FROM']) delete process.env[v];
 assert.equal(deliveryConfigured(), false);
 assert.deepEqual(await deliverKit({ orderId: kitS, plan: 'kit', itemName: plans.kit.name, amount: 100000, email: 'a@b.co', name: '김' }), { status: 'off' });
+assert.deepEqual(await deliverKit({ orderId: makeOrderId('pass', 's', randomUUID()), plan: 'pass', itemName: plans.pass.name, amount: 300000, email: 'a@b.co', name: '김' }), { status: 'none' });
 console.log('PASS: videokit kit email');
 
 // 가상계좌 입금 웹훅 판정

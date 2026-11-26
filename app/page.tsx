@@ -13,6 +13,7 @@ const won = (n: number) => `${new Intl.NumberFormat('ko-KR').format(n)}원`;
 const kitPlans = [
   { id: 'kit', label: '키트', ...plans.kit },
   { id: 'lesson', label: '키트 + 1:1 강의', ...plans.lesson },
+  { id: 'pass', label: '키트 구매자 1:1 강의권 2회', ...plans.pass },
 ] as const;
 export const metadata = {
   title: 'GroundRooted | 자료를 지식으로, 생각을 결과물로',
@@ -55,7 +56,7 @@ export default function HomePage() {
           <ul className="fx-kit-plans">
             {kitPlans.map((p) => <li key={p.id}>
               <span>{p.label}</span>
-              <span className="fx-kit-price">{sale && <s>{won(p.regular)}</s>}<b>{won(sale ? p.sale : p.regular)}</b></span>
+              <span className="fx-kit-price">{sale && p.sale < p.regular && <s>{won(p.regular)}</s>}<b>{won(sale ? p.sale : p.regular)}</b></span>
             </li>)}
           </ul>
           <p className="fx-kit-note">{sale && <>오픈기념가 · 11월 28일(토) 24:00까지<br /></>}Claude 구독 미포함 (Claude Pro 이상 별도 구독) · macOS 전용</p>

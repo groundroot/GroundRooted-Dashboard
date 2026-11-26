@@ -7,7 +7,7 @@
 // 선택: VIDEOKIT_BUCKET(videokit), VIDEOKIT_KIT_PATH(kit/claude-video-kit.zip), VIDEOKIT_MAIL_REPLY_TO, VIDEOKIT_MAIL_BCC, VIDEOKIT_NOTICE_URL(공지 오픈카톡방 주소)
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 
-type PlanId = 'kit' | 'lesson';
+type PlanId = 'kit' | 'lesson' | 'pass';
 
 export const LINK_DAYS = 7;
 
@@ -15,6 +15,7 @@ export type Order = { orderId: string; plan: PlanId; itemName: string; amount: n
 export type DeliveryResult =
   | { status: 'sent'; email: string }      // 보냄 (24시간 안에 같은 주문으로 다시 부르면 Resend가 새로 보내지 않음)
   | { status: 'off' }                      // 발송 설정이 아직 없음
+  | { status: 'none' }                     // 보낼 키트가 없는 상품(강의권)
   | { status: 'failed'; reason: string };
 
 const env = (k: string, d = '') => process.env[k] || d;
@@ -99,6 +100,7 @@ async function sendMail(to: string, mail: { subject: string; html: string; text:
 // 결제 승인 직후 부른다. 결제 완료 화면을 새로고침해도 24시간 안에는 메일이 한 번만 간다.
 // force: 판매자가 새 링크를 다시 보낼 때(scripts/videokit-resend.mjs).
 export async function deliverKit(order: Order, { force = false } = {}): Promise<DeliveryResult> {
+  if (order.plan === 'pass') return { status: 'none' };
   if (!deliveryConfigured()) return { status: 'off' };
   if (!isEmail(order.email)) { console.error('[videokit] no valid email in payment metadata', order.orderId); return { status: 'failed', reason: 'invalid email' }; }
   const bucket = env('VIDEOKIT_BUCKET', 'videokit');

@@ -514,6 +514,31 @@ html:not(.promo-end) .p-off{display:none!important}
   .vb-title{font-size:22px}
   .vb-seal{width:92px;height:92px;right:-24px;top:-22px}
 }
+/* ---------- 강의권 (키트 구매자용) ---------- */
+.vt-stage{height:230px;display:grid;place-items:center;position:relative}
+.vt-stage::after{content:"";position:absolute;left:16%;right:16%;bottom:22px;height:22px;border-radius:50%;background:rgba(0,0,0,.5);filter:blur(14px)}
+.vt{position:relative;z-index:1;display:flex;width:min(300px,100%);height:150px;transform:rotate(-5deg)}
+.vt-main{flex:1;min-width:0;display:flex;flex-direction:column;padding:16px 18px 14px;border-radius:12px 0 0 12px;
+  background:radial-gradient(120% 90% at 100% 0%,rgba(164,108,240,.5),transparent 60%),linear-gradient(160deg,#33215a,#1a1131 75%);
+  -webkit-mask:radial-gradient(circle at 100% 0,transparent 9px,#000 9.5px) top/100% 51% no-repeat,radial-gradient(circle at 100% 100%,transparent 9px,#000 9.5px) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle at 100% 0,transparent 9px,#000 9.5px) top/100% 51% no-repeat,radial-gradient(circle at 100% 100%,transparent 9px,#000 9.5px) bottom/100% 51% no-repeat}
+.vt-stub{flex:none;width:78px;display:grid;place-content:center;justify-items:center;gap:4px;border-radius:0 12px 12px 0;color:#131316;
+  background:linear-gradient(160deg,#ff8250,#e8551f);border-left:2px dashed rgba(19,19,22,.4);
+  -webkit-mask:radial-gradient(circle at 0 0,transparent 9px,#000 9.5px) top/100% 51% no-repeat,radial-gradient(circle at 0 100%,transparent 9px,#000 9.5px) bottom/100% 51% no-repeat;
+  mask:radial-gradient(circle at 0 0,transparent 9px,#000 9.5px) top/100% 51% no-repeat,radial-gradient(circle at 0 100%,transparent 9px,#000 9.5px) bottom/100% 51% no-repeat}
+.vt-stub b{font-size:32px;line-height:1;font-weight:800;letter-spacing:-.04em}
+.vt-stub span{font:700 8.5px ui-monospace,monospace;letter-spacing:.12em}
+.vt-kind{margin-top:12px;font:600 9.5px "JetBrains Mono",ui-monospace,monospace;letter-spacing:.12em;color:rgba(236,235,230,.6)}
+.vt-title{margin-top:3px;font-size:22px;line-height:1.15;font-weight:780;letter-spacing:-.03em;color:#ecebe6}
+.vt-title small{display:block;margin-top:3px;font-size:11.5px;font-weight:550;letter-spacing:-.01em;color:rgba(236,235,230,.66)}
+.vt-meta{margin-top:auto;font:600 10px "JetBrains Mono",ui-monospace,monospace;color:rgba(236,235,230,.72)}
+
+.launch-plans .lp-pass{grid-column:1/-1;grid-template-columns:300px minmax(0,1fr);column-gap:36px;align-items:center}
+.lp-pass-copy{display:grid;gap:8px;justify-items:start}
+.lp-pass .lp-price{margin-top:4px}
+.lp-pass-note{color:var(--ink-3);font-size:14px;line-height:1.6;max-width:52ch}
+.lp-pass-note b{color:var(--ink-2)}
+@media (max-width:720px){.launch-plans .lp-pass{grid-template-columns:1fr}.lp-pass .vt-stage{height:200px}}
 @media (max-width:640px){.launch-plans{grid-template-columns:1fr}.lp{padding:22px}}
 @media (max-width:420px){.cd{gap:6px}.cd-u{min-width:0;flex:1;padding:14px 4px;border-radius:14px}.cd-u b{font-size:38px}}
 
@@ -720,6 +745,25 @@ footer .wrap{align-items:flex-start}
           <p class="lp-price"><s>50만원</s><strong>30<small>만원</small></strong></p>
           <span class="lp-off">20만원 할인 · 기간 한정</span>
         </div>
+        <div class="lp lp-lec lp-pass">
+          <div class="vt-stage" aria-hidden="true"><div class="vt">
+            <div class="vt-main">
+              <p class="vb-brand"><i></i>GroundRooted</p>
+              <p class="vt-kind">1:1 LESSON PASS</p>
+              <p class="vt-title">1:1 강의권<small>클로드 비디오 키트 구매자용</small></p>
+              <p class="vt-meta">2회 · 총 2시간</p>
+            </div>
+            <div class="vt-stub"><b>×2</b><span>SESSIONS</span></div>
+          </div></div>
+          <div class="lp-pass-copy">
+            <p class="lp-for">이미 키트를 구입하셨다면</p>
+            <h3>1:1 강의권 2회</h3>
+            <p class="lp-meta">키트를 먼저 구입한 뒤 강의가 필요해졌을 때 따로 신청합니다. 클로드 코드 사용법과 키트 설치 원격 지원을 함께 진행하며, 일정은 개별 조율합니다.</p>
+            <div class="lp-inc"><span>1:1 강의 2회 · 총 2시간</span><span>클로드 코드 사용법</span><span>키트 설치 원격 지원</span></div>
+            <p class="lp-price"><strong>30<small>만원</small></strong></p>
+            <p class="lp-pass-note">할인 기간에도 같은 가격입니다. 정가 기준으로 키트와 함께 사면 강의 몫은 20만원(키트 30만원 + 강의 20만원 = 50만원)이고, 따로 사면 30만원 + 30만원 = 60만원입니다. 처음부터 강의가 필요하다면 <b>키트 + 1:1 강의</b>가 더 유리합니다.</p>
+          </div>
+        </div>
       </div>
       <p class="claude-req"><svg><use href="#i-card-off"/></svg><span><b>클로드 구독은 포함되어 있지 않습니다.</b> 이 키트는 <b>Claude Pro 이상 요금제</b>를 개인이 직접 구독해서 사용하는 키트입니다.</span></p>
       <div class="actions">
@@ -822,6 +866,11 @@ footer .wrap{align-items:flex-start}
             <p class="meta">키트 파일 + 클로드 기반 사용 설명 eBook(PDF · EPUB) · 클로드 코드에 익숙한 분께 권장</p>
             <div class="price"><s>30만원</s><strong>10<small>만원</small></strong><span>오픈 기념가</span></div>
           </div>
+          <div class="plan">
+            <h3>1:1 강의권 2회</h3>
+            <p class="meta">이미 키트를 구입한 분 · 클로드 코드 사용법 · 키트 설치 원격 지원 · 1:1 강의 2회(총 2시간)</p>
+            <div class="price"><strong>30<small>만원</small></strong><span>할인 없음</span></div>
+          </div>
         </div>
         <div class="vb-shelf launch-plans p-off">
           <div class="lp">
@@ -870,6 +919,25 @@ footer .wrap{align-items:flex-start}
             <p class="lp-meta">3주 과정. 클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행합니다.</p>
             <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook</span><span>클로드 코드 사용법</span><span>키트 설치 원격 지원</span><span>1:1 강의 3회 · 3주</span><span class="hl">365일 1:1 지원</span></div>
             <p class="lp-price"><strong>50<small>만원</small></strong></p>
+          </div>
+          <div class="lp lp-lec lp-pass">
+            <div class="vt-stage" aria-hidden="true"><div class="vt">
+              <div class="vt-main">
+                <p class="vb-brand"><i></i>GroundRooted</p>
+                <p class="vt-kind">1:1 LESSON PASS</p>
+                <p class="vt-title">1:1 강의권<small>클로드 비디오 키트 구매자용</small></p>
+                <p class="vt-meta">2회 · 총 2시간</p>
+              </div>
+              <div class="vt-stub"><b>×2</b><span>SESSIONS</span></div>
+            </div></div>
+            <div class="lp-pass-copy">
+              <p class="lp-for">이미 키트를 구입하셨다면</p>
+              <h3>1:1 강의권 2회</h3>
+              <p class="lp-meta">키트를 먼저 구입한 뒤 강의가 필요해졌을 때 따로 신청합니다. 클로드 코드 사용법과 키트 설치 원격 지원을 함께 진행하며, 일정은 개별 조율합니다.</p>
+              <div class="lp-inc"><span>1:1 강의 2회 · 총 2시간</span><span>클로드 코드 사용법</span><span>키트 설치 원격 지원</span></div>
+              <p class="lp-price"><strong>30<small>만원</small></strong></p>
+              <p class="lp-pass-note">할인 기간에도 같은 가격입니다. 정가 기준으로 키트와 함께 사면 강의 몫은 20만원(키트 30만원 + 강의 20만원 = 50만원)이고, 따로 사면 30만원 + 30만원 = 60만원입니다. 처음부터 강의가 필요하다면 <b>키트 + 1:1 강의</b>가 더 유리합니다.</p>
+            </div>
           </div>
         </div>
 
@@ -1010,8 +1078,8 @@ footer .wrap{align-items:flex-start}
       </div>
       <dl class="facts">
         <div><dt>상품명</dt><dd>클로드 비디오 키트 for 파이널컷프로</dd></div>
-        <div><dt>가격</dt><dd><span class="p-on"><b>키트 10만원</b>(정가 30만원) · <b>키트 + 2회 강의(총 2시간) 30만원</b>(정가 50만원). 마켓 오픈 기념 할인으로, 11월 28일(토) 밤 24:00까지 신청하신 분께만 적용됩니다.</span><span class="p-off"><b>키트만 제공 30만원</b> · <b>키트 + 3회 강의 50만원</b></span></dd></div>
-        <div><dt>제공 내용</dt><dd>키트 파일(빌드 코어 9단계, 플러그인 스킬 18개), 바이럴 비디오 공식을 위한 유튜브 학습 데이터, <span class="p-on">클로드 기반 사용 설명 eBook(PDF · EPUB), </span><span class="p-off">설치 · 세팅 안내, </span>업데이트 파일. <span class="p-on">강의 포함 구성은 클로드 코드 사용법, 키트 설치 원격 지원, 1:1 강의 2회(총 2시간), 365일 1:1 지원이 더해집니다.</span><span class="p-off">강의 포함 과정은 클로드 코드 사용법, 키트 설치 원격 지원, 3주 동안 1:1 강의 3회, 365일 1:1 지원이 더해집니다.</span> 키트만 구입하는 구성은 클로드 코드에 익숙한 분께 권장하며 1:1 지원은 포함되지 않습니다.</dd></div>
+        <div><dt>가격</dt><dd><span class="p-on"><b>키트 10만원</b>(정가 30만원) · <b>키트 + 2회 강의(총 2시간) 30만원</b>(정가 50만원). 마켓 오픈 기념 할인으로, 11월 28일(토) 밤 24:00까지 신청하신 분께만 적용됩니다.</span><span class="p-off"><b>키트만 제공 30만원</b> · <b>키트 + 3회 강의 50만원</b></span> 키트를 이미 구입한 분의 <b>1:1 강의권 2회는 30만원</b>이며 할인 기간에도 같은 가격입니다.</dd></div>
+        <div><dt>제공 내용</dt><dd>키트 파일(빌드 코어 9단계, 플러그인 스킬 18개), 바이럴 비디오 공식을 위한 유튜브 학습 데이터, <span class="p-on">클로드 기반 사용 설명 eBook(PDF · EPUB), </span><span class="p-off">설치 · 세팅 안내, </span>업데이트 파일. <span class="p-on">강의 포함 구성은 클로드 코드 사용법, 키트 설치 원격 지원, 1:1 강의 2회(총 2시간), 365일 1:1 지원이 더해집니다.</span><span class="p-off">강의 포함 과정은 클로드 코드 사용법, 키트 설치 원격 지원, 3주 동안 1:1 강의 3회, 365일 1:1 지원이 더해집니다.</span> 키트만 구입하는 구성은 클로드 코드에 익숙한 분께 권장하며 1:1 지원은 포함되지 않습니다. 키트를 먼저 구입한 분은 1:1 강의권 2회(클로드 코드 사용법 · 키트 설치 원격 지원 포함)로 강의를 따로 신청할 수 있습니다.</dd></div>
         <div><dt>지원 환경</dt><dd>맥(macOS) 전용. 검수는 파이널컷 프로 또는 캡컷에서 합니다(프리미어 프로 · 다빈치 리졸브 지원 예정). <b>클로드 구독은 포함되어 있지 않습니다.</b> Claude Pro 이상 요금제를 개인이 직접 구독해야 사용할 수 있습니다.</dd></div>
         <div><dt>제공 방법</dt><dd><span class="p-on">신청 순서대로 안내드리며, 결제가 완료되면 키트 파일과 사용 설명 eBook(PDF · EPUB)을 이메일로 보내드립니다. 강의 시간은 개별로 소통하여 일정을 잡고, 일정에 따라 조기 마감될 수 있습니다.</span><span class="p-off">결제가 확인되면 키트 파일과 설치 안내를 카카오톡으로 보내드립니다. 강의 포함 과정은 상담으로 첫 수업 일정을 정합니다.</span></dd></div>
         <div><dt>결제</dt><dd><span class="p-on">신청은 이메일(sungchulkang@groundrooted.com)로 받습니다. 결제는 결제창이 열리면 그때 진행하며, 강의 포함 구성은 1일차 일정이 정해지면 결제합니다. 신용 · 체크카드와 간편결제로 결제할 수 있습니다.</span><span class="p-off">구매 신청은 카카오톡 1:1로 받습니다. 상담 후 결제 링크를 보내드리며, 신용 · 체크카드와 간편결제로 결제할 수 있습니다.</span></dd></div>
