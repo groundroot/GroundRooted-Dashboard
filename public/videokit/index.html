@@ -451,6 +451,9 @@ html:not(.promo-end) .p-off{display:none!important}
 .lp h3{font-size:21px;font-weight:700;letter-spacing:-.015em}
 .lp-meta{color:var(--ink-3);font-size:15px}
 .lp-nolec{color:var(--ink-2);font-weight:600}
+.lp-first{font-size:14px;font-weight:600;line-height:1.55;color:#e5d6ff;padding:9px 12px;border-radius:10px;background:color-mix(in srgb,var(--clip-v2) 16%,transparent)}
+.lp-first a{color:#fff;font-weight:700}
+.lp-lec[id]{scroll-margin-top:88px}
 .lp-price{display:flex;align-items:baseline;gap:12px;margin-top:8px}
 .lp-price s{color:var(--ink-3);font-size:18px}
 .lp-price strong{font-size:clamp(40px,4.6vw,54px);font-weight:780;letter-spacing:-.035em;font-variant-numeric:tabular-nums}
@@ -750,11 +753,12 @@ footer .wrap{align-items:flex-start}
           <p class="lp-for">클로드 코드에 익숙한 분께 권장</p>
           <h3>키트</h3>
           <p class="lp-meta">키트 파일과 사용 설명 eBook을 받아 직접 설치하고 세팅합니다. <b class="lp-nolec">강의는 들어 있지 않으며, 필요하면 1:1 강의권을 따로 구입합니다.</b></p>
+          <p class="lp-first">클로드 코드를 처음 접하시면 <a href="#plan-lec-launch">키트 + 1:1 강의</a> 통합본을 구매해 주세요.</p>
           <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook (PDF · EPUB)</span></div>
           <p class="lp-price"><s>30만원</s><strong>10<small>만원</small></strong></p>
           <span class="lp-off">20만원 할인 · 기간 한정</span>
         </div>
-        <div class="lp lp-lec">
+        <div class="lp lp-lec" id="plan-lec-launch">
           <div class="vb-stage" aria-hidden="true"><div class="vb vb-lec">
           <div class="vb-f vb-front">
             <p class="vb-brand"><i></i>GroundRooted</p>
@@ -927,10 +931,11 @@ footer .wrap{align-items:flex-start}
             <p class="lp-for">클로드 코드에 익숙한 분께 권장</p>
             <h3>키트</h3>
             <p class="lp-meta">키트 파일을 받아 직접 설치하고 세팅합니다. <b class="lp-nolec">강의는 들어 있지 않으며, 필요하면 1:1 강의권을 따로 구입합니다.</b></p>
+            <p class="lp-first">클로드 코드를 처음 접하시면 <a href="#plan-lec">키트 + 1:1 강의</a> 통합본을 구매해 주세요.</p>
             <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook (PDF · EPUB)</span></div>
             <p class="lp-price"><strong>30<small>만원</small></strong></p>
           </div>
-          <div class="lp lp-lec">
+          <div class="lp lp-lec" id="plan-lec">
             <div class="vb-stage" aria-hidden="true"><div class="vb vb-lec">
           <div class="vb-f vb-front">
             <p class="vb-brand"><i></i>GroundRooted</p>
