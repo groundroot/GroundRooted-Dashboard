@@ -2,7 +2,7 @@
 // 토스 개발자센터 > 웹훅에 https://groundrooted.com/api/webhooks/toss 를 등록하고 DEPOSIT_CALLBACK 이벤트를 고른다.
 // 본문은 믿지 않는다: 주문번호로 결제를 다시 조회해 secret · 상태 · 금액을 확인한 뒤에만 보낸다 (depositReady).
 // 토스는 10초 안에 200을 받지 못하면 최대 7번 다시 보낸다. 같은 주문 메일은 Resend 멱등 키로 한 번만 나간다.
-import { depositReady, nameOf, paymentSecret, type TossPayment } from '@/products/videokit';
+import { depositReady, kitMailAllowed, nameOf, paymentSecret, type TossPayment } from '@/products/videokit';
 import { deliverKit } from '@/products/videokit-delivery';
 
 export const dynamic = 'force-dynamic';
@@ -28,6 +28,11 @@ export async function POST(req: Request) {
   if (!ready.ok) {
     console.error('[videokit] deposit webhook rejected', body.orderId, ready.reason);
     return new Response('rejected', { status: 200 });
+  }
+  // 테스트 키 결제(돈이 오가지 않음)의 입금 알림에는 키트를 보내지 않는다.
+  if (!kitMailAllowed()) {
+    console.error('[videokit] deposit webhook in test mode — kit mail skipped', body.orderId);
+    return new Response('test mode', { status: 200 });
   }
   const { order } = ready;
   const meta = payment?.metadata ?? {};

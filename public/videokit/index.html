@@ -6,7 +6,7 @@
 <title>클로드 비디오 키트 for 파이널컷프로</title>
 <meta name="description" content="클로드 코드로 파이널컷 프로 편집을 자동화하는 비디오 키트. 20년 차 편집 노하우를 담아 반복 작업은 맥에서 처리하고 클로드 토큰 사용량을 줄였습니다.">
 <meta property="og:title" content="클로드 비디오 키트 for 파이널컷프로">
-<meta property="og:description" content="클로드 코드로 파이널컷 프로 편집을 자동화하는 비디오 키트. 구매 문의는 카카오톡 1:1.">
+<meta property="og:description" content="클로드 코드로 파이널컷 프로 편집을 자동화하는 비디오 키트. 결제하기에서 계좌이체 또는 카드 · 간편결제로 구매할 수 있습니다.">
 <meta property="og:url" content="https://groundrooted.com/videokit">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#131316">
@@ -432,8 +432,14 @@ section.band{border-top:1px solid var(--line-soft)}
 /* ---------- 마켓 오픈 기념 할인 ---------- */
 .promo-end .p-on{display:none!important}
 html:not(.promo-end) .p-off{display:none!important}
-.btn-mail{background:var(--ink);color:#141417;box-shadow:0 6px 16px -6px rgba(0,0,0,.6)}
-.btn-mail:hover{transform:translateY(-2px);background:#fff}
+.btn-buy{background:var(--head);color:#141417;box-shadow:0 6px 16px -6px rgba(0,0,0,.6)}
+.btn-buy:hover{transform:translateY(-2px);background:#ff8455}
+.lp-buy{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.lp-buy .btn{flex:1 1 9em;justify-content:center;height:50px}
+.lp-pass-copy .lp-buy{justify-self:stretch;max-width:520px;width:100%}
+.buy-note{max-width:880px;margin:20px auto 0;text-align:center;color:var(--ink-2);font-size:15px;line-height:1.7}
+.buy-note a{color:var(--ink);text-underline-offset:3px}
+.vb-shelf .buy-note{grid-column:1/-1;margin-top:4px}
 .band-launch{background:#17140f;border-top:1px solid #2c261d;border-bottom:1px solid #2c261d}
 .launch-head{text-align:center}
 .launch-tag{font-size:13px;letter-spacing:.14em;color:var(--head);margin-bottom:12px}
@@ -614,36 +620,6 @@ footer .wrap{align-items:flex-start}
 .maker p{margin:0;max-width:60ch}
 
 /* ---------- 신청 팝업 ---------- */
-.apply{width:min(520px,calc(100vw - 32px));max-height:calc(100dvh - 32px);margin:auto;padding:0;border:1px solid var(--line);border-radius:20px;background:var(--panel);color:var(--ink);font-family:var(--sans);overflow:auto}
-.apply::backdrop{background:rgba(8,8,10,.72);backdrop-filter:blur(4px)}
-.apply form,.apply .apply-done{padding:28px 26px 26px;display:grid;gap:14px}
-.apply-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.apply h2{font-size:22px;line-height:1.35;letter-spacing:-.02em}
-.apply-x{flex:none;width:36px;height:36px;border:0;border-radius:10px;background:var(--panel-2);color:var(--ink-2);font-size:20px;cursor:pointer}
-.apply-x:hover{color:var(--ink)}
-.apply-lede{font-size:14px;line-height:1.6;color:var(--ink-2)}
-.apply label{display:grid;gap:6px;font-size:14px;font-weight:600}
-.apply label small{font-weight:500;color:var(--ink-3)}
-.apply input[type=text],.apply input[type=email],.apply input[type=tel]{height:48px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:500 16px var(--sans)}
-.apply input:focus-visible{outline:2px solid var(--clip-v1);outline-offset:1px}
-.apply fieldset{border:0;display:grid;gap:8px}
-.apply legend{font-size:14px;font-weight:600;margin-bottom:6px}
-.apply-plan{display:flex!important;align-items:center;gap:12px;padding:14px;border:1px solid var(--line);border-radius:12px;background:var(--bg);cursor:pointer;font-weight:500!important}
-.apply-plan:has(input:checked){border-color:var(--clip-v1);background:color-mix(in srgb,var(--clip-v1) 12%,var(--bg))}
-.apply-plan input{accent-color:var(--clip-v1);width:18px;height:18px;flex:none}
-.apply-plan span{flex:1;display:grid;gap:2px}
-.apply-plan b{font-size:15px}
-.apply-plan small{font-size:13px;color:var(--ink-3)}
-.apply-plan em{font-style:normal;font-weight:700;white-space:nowrap}
-.apply [hidden]{display:none!important}
-.apply-hp{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
-.apply-err{font-size:14px;color:#ff8a6b;line-height:1.6}
-.apply-err a{color:inherit}
-.apply-privacy{font-size:12.5px;line-height:1.6;color:var(--ink-3)}
-.apply-privacy a{color:var(--ink-2);text-underline-offset:2px}
-.apply .btn{width:100%;justify-content:center;border:0;cursor:pointer;font-family:var(--sans)}
-.apply .btn[disabled]{opacity:.6;cursor:default}
-.apply-done p{font-size:15px;line-height:1.7;color:var(--ink-2)}
 </style>
 <script>(function(){if(Date.now()>=Date.parse('2026-11-29T00:00:00+09:00'))document.documentElement.classList.add('promo-end')})();</script>
 <script>(function(){var d=document.documentElement;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('rv-on');setTimeout(function(){if(!window.__rv)d.classList.add('rv-done')},2500)})();</script>
@@ -684,15 +660,15 @@ footer .wrap{align-items:flex-start}
         영상 편집 20년 차의 노하우를 담아, 반복 작업은 <b>맥에서 직접</b> 돌리고 <b>클로드 토큰 사용량</b>은 줄였습니다.
       </p>
       <div class="actions p-on">
-        <a class="btn btn-mail js-apply" href="#launch"><svg><use href="#i-mail"/></svg>신청서 작성</a>
+        <a class="btn btn-buy" href="/price">결제하기</a>
         <a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡 문의</a>
       </div>
-      <p class="note p-on">마켓 오픈 기념 할인 중 · 11월 28일(토) 밤 24:00까지 신청서를 작성하신 분께 적용됩니다.</p>
+      <p class="note p-on">마켓 오픈 기념 할인 중 · 11월 28일(토) 밤 24:00까지 결제(계좌이체 주문 포함)하신 분께 적용됩니다.</p>
       <div class="actions p-off">
+        <a class="btn btn-buy" href="/price">결제하기</a>
         <a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡 1:1 문의</a>
-        <a class="btn btn-ghost" href="#kit">키트 살펴보기</a>
       </div>
-      <p class="note p-off">구매 신청은 카카오톡 1:1로 받고 있습니다. 결제 방법은 상담 후 안내드립니다.</p>
+      <p class="note p-off">결제하기에서 계좌이체 또는 카드 · 간편결제로 구매할 수 있습니다. 궁금한 점은 카카오톡으로 문의해 주세요.</p>
 
       <div class="tl" aria-label="키트 작업 흐름">
         <div class="tl-head">
@@ -728,7 +704,7 @@ footer .wrap{align-items:flex-start}
       <div class="launch-head">
         <p class="launch-tag tc">MARKET OPEN SALE</p>
         <h2 id="launch-h">마켓 오픈 기념 할인</h2>
-        <p>11월 28일(토) 밤 24:00까지 신청하신 분께만 드립니다.</p>
+        <p>11월 28일(토) 밤 24:00까지 구매하신 분께만 드립니다.</p>
       </div>
       <div class="cd" role="timer" aria-label="할인 마감까지 남은 시간" data-deadline="2026-11-29T00:00:00+09:00">
         <div class="cd-u"><b data-u="d">-</b><span>일</span></div>
@@ -757,6 +733,7 @@ footer .wrap{align-items:flex-start}
           <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook (PDF · EPUB)</span></div>
           <p class="lp-price"><s>30만원</s><strong>10<small>만원</small></strong></p>
           <span class="lp-off">20만원 할인 · 기간 한정</span>
+          <div class="lp-buy"><a class="btn btn-buy" href="/price?plan=kit" aria-label="키트 결제하기">결제하기</a></div>
         </div>
         <div class="lp lp-lec" id="plan-lec-launch">
           <div class="vb-stage" aria-hidden="true"><div class="vb vb-lec">
@@ -786,6 +763,7 @@ footer .wrap{align-items:flex-start}
           <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook</span><span>클로드 코드 사용법</span><span>키트 설치 원격 지원</span><span>1:1 강의 2회 · 총 2시간</span><span class="hl">365일 1:1 채팅 지원</span></div>
           <p class="lp-price"><s>50만원</s><strong>30<small>만원</small></strong></p>
           <span class="lp-off">20만원 할인 · 기간 한정</span>
+          <div class="lp-buy"><a class="btn btn-buy" href="/price?plan=lesson" aria-label="키트 + 1:1 강의 결제하기">결제하기</a></div>
         </div>
         <div class="lp lp-lec lp-pass">
           <div class="vt-stage" aria-hidden="true"><div class="vt">
@@ -804,15 +782,12 @@ footer .wrap{align-items:flex-start}
             <div class="lp-inc"><span>1:1 강의 2회 · 총 2시간</span><span>클로드 코드 사용법</span><span>키트 설치 원격 지원</span></div>
             <p class="lp-price"><strong>30<small>만원</small></strong></p>
             <p class="lp-pass-note">할인 기간에도 같은 가격입니다. 정가 기준으로 키트와 함께 사면 강의 몫은 20만원(키트 30만원 + 강의 20만원 = 50만원)이고, 따로 사면 30만원 + 30만원 = 60만원입니다. 처음부터 강의가 필요하다면 <b>키트 + 1:1 강의</b>가 더 유리합니다.</p>
+            <div class="lp-buy"><a class="btn btn-buy" href="/price?plan=pass" aria-label="1:1 강의권 2회 결제하기">결제하기</a></div>
           </div>
         </div>
       </div>
       <p class="claude-req"><svg><use href="#i-card-off"/></svg><span><b>클로드 구독은 포함되어 있지 않습니다.</b> 이 키트는 <b>Claude Pro 이상 요금제</b>를 개인이 직접 구독해서 사용하는 키트입니다.</span></p>
-      <div class="actions">
-        <a class="btn btn-mail js-apply" href="mailto:sungchulkang@groundrooted.com?subject=%5B%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%20%EC%8B%A0%EC%B2%AD%5D%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8&amp;body=%EC%95%88%EB%85%95%ED%95%98%EC%84%B8%EC%9A%94.%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8%20%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%EC%9D%84%20%EC%8B%A0%EC%B2%AD%ED%95%A9%EB%8B%88%EB%8B%A4.%0A%0A1.%20%EC%9D%B4%EB%A6%84%3A%0A2.%20%EC%97%B0%EB%9D%BD%EC%B2%98%3A%0A3.%20%EC%8B%A0%EC%B2%AD%20%EA%B5%AC%EC%84%B1%20%28%ED%95%98%EB%82%98%EB%A7%8C%20%EB%82%A8%EA%B2%A8%20%EC%A3%BC%EC%84%B8%EC%9A%94%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2810%EB%A7%8C%EC%9B%90%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2B%202%ED%9A%8C%20%EA%B0%95%EC%9D%98%2C%20%EC%B4%9D%202%EC%8B%9C%EA%B0%84%20%2830%EB%A7%8C%EC%9B%90%29%0A4.%20%EC%82%AC%EC%9A%A9%ED%95%98%EB%8A%94%20%EB%A7%A5%EA%B3%BC%20%ED%8E%B8%EC%A7%91%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8%3A%0A5.%20Claude%20Pro%20%EC%9D%B4%EC%83%81%20%EC%9A%94%EA%B8%88%EC%A0%9C%20%EA%B5%AC%EB%8F%85%20%EC%97%AC%EB%B6%80%3A%0A"><svg><use href="#i-mail"/></svg>신청서 작성</a>
-        <a class="btn btn-ghost" href="#how">진행 방식 보기</a>
-      </div>
-      <p class="note">신청서를 보내 주시면 신청 순서대로 결제와 키트 발송을 안내드립니다. 궁금한 점은 카카오톡으로 문의해 주세요.</p>
+      <p class="buy-note">결제하기를 누르면 결제 화면에서 상품과 금액을 확인하고 계좌이체 또는 카드 · 간편결제(토스페이먼츠)를 고릅니다. 결제(입금)가 확인되면 적어 주신 이메일로 키트 다운로드 링크(7일 동안 열림)와 사용 설명 eBook을 보내드리고, 강의는 카카오톡으로 일정을 잡습니다. 환불은 <a href="#refund">환불 안내</a>를 확인해 주세요. 궁금한 점은 카카오톡으로 문의해 주세요.</p>
     </div>
   </section>
 
@@ -934,6 +909,7 @@ footer .wrap{align-items:flex-start}
             <p class="lp-first">클로드 코드를 처음 접하시면 <a href="#plan-lec">키트 + 1:1 강의</a> 통합본을 구매해 주세요.</p>
             <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook (PDF · EPUB)</span></div>
             <p class="lp-price"><strong>30<small>만원</small></strong></p>
+            <div class="lp-buy"><a class="btn btn-buy" href="/price?plan=kit" aria-label="키트 결제하기">결제하기</a></div>
           </div>
           <div class="lp lp-lec" id="plan-lec">
             <div class="vb-stage" aria-hidden="true"><div class="vb vb-lec">
@@ -962,6 +938,7 @@ footer .wrap{align-items:flex-start}
             <p class="lp-meta">3주 과정. 클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행합니다.</p>
             <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook</span><span>클로드 코드 사용법</span><span>키트 설치 원격 지원</span><span>1:1 강의 3회 · 3주</span><span class="hl">365일 1:1 채팅 지원</span></div>
             <p class="lp-price"><strong>50<small>만원</small></strong></p>
+            <div class="lp-buy"><a class="btn btn-buy" href="/price?plan=lesson" aria-label="키트 + 1:1 강의 결제하기">결제하기</a></div>
           </div>
           <div class="lp lp-lec lp-pass">
             <div class="vt-stage" aria-hidden="true"><div class="vt">
@@ -980,8 +957,10 @@ footer .wrap{align-items:flex-start}
               <div class="lp-inc"><span>1:1 강의 2회 · 총 2시간</span><span>클로드 코드 사용법</span><span>키트 설치 원격 지원</span></div>
               <p class="lp-price"><strong>30<small>만원</small></strong></p>
               <p class="lp-pass-note">할인 기간에도 같은 가격입니다. 정가 기준으로 키트와 함께 사면 강의 몫은 20만원(키트 30만원 + 강의 20만원 = 50만원)이고, 따로 사면 30만원 + 30만원 = 60만원입니다. 처음부터 강의가 필요하다면 <b>키트 + 1:1 강의</b>가 더 유리합니다.</p>
+            <div class="lp-buy"><a class="btn btn-buy" href="/price?plan=pass" aria-label="1:1 강의권 2회 결제하기">결제하기</a></div>
             </div>
           </div>
+          <p class="buy-note">결제하기를 누르면 결제 화면에서 상품과 금액을 확인하고 계좌이체 또는 카드 · 간편결제(토스페이먼츠)를 고릅니다. 결제(입금)가 확인되면 적어 주신 이메일로 키트 다운로드 링크(7일 동안 열림)와 사용 설명 eBook을 보내드리고, 강의는 카카오톡으로 일정을 잡습니다. 환불은 <a href="#refund">환불 안내</a>를 확인해 주세요. 궁금한 점은 카카오톡으로 문의해 주세요.</p>
         </div>
 
         <div>
@@ -1120,12 +1099,12 @@ footer .wrap{align-items:flex-start}
       </div>
       <dl class="facts">
         <div><dt>상품명</dt><dd>클로드 비디오 키트 for 파이널컷프로</dd></div>
-        <div><dt>가격</dt><dd><span class="p-on"><b>키트 10만원</b>(정가 30만원) · <b>키트 + 2회 강의(총 2시간) 30만원</b>(정가 50만원). 마켓 오픈 기념 할인으로, 11월 28일(토) 밤 24:00까지 신청하신 분께만 적용됩니다.</span><span class="p-off"><b>키트만 제공 30만원</b> · <b>키트 + 3회 강의 50만원</b></span> 키트를 이미 구입한 분의 <b>1:1 강의권 2회는 30만원</b>이며 할인 기간에도 같은 가격입니다.</dd></div>
+        <div><dt>가격</dt><dd><span class="p-on"><b>키트 10만원</b>(정가 30만원) · <b>키트 + 2회 강의(총 2시간) 30만원</b>(정가 50만원). 마켓 오픈 기념 할인으로, 11월 28일(토) 밤 24:00까지 결제(계좌이체 주문 포함)하신 분께만 적용됩니다.</span><span class="p-off"><b>키트만 제공 30만원</b> · <b>키트 + 3회 강의 50만원</b></span> 키트를 이미 구입한 분의 <b>1:1 강의권 2회는 30만원</b>이며 할인 기간에도 같은 가격입니다.</dd></div>
         <div><dt>제공 내용</dt><dd>키트 파일(빌드 코어 9단계, 플러그인 스킬 18개), 바이럴 비디오 공식을 위한 유튜브 학습 데이터, <span class="p-on">클로드 기반 사용 설명 eBook(PDF · EPUB), </span><span class="p-off">설치 · 세팅 안내, </span>업데이트 파일. <span class="p-on">강의 포함 구성은 클로드 코드 사용법, 키트 설치 원격 지원, 1:1 강의 2회(총 2시간), 365일 1:1 채팅 지원이 더해집니다.</span><span class="p-off">강의 포함 과정은 클로드 코드 사용법, 키트 설치 원격 지원, 3주 동안 1:1 강의 3회, 365일 1:1 채팅 지원이 더해집니다.</span> 키트만 구입하는 구성은 클로드 코드에 익숙한 분께 권장하며 1:1 지원은 포함되지 않습니다. 키트를 먼저 구입한 분은 1:1 강의권 2회(클로드 코드 사용법 · 키트 설치 원격 지원 포함)로 강의를 따로 신청할 수 있습니다.</dd></div>
         <div><dt>지원 환경</dt><dd>맥(macOS) 전용. 검수는 파이널컷 프로 또는 캡컷에서 합니다(프리미어 프로 · 다빈치 리졸브 지원 예정). <b>클로드 구독은 포함되어 있지 않습니다.</b> Claude Pro 이상 요금제를 개인이 직접 구독해야 사용할 수 있습니다.</dd></div>
-        <div><dt>제공 방법</dt><dd><span class="p-on">신청 순서대로 안내드리며, 결제가 완료되면 키트 파일과 사용 설명 eBook(PDF · EPUB)을 이메일로 보내드립니다. 강의 시간은 개별로 소통하여 일정을 잡고, 일정에 따라 조기 마감될 수 있습니다.</span><span class="p-off">결제가 확인되면 키트 파일과 설치 안내를 카카오톡으로 보내드립니다. 강의 포함 과정은 상담으로 첫 수업 일정을 정합니다.</span></dd></div>
-        <div><dt>결제</dt><dd><span class="p-on">신청은 페이지의 신청서 작성 버튼으로 받습니다. 신청 순서대로 계좌이체 결제를 안내드립니다.</span><span class="p-off">구매 신청은 카카오톡 1:1로 받습니다. 상담 후 계좌이체 결제를 안내드립니다.</span></dd></div>
-        <div id="refund"><dt>환불</dt><dd>키트 파일을 받기 전에는 전액 환불됩니다. 파일을 받은 뒤에는 디지털 콘텐츠 특성상 청약철회가 제한됩니다.</dd></div>
+        <div><dt>결제</dt><dd>상품마다 있는 <b>결제하기</b>를 누르면 결제 화면으로 이동합니다. 결제 화면에서 상품과 금액을 확인하고 <b>계좌이체</b>(토스뱅크, 예금주 그라운드루티드) 또는 <b>카드 · 간편결제</b>(토스페이먼츠)를 고릅니다. 계좌이체는 주문 후 안내된 계좌로 입금하시면 판매자가 확인합니다. 카카오톡은 문의용입니다.</dd></div>
+        <div><dt>제공 방법</dt><dd>결제(입금)가 확인되면 결제 화면에 적은 이메일로 키트 다운로드 링크(7일 동안 열림)와 사용 설명 eBook(PDF · EPUB), 설치 안내를 보내드립니다. 링크 기간이 지나면 메일에 답장해 주시면 새 링크를 보내드립니다. 업데이트 파일도 같은 이메일로 보내드리며, 후속지원은 구매일로부터 1년입니다. 강의 포함 상품과 강의권은 결제 후 카카오톡으로 일정을 잡고, 일정에 따라 조기 마감될 수 있습니다.</dd></div>
+        <div id="refund"><dt>환불</dt><dd>키트 파일을 받기 전에는 결제일로부터 7일 안에 요청하시면 전액 환불됩니다. 파일을 받은 뒤에는 디지털 콘텐츠 특성상 청약철회가 제한됩니다. 자세한 내용은 <a href="/videokit/terms">이용약관</a> 제8조를 확인해 주세요.</dd></div>
         <div><dt>업데이트</dt><dd>새 버전과 변경 사항은 오픈카톡방 공지로 알려 드리고, 업데이트 파일은 이메일로 보내드립니다.</dd></div>
       </dl>
     </div>
@@ -1136,7 +1115,7 @@ footer .wrap{align-items:flex-start}
     <div class="wrap faq">
       <div class="sec-head"><h2>자주 묻는 질문</h2></div>
       <div class="faq-list">
-        <details class="p-on"><summary>오픈 할인은 언제까지인가요?</summary><p>11월 28일(토) 밤 24:00까지 신청서를 작성하신 분께만 적용됩니다. 결제는 신청 순서대로 계좌이체로 안내드립니다.</p></details>
+        <details class="p-on"><summary>오픈 할인은 언제까지인가요?</summary><p>11월 28일(토) 밤 24:00까지 결제하기에서 결제하거나 계좌이체로 주문하신 분께 적용됩니다.</p></details>
         <details class="p-on"><summary>강의 일정은 어떻게 정하나요?</summary><p>강의 시간은 개별로 소통하여 정합니다. 강의는 일정에 따라 조기 마감될 수 있습니다.</p></details>
         <details><summary>윈도우에서도 쓸 수 있나요?</summary><p>아니요. 반복 작업을 맥에서 직접 처리하도록 만든 키트라 맥(macOS)에서만 동작합니다.</p></details>
         <details><summary>클로드 요금은 따로 내야 하나요?</summary><p>네. 키트에는 클로드 구독이 포함되어 있지 않습니다. <b>Claude Pro 이상 요금제</b>를 개인이 직접 구독해야 사용할 수 있습니다. 대신 장면 분석과 타임라인 작성처럼 토큰이 많이 드는 일을 맥에서 처리하도록 만들어 사용량을 줄였습니다.</p></details>
@@ -1151,25 +1130,13 @@ footer .wrap{align-items:flex-start}
   <!-- 진행 방식 -->
   <section id="how" class="band band-raised">
     <div class="wrap">
-      <div class="p-on">
-        <div class="sec-head">
-          <h2>신청은 신청서로</h2>
-        </div>
-        <div class="how">
-          <div><h3>1. 신청서 작성</h3><p><a class="js-apply" href="mailto:sungchulkang@groundrooted.com?subject=%5B%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%20%EC%8B%A0%EC%B2%AD%5D%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8&amp;body=%EC%95%88%EB%85%95%ED%95%98%EC%84%B8%EC%9A%94.%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8%20%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%EC%9D%84%20%EC%8B%A0%EC%B2%AD%ED%95%A9%EB%8B%88%EB%8B%A4.%0A%0A1.%20%EC%9D%B4%EB%A6%84%3A%0A2.%20%EC%97%B0%EB%9D%BD%EC%B2%98%3A%0A3.%20%EC%8B%A0%EC%B2%AD%20%EA%B5%AC%EC%84%B1%20%28%ED%95%98%EB%82%98%EB%A7%8C%20%EB%82%A8%EA%B2%A8%20%EC%A3%BC%EC%84%B8%EC%9A%94%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2810%EB%A7%8C%EC%9B%90%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2B%202%ED%9A%8C%20%EA%B0%95%EC%9D%98%2C%20%EC%B4%9D%202%EC%8B%9C%EA%B0%84%20%2830%EB%A7%8C%EC%9B%90%29%0A4.%20%EC%82%AC%EC%9A%A9%ED%95%98%EB%8A%94%20%EB%A7%A5%EA%B3%BC%20%ED%8E%B8%EC%A7%91%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8%3A%0A5.%20Claude%20Pro%20%EC%9D%B4%EC%83%81%20%EC%9A%94%EA%B8%88%EC%A0%9C%20%EA%B5%AC%EB%8F%85%20%EC%97%AC%EB%B6%80%3A%0A">신청서 작성</a> 버튼을 눌러 이름 · 이메일 · 전화번호 · 원하는 상품을 남겨 주세요.</p></div>
-          <div><h3>2. 순서대로 결제 안내</h3><p>신청 순서대로 계좌이체 결제를 안내드립니다.</p></div>
-          <div><h3>3. 이메일로 키트 발송</h3><p>결제가 완료되면 키트 파일과 클로드 기반 사용 설명 eBook(PDF · EPUB)을 이메일로 보내드립니다.</p></div>
-        </div>
-      </div>
-      <div class="p-off">
       <div class="sec-head">
-        <h2>구매는 카톡 한 번으로</h2>
+        <h2>구매는 이렇게 진행됩니다</h2>
       </div>
       <div class="how">
-        <div><h3>카톡으로 문의</h3><p>쓰고 있는 맥과 편집 프로그램, 만들고 싶은 영상을 알려주세요.</p></div>
-        <div><h3>구성 선택</h3><p>키트만 받을지, 3회 강의와 함께 세팅까지 할지 정합니다.</p></div>
-        <div><h3>키트 전달</h3><p>결제 방법은 상담 후 카톡으로 안내드립니다. 결제가 확인되면 키트를 보내드립니다.</p></div>
-      </div>
+        <div><h3>1. 결제하기</h3><p>상품마다 있는 <b>결제하기</b>를 누르면 결제 화면에서 상품과 금액을 확인합니다.</p></div>
+        <div><h3>2. 계좌이체 또는 카드 · 간편결제</h3><p>계좌이체는 주문 후 화면에 보이는 계좌로 입금하고, 카드 · 간편결제는 토스페이먼츠 결제창에서 바로 결제합니다.</p></div>
+        <div><h3>3. 이메일로 키트 받기</h3><p>결제가 확인되면 키트 다운로드 링크와 사용 설명 eBook(PDF · EPUB)을 이메일로 보내드립니다. 강의는 카카오톡으로 일정을 잡습니다.</p></div>
       </div>
     </div>
   </section>
@@ -1177,29 +1144,16 @@ footer .wrap{align-items:flex-start}
   <!-- 문의 -->
   <section id="contact" class="contact">
     <div class="wrap">
-      <div class="p-on">
-      <h2>오픈 할인 신청은 신청서로,<br>궁금한 점은 카카오톡으로 받습니다.</h2>
-      <p class="lede">11월 28일(토) 밤 24:00까지 신청서를 작성해 주세요. 결제가 완료되면 키트와 사용 설명 eBook(PDF · EPUB)을 이메일로 보내드립니다.</p>
+      <h2>구매는 결제하기로,<br>궁금한 점은 카카오톡으로 받습니다.</h2>
+      <p class="lede">결제하기에서 계좌이체 또는 카드 · 간편결제로 구매합니다. 결제(입금)가 확인되면 키트와 사용 설명 eBook(PDF · EPUB)을 이메일로 보내드립니다.</p>
       <div class="actions">
-        <a class="btn btn-mail js-apply" href="mailto:sungchulkang@groundrooted.com?subject=%5B%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%20%EC%8B%A0%EC%B2%AD%5D%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8&amp;body=%EC%95%88%EB%85%95%ED%95%98%EC%84%B8%EC%9A%94.%20%ED%81%B4%EB%A1%9C%EB%93%9C%20%EB%B9%84%EB%94%94%EC%98%A4%20%ED%82%A4%ED%8A%B8%20%EC%98%A4%ED%94%88%20%ED%95%A0%EC%9D%B8%EC%9D%84%20%EC%8B%A0%EC%B2%AD%ED%95%A9%EB%8B%88%EB%8B%A4.%0A%0A1.%20%EC%9D%B4%EB%A6%84%3A%0A2.%20%EC%97%B0%EB%9D%BD%EC%B2%98%3A%0A3.%20%EC%8B%A0%EC%B2%AD%20%EA%B5%AC%EC%84%B1%20%28%ED%95%98%EB%82%98%EB%A7%8C%20%EB%82%A8%EA%B2%A8%20%EC%A3%BC%EC%84%B8%EC%9A%94%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2810%EB%A7%8C%EC%9B%90%29%0A%20%20%20-%20%ED%82%A4%ED%8A%B8%20%2B%202%ED%9A%8C%20%EA%B0%95%EC%9D%98%2C%20%EC%B4%9D%202%EC%8B%9C%EA%B0%84%20%2830%EB%A7%8C%EC%9B%90%29%0A4.%20%EC%82%AC%EC%9A%A9%ED%95%98%EB%8A%94%20%EB%A7%A5%EA%B3%BC%20%ED%8E%B8%EC%A7%91%20%ED%94%84%EB%A1%9C%EA%B7%B8%EB%9E%A8%3A%0A5.%20Claude%20Pro%20%EC%9D%B4%EC%83%81%20%EC%9A%94%EA%B8%88%EC%A0%9C%20%EA%B5%AC%EB%8F%85%20%EC%97%AC%EB%B6%80%3A%0A"><svg><use href="#i-mail"/></svg>신청서 작성</a>
+        <a class="btn btn-buy" href="/price">결제하기</a>
         <a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡으로 문의하기</a>
       </div>
       <div class="policy">
-        <span><svg><use href="#i-mail"/></svg>신청 · 신청서 작성</span>
+        <span><svg><use href="#i-check"/></svg>결제 · 계좌이체, 카드 · 간편결제</span>
         <span><svg><use href="#i-chat"/></svg>문의 · 카톡 1:1</span>
         <span><svg><use href="#i-mail"/></svg>업데이트 · 오픈카톡방 공지 + 이메일 발송</span>
-      </div>
-      </div>
-      <div class="p-off">
-      <h2>강의 신청과 키트 구입 문의는<br>카카오톡으로 받습니다.</h2>
-      <p class="lede">아래 문의 버튼을 누르면 카카오톡 1:1 대화로 바로 연결됩니다. 키트 업데이트는 오픈카톡방 공지와 이메일로 보내드립니다.</p>
-      <div class="actions">
-        <a class="btn btn-kakao js-kakao" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡으로 문의하기</a>
-      </div>
-      <div class="policy">
-        <span><svg><use href="#i-chat"/></svg>강의 신청 · 키트 구입 문의 · 카톡 1:1</span>
-        <span><svg><use href="#i-mail"/></svg>업데이트 · 오픈카톡방 공지 + 이메일 발송</span>
-      </div>
       </div>
     </div>
   </section>
@@ -1223,32 +1177,7 @@ footer .wrap{align-items:flex-start}
   </div>
 </footer>
 
-<dialog class="apply" id="apply" aria-labelledby="apply-h">
-  <form id="apply-form" novalidate>
-    <div class="apply-head"><h2 id="apply-h">클로드 비디오 키트 신청</h2><button type="button" class="apply-x js-apply-close" aria-label="닫기">×</button></div>
-    <p class="apply-lede">남겨 주신 이메일과 전화번호로 결제와 키트 발송을 신청 순서대로 안내드립니다.</p>
-    <label>이름<input type="text" name="name" required maxlength="50" autocomplete="name"></label>
-    <label>이메일 <small>비디오 키트를 받으실 주소</small><input type="email" name="email" required maxlength="254" autocomplete="email"></label>
-    <label>이메일 확인 <small>같은 주소를 한 번 더 입력해 주세요</small><input type="email" name="email2" required maxlength="254" autocomplete="off"></label>
-    <label>전화번호<input type="tel" name="phone" required inputmode="tel" autocomplete="tel" pattern="[0-9\- ]{10,13}" placeholder="010-0000-0000"></label>
-    <fieldset>
-      <legend>상품 선택</legend>
-      <label class="apply-plan"><input type="radio" name="plan" value="kit" required><span><b>키트</b><small>키트 파일 · 사용 설명 eBook</small></span><em><span class="p-on">10만원</span><span class="p-off">30만원</span></em></label>
-      <label class="apply-plan"><input type="radio" name="plan" value="lesson"><span><b>키트 + 1:1 강의</b><small><span class="p-on">1:1 강의 2회 · 총 2시간</span><span class="p-off">1:1 강의 3회</span> · 365일 1:1 채팅 지원</small></span><em><span class="p-on">30만원</span><span class="p-off">50만원</span></em></label>
-      <label class="apply-plan"><input type="radio" name="plan" value="pass"><span><b>1:1 강의권 2회</b><small>키트를 이미 구입한 분</small></span><em>30만원</em></label>
-    </fieldset>
-    <label class="apply-hp" aria-hidden="true">웹사이트<input type="text" name="website" tabindex="-1" autocomplete="off"></label>
-    <p class="apply-err" id="apply-err" role="alert" hidden></p>
-    <p class="apply-privacy">이름 · 이메일 · 전화번호는 결제 안내와 키트 발송, 강의 일정 안내에만 쓰고, 거래가 끝나면 법령이 정한 기간만 보관합니다. 자세한 내용은 <a href="/videokit/privacy" target="_blank" rel="noopener">개인정보처리방침</a>을 확인해 주세요.</p>
-    <button class="btn btn-mail" type="submit">신청 보내기</button>
-  </form>
-  <div class="apply-done" id="apply-done" hidden>
-    <div class="apply-head"><h2>신청이 접수되었습니다</h2><button type="button" class="apply-x js-apply-close" aria-label="닫기">×</button></div>
-    <p>신청해 주셔서 감사합니다. 신청 순서대로 결제 방법을 이메일이나 문자로 안내드립니다. 궁금한 점은 카카오톡으로 문의해 주세요.</p>
-    <button type="button" class="btn btn-mail js-apply-close">닫기</button>
-  </div>
-</dialog>
-<div class="dock" id="dock"><a class="btn btn-mail p-on js-apply" href="#launch"><svg><use href="#i-mail"/></svg>신청서 작성</a><a class="btn btn-kakao js-kakao dock-ico p-on" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener" aria-label="카카오톡 문의"><svg><use href="#i-chat"/></svg></a><a class="btn btn-kakao js-kakao p-off" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener"><svg><use href="#i-chat"/></svg>카카오톡 1:1 문의</a></div>
+<div class="dock" id="dock"><a class="btn btn-buy" href="/price">결제하기</a><a class="btn btn-kakao js-kakao dock-ico" href="https://open.kakao.com/o/s40bSEXi" target="_blank" rel="noopener" aria-label="카카오톡 문의"><svg><use href="#i-chat"/></svg></a></div>
 
 <script>
 /*! vanilla-tilt.js 1.8.1 | MIT License | (c) 2017 Șandor Sergiu | https://github.com/micku7zu/vanilla-tilt.js */
@@ -1364,38 +1293,6 @@ document.querySelectorAll('.js-kakao').forEach(a=>{
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!fine || reduce || !window.VanillaTilt) return;
   VanillaTilt.init(document.querySelectorAll('.flow .fc'), { max: 12, speed: 700, perspective: 900, scale: 1.03, glare: true, 'max-glare': .12, reset: true, gyroscope: false });
-})();
-</script>
-<script>
-(function(){
-  var dlg=document.getElementById('apply'), form=document.getElementById('apply-form'), err=document.getElementById('apply-err'), done=document.getElementById('apply-done');
-  if(!dlg||!dlg.showModal) return; // 팝업을 못 여는 브라우저는 기존 메일 링크로 신청
-  var PLANS={kit:'키트',lesson:'키트 + 1:1 강의',pass:'1:1 강의권 2회'};
-  var same=function(a,b){return a.trim().toLowerCase()===b.trim().toLowerCase()};
-  var e1=form.elements.email, e2=form.elements.email2;
-  function checkMail(){e2.setCustomValidity(e2.value&&!same(e1.value,e2.value)?'두 이메일 주소가 다릅니다. 철자를 확인해 주세요.':'')}
-  e1.addEventListener('input',checkMail); e2.addEventListener('input',checkMail);
-  function show(msg){err.innerHTML=msg; err.hidden=!msg}
-  document.querySelectorAll('.js-apply').forEach(function(a){a.addEventListener('click',function(ev){ev.preventDefault(); form.hidden=false; done.hidden=true; show(''); dlg.showModal()})});
-  dlg.querySelectorAll('.js-apply-close').forEach(function(b){b.addEventListener('click',function(){dlg.close()})});
-  dlg.addEventListener('click',function(ev){if(ev.target===dlg) dlg.close()});
-  form.addEventListener('submit',function(ev){
-    ev.preventDefault(); checkMail();
-    if(!form.checkValidity()){
-      var bad=form.querySelector(':invalid'); show(bad===e2?'두 이메일 주소가 다릅니다. 철자를 확인해 주세요.':bad&&bad.name==='plan'?'상품을 선택해 주세요.':'빈칸이나 형식이 맞지 않는 칸을 확인해 주세요.');
-      if(bad) bad.focus(); return;
-    }
-    var f=form.elements, data={name:f.name.value.trim(),email:f.email.value.trim(),phone:f.phone.value.trim(),plan:form.querySelector('input[name=plan]:checked').value,website:f.website.value};
-    var btn=form.querySelector('button[type=submit]'); btn.disabled=true; btn.textContent='보내는 중…'; show('');
-    fetch('/api/videokit/apply',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)})
-      .then(function(r){if(!r.ok) throw new Error(r.status); form.reset(); form.hidden=true; done.hidden=false})
-      .catch(function(){
-        var body='이름: '+data.name+'\n이메일: '+data.email+'\n전화번호: '+data.phone+'\n상품: '+PLANS[data.plan]+'\n';
-        var href='mailto:sungchulkang@groundrooted.com?subject='+encodeURIComponent('[구매 신청] 클로드 비디오 키트')+'&body='+encodeURIComponent(body);
-        show('신청을 보내지 못했습니다. 잠시 뒤 다시 시도하거나 <a href="'+href+'">메일로 보내기</a>를 눌러 주세요.');
-      })
-      .finally(function(){btn.disabled=false; btn.textContent='신청 보내기'});
-  });
 })();
 </script>
 </body>

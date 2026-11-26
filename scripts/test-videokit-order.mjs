@@ -66,3 +66,20 @@ console.log('PASS: videokit kit email');
   assert.equal(checkOrder(id, 100000, SALE_ENDS + 86400_000, { anyTime: true }).ok, true);
   console.log('PASS: videokit deposit webhook checks');
 }
+
+// 테스트 키 결제에는 키트 메일을 보내지 않는다 · 카드 결제 '심사 중' 안내
+{
+  const { kitMailAllowed, cardPending } = await import('../products/videokit.ts');
+  for (const k of ['TOSS_CLIENT_KEY', 'TOSS_SECRET_KEY', 'TOSS_API_CLIENT_KEY', 'TOSS_API_SECRET_KEY', 'VIDEOKIT_CARD_PENDING']) delete process.env[k];
+  assert.equal(kitMailAllowed(), false); assert.equal(cardPending(), true);           // 키 없음 = 문서 테스트 키
+  process.env.TOSS_CLIENT_KEY = 'test_gck_x'; process.env.TOSS_SECRET_KEY = 'test_gsk_x';
+  assert.equal(kitMailAllowed(), false); assert.equal(cardPending(), true);           // 테스트 키
+  process.env.TOSS_CLIENT_KEY = 'live_gck_x'; process.env.TOSS_SECRET_KEY = 'live_gsk_x';
+  assert.equal(kitMailAllowed(), true); assert.equal(cardPending(), false);           // 실제 키: 동작 그대로
+  process.env.VIDEOKIT_CARD_PENDING = '1';
+  assert.equal(kitMailAllowed(), true); assert.equal(cardPending(), true);            // 실제 키 + 심사 중 표시
+  process.env.TOSS_API_CLIENT_KEY = 'test_ck_x'; process.env.TOSS_API_SECRET_KEY = 'test_sk_x';
+  assert.equal(kitMailAllowed(), false);                                               // 결제창 키가 테스트면 메일 없음
+  for (const k of ['TOSS_CLIENT_KEY', 'TOSS_SECRET_KEY', 'TOSS_API_CLIENT_KEY', 'TOSS_API_SECRET_KEY', 'VIDEOKIT_CARD_PENDING']) delete process.env[k];
+  console.log('PASS: videokit test-mode kit mail guard');
+}

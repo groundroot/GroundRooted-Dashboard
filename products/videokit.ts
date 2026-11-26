@@ -13,6 +13,14 @@ export const plans = {
   // 키트를 먼저 산 분이 나중에 신청하는 강의권. 키트 파일은 들어 있지 않고, 할인 기간에도 가격이 같다.
   pass: { name: '클로드 비디오 키트 for 파이널컷프로 — 1:1 강의권 2회(키트 구매자용)', saleName: '클로드 비디오 키트 for 파이널컷프로 — 1:1 강의권 2회(키트 구매자용)', sale: 300_000, regular: 300_000 },
 } as const;
+// 결제 화면의 상품 선택에 보이는 짧은 이름과 설명
+export const planLabels: Record<keyof typeof plans, { label: string; note: string }> = {
+  kit: { label: '키트', note: '키트 파일 · 사용 설명 eBook · 클로드 코드에 익숙한 분께 권장' },
+  lesson: { label: '키트 + 1:1 강의', note: '키트 + 클로드 코드 사용법 · 키트 설치 원격 지원 · 365일 1:1 채팅 지원' },
+  pass: { label: '키트 구매자 1:1 강의권', note: '이미 키트를 구입한 분 · 1:1 강의 2회(총 2시간) · 키트 파일 없음' },
+};
+// 계좌이체 입금 계좌 (/videokit/transfer 와 같음)
+export const BANK = { bank: '토스뱅크', number: '1002-8619-7757', holder: '그라운드루티드' } as const;
 // 강의 일정을 따로 조율하는 상품
 export const hasLesson = (plan: PlanId) => plan === 'lesson' || plan === 'pass';
 // 키트 파일을 보내는 상품
@@ -65,6 +73,11 @@ export function tossApiKeys() {
 }
 // 결제 승인 · 조회에 쓰는 시크릿 키: 결제창 키가 있으면 그것, 없으면 결제위젯 키.
 export const paymentSecret = () => { const api = tossApiKeys(); return api ? api : tossKeys(); };
+// 키트 메일은 실제(live) 키로 승인된 결제에만 보낸다. 테스트 키 결제는 돈이 오가지 않으므로 키트를 보내지 않는다.
+export const kitMailAllowed = () => paymentSecret().live;
+// 결제 화면에 '카드 결제는 심사 중 · 계좌이체 신청서로 구매' 안내를 띄울지.
+// 테스트 키일 때는 항상 띄우고, 실제 키여도 VIDEOKIT_CARD_PENDING=1 이면 띄운다(결제창 진입은 그대로 둔다).
+export const cardPending = () => !paymentSecret().live || process.env.VIDEOKIT_CARD_PENDING === '1';
 
 // 가상계좌 은행 코드(토스페이먼츠 2자리) → 이름. 없는 코드는 코드 그대로 보여 준다.
 const BANKS: Record<string, string> = {

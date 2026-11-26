@@ -26,7 +26,7 @@ const faqs = [
   ],
   [
     '지금 다운로드하거나 구매할 수 있나요?',
-    '클로드 비디오 키트 for 파이널컷프로는 지금 구매할 수 있습니다. 구매 방법은 상품 페이지의 구매 안내를 확인해 주세요. ReadyMD와 YouTube to MD는 출시 준비 중입니다. 각 소개 페이지에서 사용 흐름을 살펴볼 수 있으며, 가격과 지원 환경은 확정 후 안내합니다. TypeCut Pro의 배포·구매 정보는 연결된 공식 사이트에서 확인해 주세요.',
+    '클로드 비디오 키트 for 파이널컷프로는 지금 구매할 수 있습니다. 위 상품 목록의 결제하기에서 계좌이체 또는 카드 · 간편결제로 결제할 수 있습니다. ReadyMD와 YouTube to MD는 출시 준비 중입니다. 각 소개 페이지에서 사용 흐름을 살펴볼 수 있으며, 가격과 지원 환경은 확정 후 안내합니다. TypeCut Pro의 배포·구매 정보는 연결된 공식 사이트에서 확인해 주세요.',
   ],
   [
     '페이지에 보이는 예시는 실제 앱의 결과인가요?',
@@ -57,13 +57,15 @@ export default function HomePage() {
             {kitPlans.map((p) => <li key={p.id}>
               <span>{p.label}</span>
               <span className="fx-kit-price">{sale && p.sale < p.regular && <s>{won(p.regular)}</s>}<b>{won(sale ? p.sale : p.regular)}</b></span>
+              <a className="fx-kit-buy" href={`/price?plan=${p.id}`}>결제하기<span className="fx-sr-only"> — {p.label}</span></a>
             </li>)}
           </ul>
           <p className="fx-kit-note">{sale && <>오픈기념가 · 11월 28일(토) 24:00까지<br /></>}Claude 구독 미포함 (Claude Pro 이상 별도 구독) · macOS 전용</p>
           <div className="fx-kit-actions">
             <a href="/videokit" className="fx-pill fx-pill-videokit">상품 자세히 보기 <ArrowRight size={18} aria-hidden="true" /></a>
-            <a href="/videokit#buy" className="fx-kit-link">구매 안내</a>
+            <a href="/videokit#buy" className="fx-kit-link">구매 안내 · 환불</a>
           </div>
+          <p className="fx-kit-note">결제하기에서 계좌이체 또는 카드 · 간편결제로 구매합니다. 결제(입금)가 확인되면 이메일로 키트 다운로드 링크를 보내드립니다.</p>
         </div>
       </article>
       <article className="fx-typecut-banner">

@@ -1,6 +1,10 @@
 # 클로드 비디오 키트 — 결제 후 키트 자동 발송 설정
 
-결제(`/price?plan=kit` 또는 `?plan=lesson`)가 승인되면 결제 화면에 적은 이메일로 키트 다운로드 링크(7일 유효)와 설치 안내가 자동으로 갑니다.
+결제 화면은 `/price`(상품 선택 · `?plan=kit|lesson|pass`로 미리 고름)입니다. 결제 수단은 두 가지입니다.
+
+- **계좌이체**: 화면에 계좌(토스뱅크 1002-8619-7757, 예금주 그라운드루티드)와 금액이 보이고, 주문하기를 누르면 `/api/videokit/apply`가 판매자 메일로 주문을 보냅니다(제목 `[구매 신청] <구성> · <이름>`, Reply-To = 구매자 이메일). 판매자가 입금을 확인한 뒤 키트를 보냅니다.
+- **카드 · 간편결제(토스페이먼츠)**: 실제(live) 키로 승인되면 결제 화면에 적은 이메일로 키트 다운로드 링크(7일 유효)와 설치 안내가 자동으로 갑니다.
+- **테스트 키로 승인된 결제에는 키트 메일을 보내지 않습니다**(결제 완료 화면 · 가상계좌 웹훅 모두). 테스트 키이거나 `VIDEOKIT_CARD_PENDING=1`이면 결제 화면이 카드 · 간편결제를 '심사 중 · 곧 열립니다'로 표시하고 계좌이체를 기본으로 둡니다. 결제창 진입은 심사자를 위해 남깁니다. 실제 키를 넣고 `VIDEOKIT_CARD_PENDING`이 없으면 카드 · 간편결제가 기본이 됩니다(코드 수정 없음).
 
 - 코드: `products/videokit-delivery.ts`(발송), `app/price/success/page.tsx`(승인 직후 호출), `products/videokit.ts`(가격·주문 검증)
 - 주문·구매자 정보는 자체 DB에 저장하지 않습니다. 결제 내역은 토스 상점관리자에서 봅니다. 같은 주문에 두 번 보내지 않는 것은 Resend의 Idempotency-Key(주문번호, 24시간)로 막습니다.
@@ -22,8 +26,8 @@
    - resend.com에 가입하고 Domains에서 `groundrooted.com`을 추가합니다. 안내되는 DNS 레코드(SPF · DKIM)를 도메인 DNS에 넣고 인증이 끝날 때까지 기다립니다.
    - API Keys에서 발송 전용(Sending access) 키를 만듭니다.
 4. **Vercel 환경변수** (Production): `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `RESEND_API_KEY`, `VIDEOKIT_MAIL_FROM`(예: `그라운드루티드 <kit@groundrooted.com>`). 선택: `VIDEOKIT_MAIL_REPLY_TO`(기본 sungchulkang@groundrooted.com), `VIDEOKIT_MAIL_BCC`(판매자 사본).
-5. **시험 결제**: 토스 실제 키를 넣기 전, 테스트 키 상태에서 `/price?plan=kit`로 본인 이메일을 넣고 결제해 봅니다. 메일이 오고 링크로 zip이 내려받아지는지 확인합니다.
-6. **실결제 전환**: 토스 심사가 끝나면 `TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`(live 키 둘 다)를 넣고 다시 배포합니다.
+5. **발송 확인**: 테스트 키 결제로는 메일이 나가지 않습니다. 메일 · 링크 확인은 `scripts/videokit-resend.mjs`로 본인 주소에 보내 봅니다(아래 운영 항목).
+6. **실결제 전환**: 토스 심사가 끝나면 `TOSS_CLIENT_KEY`, `TOSS_SECRET_KEY`(live 키 둘 다)를 넣고, `VIDEOKIT_CARD_PENDING`을 지운 뒤 다시 배포합니다.
 
 ## 운영
 

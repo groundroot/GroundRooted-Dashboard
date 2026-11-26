@@ -1,7 +1,8 @@
-// 상품 페이지의 '신청서 작성' 팝업이 보낸 신청을 판매자 메일로 전달한다 (서버 전용, 신청 내용은 저장하지 않음).
+// 결제 화면(/price)의 계좌이체 주문을 판매자 메일로 전달한다 (서버 전용, 신청 내용은 저장하지 않음).
 // 필요한 환경변수: RESEND_API_KEY, VIDEOKIT_MAIL_FROM (Resend에서 인증한 보내는 주소)
 // 선택: VIDEOKIT_APPLY_TO (받는 주소, 기본 sungchulkang@groundrooted.com)
 import { isEmail } from '@/products/videokit-delivery';
+import { priceOf, tierAt } from '@/products/videokit';
 
 export const dynamic = 'force-dynamic';
 
@@ -42,7 +43,8 @@ export async function POST(req: Request) {
   }
   const to = process.env.VIDEOKIT_APPLY_TO || 'sungchulkang@groundrooted.com';
   const at = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'medium', timeStyle: 'short' }).format(Date.now());
-  const rows: [string, string][] = [['이름', name], ['이메일', email], ['전화번호', phone], ['상품', PLANS[plan]], ['신청 시각', at]];
+  const amount = `${new Intl.NumberFormat('ko-KR').format(priceOf(plan, tierAt()))}원`;
+  const rows: [string, string][] = [['이름', name], ['이메일', email], ['전화번호', phone], ['상품', PLANS[plan]], ['금액', amount], ['신청 시각', at]];
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
