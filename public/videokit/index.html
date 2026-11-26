@@ -445,7 +445,7 @@ html:not(.promo-end) .p-off{display:none!important}
 .cd-u b{font-family:var(--mono);font-variant-numeric:tabular-nums;font-weight:500;font-size:clamp(44px,9vw,108px);line-height:1;letter-spacing:-.04em;color:var(--ink)}
 .cd-u span{font-size:clamp(13px,1.4vw,16px);font-weight:600;color:var(--ink-3)}
 .cd-u:first-child b{color:var(--head)}
-.launch-plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px;max-width:880px;margin:clamp(32px,4vw,48px) auto 0}
+.launch-plans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;max-width:980px;margin:clamp(32px,4vw,48px) auto 0}
 .lp{display:grid;gap:6px;padding:26px 28px;border:1px solid var(--line);border-radius:18px;background:var(--panel)}
 .lp-lec{border-color:color-mix(in srgb,var(--clip-v2) 40%,var(--line))}
 .lp h3{font-size:21px;font-weight:700;letter-spacing:-.015em}
@@ -463,6 +463,57 @@ html:not(.promo-end) .p-off{display:none!important}
 .band-launch .note{text-align:center;max-width:880px;margin:16px auto 0}
 .price s{display:block;color:var(--ink-3);font-size:15px;font-weight:500}
 .dock .dock-ico{flex:none;width:52px;padding:0;justify-content:center}
+/* ---------- 상품 박스 (키트 / 키트 + 1:1 강의) ---------- */
+.lp{gap:8px;padding:28px 28px 30px;border-radius:22px}
+.lp-lec{background:color-mix(in srgb,var(--clip-v2) 5%,var(--panel))}
+.lp-for{justify-self:start;font-size:13px;font-weight:650;color:#aab4ff;padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--clip-v1) 18%,transparent)}
+.lp-lec .lp-for{color:#d6bbff;background:color-mix(in srgb,var(--clip-v2) 20%,transparent)}
+.lp-inc{display:flex;flex-wrap:wrap;gap:6px;margin-top:2px}
+.lp-inc span{font-size:13px;font-weight:600;color:var(--ink-2);padding:5px 10px;border-radius:999px;background:var(--panel-2)}
+.lp-inc .hl{color:#e5d6ff;background:color-mix(in srgb,var(--clip-v2) 24%,transparent)}
+.vb-stage{height:380px;display:grid;place-items:center;perspective:1500px;margin:-6px 0 8px;position:relative}
+.vb-stage::after{content:"";position:absolute;left:18%;right:14%;bottom:20px;height:26px;border-radius:50%;background:rgba(0,0,0,.55);filter:blur(16px)}
+.vb{--w:230px;--h:318px;--d:58px;position:relative;width:var(--w);height:var(--h);transform-style:preserve-3d;transform:rotateY(-24deg) rotateX(4deg);z-index:1}
+.vb-lec{--d:84px}
+.vb-f{position:absolute;overflow:hidden;backface-visibility:hidden}
+.vb-front{inset:0;transform:translateZ(calc(var(--d)/2));border-radius:4px;padding:22px 20px 18px;display:flex;flex-direction:column;
+  background:radial-gradient(120% 70% at 100% 0%,rgba(91,108,240,.45),transparent 60%),linear-gradient(160deg,#202652,#141733 70%)}
+.vb-side{top:0;left:calc(50% - var(--d)/2);width:var(--d);height:var(--h);transform:rotateY(90deg) translateZ(calc(var(--w)/2));display:flex;align-items:center;justify-content:center;background:linear-gradient(180deg,#151a3c,#0e1128)}
+.vb-top{left:0;top:calc(50% - var(--d)/2);width:var(--w);height:var(--d);transform:rotateX(90deg) translateZ(calc(var(--h)/2));background:#262d63}
+.vb-lec .vb-front{background:radial-gradient(120% 70% at 100% 0%,rgba(164,108,240,.5),transparent 60%),linear-gradient(160deg,#33215a,#1a1131 70%)}
+.vb-lec .vb-side{background:linear-gradient(180deg,#24173f,#150d26)}
+.vb-lec .vb-top{background:#3d2a68}
+.vb-brand{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:650;letter-spacing:.02em;color:rgba(236,235,230,.72)}
+.vb-brand i{width:7px;height:7px;border-radius:50%;background:var(--head)}
+.vb-marks{display:flex;align-items:center;gap:8px;margin-top:22px}
+.vb-marks span{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.08);display:grid;place-items:center}
+.vb-marks img{width:26px;height:26px}
+.vb-marks .fcp img{width:36px;height:36px}
+.vb-marks em{width:14px;height:2px;background:rgba(255,255,255,.28);position:relative}
+.vb-marks em::after{content:"";position:absolute;right:-1px;top:-3px;border:4px solid transparent;border-left:5px solid rgba(255,255,255,.28);border-right:0}
+.vb-title{margin-top:18px;font-size:25px;line-height:1.12;font-weight:780;letter-spacing:-.035em;color:var(--ink)}
+.vb-title small{display:block;margin-top:5px;font-size:13px;font-weight:550;color:rgba(236,235,230,.66);letter-spacing:-.01em}
+.vb-tags{display:flex;gap:6px;margin-top:14px;font-size:12px;font-weight:650;color:#e5d6ff}
+.vb-tags span{background:rgba(255,255,255,.12);padding:4px 8px;border-radius:6px}
+.vb-lanes{margin-top:auto;display:grid;gap:5px}
+.vb-lanes i{display:block;height:9px;border-radius:3px}
+.vb-lanes i:nth-child(1){background:linear-gradient(90deg,var(--clip-v2) 0 34%,transparent 34% 37%,var(--clip-v2) 37% 78%,transparent 78%)}
+.vb-lanes i:nth-child(2){background:linear-gradient(90deg,var(--clip-v1) 0 26%,transparent 26% 28%,var(--clip-v1) 28% 100%)}
+.vb-lanes i:nth-child(3){background:var(--clip-a1);opacity:.85}
+.vb-ed{margin-top:12px;display:flex;justify-content:space-between;align-items:center;font:600 9.5px var(--mono);color:rgba(236,235,230,.6);letter-spacing:.06em}
+.vb-ed b{font-weight:600;color:var(--ink);background:rgba(255,255,255,.1);padding:3px 6px;border-radius:4px}
+.vb-side p{transform:rotate(90deg);font-size:12px;font-weight:700;letter-spacing:-.01em;color:rgba(236,235,230,.86);white-space:nowrap;display:flex;align-items:center;gap:8px}
+.vb-side p i{width:6px;height:6px;border-radius:50%;background:var(--head)}
+.vb-seal{position:absolute;right:-34px;top:-30px;width:104px;height:104px;transform:translateZ(calc(var(--d)/2 + 14px)) rotate(-10deg);z-index:3}
+.vb-seal svg{width:100%;height:100%;filter:drop-shadow(0 10px 16px rgba(0,0,0,.45))}
+.vb-shelf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;max-width:980px;margin:0 auto 32px}
+@media (max-width:720px){
+  .vb-shelf{grid-template-columns:1fr}
+  .vb-stage{height:340px}
+  .vb{--w:206px;--h:286px}
+  .vb-title{font-size:22px}
+  .vb-seal{width:92px;height:92px;right:-24px;top:-22px}
+}
 @media (max-width:640px){.launch-plans{grid-template-columns:1fr}.lp{padding:22px}}
 @media (max-width:420px){.cd{gap:6px}.cd-u{min-width:0;flex:1;padding:14px 4px;border-radius:14px}.cd-u b{font-size:38px}}
 
@@ -621,14 +672,51 @@ footer .wrap{align-items:flex-start}
       </div>
       <div class="launch-plans">
         <div class="lp">
+          <div class="vb-stage" aria-hidden="true"><div class="vb">
+          <div class="vb-f vb-front">
+            <p class="vb-brand"><i></i>GroundRooted</p>
+            <div class="vb-marks"><span><img src="/videokit/logos/claude.svg" alt="" width="26" height="26" loading="lazy"></span><em></em><span class="fcp"><img src="/videokit/logos/final-cut-pro.png" alt="" width="36" height="36" loading="lazy"></span></div>
+            <p class="vb-title">클로드<br>비디오 키트<small>for 파이널컷프로</small></p>
+            
+            <div class="vb-lanes"><i></i><i></i><i></i></div>
+            <p class="vb-ed"><span>VIDEO KIT</span><b>macOS</b></p>
+          </div>
+          <div class="vb-f vb-side"><p><i></i>클로드 비디오 키트</p></div>
+          <div class="vb-f vb-top"></div>
+        </div></div>
+          <p class="lp-for">클로드 코드에 익숙한 분께 권장</p>
           <h3>키트</h3>
-          <p class="lp-meta">키트 파일 + 클로드 기반 사용 설명 eBook(PDF · EPUB)</p>
+          <p class="lp-meta">키트 파일과 사용 설명 eBook을 받아 직접 설치하고 세팅합니다.</p>
+          <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook (PDF · EPUB)</span></div>
           <p class="lp-price"><s>30만원</s><strong>10<small>만원</small></strong></p>
           <span class="lp-off">20만원 할인 · 기간 한정</span>
         </div>
         <div class="lp lp-lec">
-          <h3>키트 + 2회 강의</h3>
-          <p class="lp-meta">1:1 강의 2회 · 총 2시간 · 일정은 개별 조율</p>
+          <div class="vb-stage" aria-hidden="true"><div class="vb vb-lec">
+          <div class="vb-f vb-front">
+            <p class="vb-brand"><i></i>GroundRooted</p>
+            <div class="vb-marks"><span><img src="/videokit/logos/claude.svg" alt="" width="26" height="26" loading="lazy"></span><em></em><span class="fcp"><img src="/videokit/logos/final-cut-pro.png" alt="" width="36" height="36" loading="lazy"></span></div>
+            <p class="vb-title">클로드<br>비디오 키트<small>for 파이널컷프로</small></p>
+            <p class="vb-tags"><span>+ 1:1 강의</span><span>원격 설치</span></p>
+            <div class="vb-lanes"><i></i><i></i><i></i></div>
+            <p class="vb-ed"><span>VIDEO KIT + 1:1</span><b>macOS</b></p>
+          </div>
+          <div class="vb-f vb-side"><p><i></i>키트 + 1:1 강의</p></div>
+          <div class="vb-f vb-top"></div>
+          <div class="vb-seal"><svg viewBox="0 0 120 120" role="img" aria-label="365일 1:1 지원">
+            <defs><path id="vb-ring-a" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
+            <circle cx="60" cy="60" r="58" fill="#ff6b3d"/>
+            <circle cx="60" cy="60" r="51" fill="none" stroke="#131316" stroke-opacity=".35" stroke-width="1.2"/>
+            <circle cx="60" cy="60" r="33" fill="#131316"/>
+            <text font-family="JetBrains Mono, ui-monospace, monospace" font-size="8" font-weight="700" fill="#131316"><textPath href="#vb-ring-a" textLength="272" lengthAdjust="spacing">365 DAYS · 1:1 SUPPORT · 365 DAYS · 1:1 SUPPORT · </textPath></text>
+            <text x="60" y="63" text-anchor="middle" font-family="Pretendard Variable, Pretendard, sans-serif" font-size="25" font-weight="800" letter-spacing="-1" fill="#ff6b3d">365</text>
+            <text x="60" y="78" text-anchor="middle" font-family="Pretendard Variable, Pretendard, sans-serif" font-size="10" font-weight="700" fill="#ecebe6">일 1:1 지원</text>
+          </svg></div>
+        </div></div>
+          <p class="lp-for">클로드 코드가 처음이라면</p>
+          <h3>키트 + 1:1 강의</h3>
+          <p class="lp-meta">클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행합니다. 일정은 개별 조율합니다.</p>
+          <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook</span><span>클로드 코드 사용법</span><span>키트 설치 원격 지원</span><span>1:1 강의 2회 · 총 2시간</span><span class="hl">365일 1:1 지원</span></div>
           <p class="lp-price"><s>50만원</s><strong>30<small>만원</small></strong></p>
           <span class="lp-off">20만원 할인 · 기간 한정</span>
         </div>
@@ -726,25 +814,62 @@ footer .wrap{align-items:flex-start}
         <div class="plans p-on">
           <div class="plan featured">
             <h3>키트 + 2회 강의</h3>
-            <p class="meta">1:1 강의 2회 · 총 2시간 · 키트 세팅부터 직접 제작까지 · 1년 후속지원</p>
+            <p class="meta">클로드 코드 사용법 · 키트 설치 원격 지원 · 1:1 강의 2회(총 2시간) · 365일 1:1 지원</p>
             <div class="price"><s>50만원</s><strong>30<small>만원</small></strong><span>오픈 기념가</span></div>
           </div>
           <div class="plan">
             <h3>키트만 제공</h3>
-            <p class="meta">키트 파일 + 클로드 기반 사용 설명 eBook(PDF · EPUB) · 1년 후속지원</p>
+            <p class="meta">키트 파일 + 클로드 기반 사용 설명 eBook(PDF · EPUB) · 클로드 코드에 익숙한 분께 권장</p>
             <div class="price"><s>30만원</s><strong>10<small>만원</small></strong><span>오픈 기념가</span></div>
           </div>
         </div>
-        <div class="plans p-off">
-          <div class="plan featured">
-            <h3>키트 + 3회 강의</h3>
-            <p class="meta">3주 과정 · 키트 세팅부터 직접 제작까지 · 1년 후속지원</p>
-            <div class="price"><strong>50<small>만원</small></strong></div>
+        <div class="vb-shelf launch-plans p-off">
+          <div class="lp">
+            <div class="vb-stage" aria-hidden="true"><div class="vb">
+          <div class="vb-f vb-front">
+            <p class="vb-brand"><i></i>GroundRooted</p>
+            <div class="vb-marks"><span><img src="/videokit/logos/claude.svg" alt="" width="26" height="26" loading="lazy"></span><em></em><span class="fcp"><img src="/videokit/logos/final-cut-pro.png" alt="" width="36" height="36" loading="lazy"></span></div>
+            <p class="vb-title">클로드<br>비디오 키트<small>for 파이널컷프로</small></p>
+            
+            <div class="vb-lanes"><i></i><i></i><i></i></div>
+            <p class="vb-ed"><span>VIDEO KIT</span><b>macOS</b></p>
           </div>
-          <div class="plan">
-            <h3>키트만 제공</h3>
-            <p class="meta">키트 파일을 받아 직접 세팅 · 1년 후속지원</p>
-            <div class="price"><strong>30<small>만원</small></strong></div>
+          <div class="vb-f vb-side"><p><i></i>클로드 비디오 키트</p></div>
+          <div class="vb-f vb-top"></div>
+        </div></div>
+            <p class="lp-for">클로드 코드에 익숙한 분께 권장</p>
+            <h3>키트</h3>
+            <p class="lp-meta">키트 파일을 받아 직접 설치하고 세팅합니다.</p>
+            <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook (PDF · EPUB)</span></div>
+            <p class="lp-price"><strong>30<small>만원</small></strong></p>
+          </div>
+          <div class="lp lp-lec">
+            <div class="vb-stage" aria-hidden="true"><div class="vb vb-lec">
+          <div class="vb-f vb-front">
+            <p class="vb-brand"><i></i>GroundRooted</p>
+            <div class="vb-marks"><span><img src="/videokit/logos/claude.svg" alt="" width="26" height="26" loading="lazy"></span><em></em><span class="fcp"><img src="/videokit/logos/final-cut-pro.png" alt="" width="36" height="36" loading="lazy"></span></div>
+            <p class="vb-title">클로드<br>비디오 키트<small>for 파이널컷프로</small></p>
+            <p class="vb-tags"><span>+ 1:1 강의</span><span>원격 설치</span></p>
+            <div class="vb-lanes"><i></i><i></i><i></i></div>
+            <p class="vb-ed"><span>VIDEO KIT + 1:1</span><b>macOS</b></p>
+          </div>
+          <div class="vb-f vb-side"><p><i></i>키트 + 1:1 강의</p></div>
+          <div class="vb-f vb-top"></div>
+          <div class="vb-seal"><svg viewBox="0 0 120 120" role="img" aria-label="365일 1:1 지원">
+            <defs><path id="vb-ring-b" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0"/></defs>
+            <circle cx="60" cy="60" r="58" fill="#ff6b3d"/>
+            <circle cx="60" cy="60" r="51" fill="none" stroke="#131316" stroke-opacity=".35" stroke-width="1.2"/>
+            <circle cx="60" cy="60" r="33" fill="#131316"/>
+            <text font-family="JetBrains Mono, ui-monospace, monospace" font-size="8" font-weight="700" fill="#131316"><textPath href="#vb-ring-b" textLength="272" lengthAdjust="spacing">365 DAYS · 1:1 SUPPORT · 365 DAYS · 1:1 SUPPORT · </textPath></text>
+            <text x="60" y="63" text-anchor="middle" font-family="Pretendard Variable, Pretendard, sans-serif" font-size="25" font-weight="800" letter-spacing="-1" fill="#ff6b3d">365</text>
+            <text x="60" y="78" text-anchor="middle" font-family="Pretendard Variable, Pretendard, sans-serif" font-size="10" font-weight="700" fill="#ecebe6">일 1:1 지원</text>
+          </svg></div>
+        </div></div>
+            <p class="lp-for">클로드 코드가 처음이라면</p>
+            <h3>키트 + 1:1 강의</h3>
+            <p class="lp-meta">3주 과정. 클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행합니다.</p>
+            <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook</span><span>클로드 코드 사용법</span><span>키트 설치 원격 지원</span><span>1:1 강의 3회 · 3주</span><span class="hl">365일 1:1 지원</span></div>
+            <p class="lp-price"><strong>50<small>만원</small></strong></p>
           </div>
         </div>
 
@@ -773,7 +898,7 @@ footer .wrap{align-items:flex-start}
             </ul>
           </div>
           <div class="detail">
-            <h4>후속지원 (두 구성 모두, 1년)</h4>
+            <h4>365일 1:1 지원 (강의 포함 구성)</h4>
             <ul class="list">
               <li><svg><use href="#i-check"/></svg><span>스킬과 세팅 최적화</span></li>
               <li><svg><use href="#i-check"/></svg><span>유튜브 학습 데이터 제공</span></li>
@@ -816,8 +941,8 @@ footer .wrap{align-items:flex-start}
           <li><b>키트 파일</b>스킬 29개, 빌드 코어 스크립트, 스타일 프리셋 12종, 설치 스크립트와 설치 프롬프트. 압축을 풀고 그 폴더에서 클로드 코드를 열면 바로 읽힙니다.</li>
           <li><b>유튜브 학습 데이터</b>한국 · 해외 편집 스타일 분석과 예능 · 브이로그 · 쇼츠 · 제품 리뷰 · 스토리텔링 · 팟캐스트 6개 장르의 레퍼런스 리포트와 체크리스트.</li>
           <li><b>클로드 기반 사용 설명서</b>PDF와 Apple Books에서 읽는 EPUB. 기본 개념, 설치, 첫 편집, 완성본을 고치는 세 가지 방법, 새 스킬 만들기, 설치 오류 해결까지 담았습니다.</li>
-          <li><b>1년 후속지원</b>스킬과 세팅 최적화를 돕고, 새 버전과 변경 사항은 오픈카톡방 공지로 알려 드리고, 업데이트 파일은 이메일로 보내드립니다.</li>
-          <li><b>강의 포함 구성이라면</b><span class="p-on">1:1 강의 2회, 총 2시간.</span><span class="p-off">3주 과정 3회 강의.</span> 키트 세팅부터 내 소스로 직접 제작까지 함께합니다. 일정은 개별로 조율합니다.</li>
+          <li><b>업데이트</b>새 버전과 변경 사항은 오픈카톡방 공지로 알려 드리고, 업데이트 파일은 이메일로 보내드립니다.</li>
+          <li><b>강의 포함 구성이라면</b><span class="p-on">1:1 강의 2회, 총 2시간.</span><span class="p-off">3주 과정 3회 강의.</span> 클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행한 뒤 내 소스로 직접 제작까지 해 봅니다. 구매일로부터 365일 동안 1:1로 스킬과 세팅 최적화를 지원합니다. 일정은 개별로 조율합니다.</li>
         </ul>
         <p class="get-not">들어 있지 않은 것: Claude 요금제(Pro 이상, 직접 구독), 편집 프로그램, 유료 폰트 · 음악 · motionVFX 같은 라이선스 자산.</p>
       </div>
@@ -886,7 +1011,7 @@ footer .wrap{align-items:flex-start}
       <dl class="facts">
         <div><dt>상품명</dt><dd>클로드 비디오 키트 for 파이널컷프로</dd></div>
         <div><dt>가격</dt><dd><span class="p-on"><b>키트 10만원</b>(정가 30만원) · <b>키트 + 2회 강의(총 2시간) 30만원</b>(정가 50만원). 마켓 오픈 기념 할인으로, 11월 28일(토) 밤 24:00까지 신청하신 분께만 적용됩니다.</span><span class="p-off"><b>키트만 제공 30만원</b> · <b>키트 + 3회 강의 50만원</b></span></dd></div>
-        <div><dt>제공 내용</dt><dd>키트 파일(빌드 코어 9단계, 플러그인 스킬 18개), 바이럴 비디오 공식을 위한 유튜브 학습 데이터, <span class="p-on">클로드 기반 사용 설명 eBook(PDF · EPUB), </span><span class="p-off">설치 · 세팅 안내, </span>1년 후속지원. <span class="p-on">강의 포함 구성은 1:1 강의 2회(총 2시간)가 더해집니다.</span><span class="p-off">강의 포함 과정은 3주 동안 1:1 강의 3회가 더해집니다.</span></dd></div>
+        <div><dt>제공 내용</dt><dd>키트 파일(빌드 코어 9단계, 플러그인 스킬 18개), 바이럴 비디오 공식을 위한 유튜브 학습 데이터, <span class="p-on">클로드 기반 사용 설명 eBook(PDF · EPUB), </span><span class="p-off">설치 · 세팅 안내, </span>업데이트 파일. <span class="p-on">강의 포함 구성은 클로드 코드 사용법, 키트 설치 원격 지원, 1:1 강의 2회(총 2시간), 365일 1:1 지원이 더해집니다.</span><span class="p-off">강의 포함 과정은 클로드 코드 사용법, 키트 설치 원격 지원, 3주 동안 1:1 강의 3회, 365일 1:1 지원이 더해집니다.</span> 키트만 구입하는 구성은 클로드 코드에 익숙한 분께 권장하며 1:1 지원은 포함되지 않습니다.</dd></div>
         <div><dt>지원 환경</dt><dd>맥(macOS) 전용. 검수는 파이널컷 프로 또는 캡컷에서 합니다(프리미어 프로 · 다빈치 리졸브 지원 예정). <b>클로드 구독은 포함되어 있지 않습니다.</b> Claude Pro 이상 요금제를 개인이 직접 구독해야 사용할 수 있습니다.</dd></div>
         <div><dt>제공 방법</dt><dd><span class="p-on">신청 순서대로 안내드리며, 결제가 완료되면 키트 파일과 사용 설명 eBook(PDF · EPUB)을 이메일로 보내드립니다. 강의 시간은 개별로 소통하여 일정을 잡고, 일정에 따라 조기 마감될 수 있습니다.</span><span class="p-off">결제가 확인되면 키트 파일과 설치 안내를 카카오톡으로 보내드립니다. 강의 포함 과정은 상담으로 첫 수업 일정을 정합니다.</span></dd></div>
         <div><dt>결제</dt><dd><span class="p-on">신청은 이메일(sungchulkang@groundrooted.com)로 받습니다. 결제는 결제창이 열리면 그때 진행하며, 강의 포함 구성은 1일차 일정이 정해지면 결제합니다. 신용 · 체크카드와 간편결제로 결제할 수 있습니다.</span><span class="p-off">구매 신청은 카카오톡 1:1로 받습니다. 상담 후 결제 링크를 보내드리며, 신용 · 체크카드와 간편결제로 결제할 수 있습니다.</span></dd></div>

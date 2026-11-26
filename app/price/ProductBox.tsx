@@ -1,0 +1,42 @@
+import type { PlanId, Tier } from '@/products/videokit';
+
+// 상품 페이지(/videokit)의 상품 박스와 같은 모양. 결제 화면에서 무엇을 사는지 보여 준다.
+export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier }) {
+  const lec = plan === 'lesson';
+  const sessions = tier === 's' ? '1:1 강의 2회 · 총 2시간' : '1:1 강의 3회 · 3주';
+  return <section className="vk-prod" aria-label="구매 상품">
+    <div className="vb-stage" aria-hidden="true"><div className={lec ? 'vb vb-lec' : 'vb'}>
+      <div className="vb-f vb-front">
+        <p className="vb-brand"><i />GroundRooted</p>
+        <div className="vb-marks"><span><img src="/videokit/logos/claude.svg" alt="" width={26} height={26} /></span><em /><span className="fcp"><img src="/videokit/logos/final-cut-pro.png" alt="" width={36} height={36} /></span></div>
+        <p className="vb-title">클로드<br />비디오 키트<small>for 파이널컷프로</small></p>
+        {lec && <p className="vb-tags"><span>+ 1:1 강의</span><span>원격 설치</span></p>}
+        <div className="vb-lanes"><i /><i /><i /></div>
+        <p className="vb-ed"><span>{lec ? 'VIDEO KIT + 1:1' : 'VIDEO KIT'}</span><b>macOS</b></p>
+      </div>
+      <div className="vb-f vb-side"><p><i />{lec ? '키트 + 1:1 강의' : '클로드 비디오 키트'}</p></div>
+      <div className="vb-f vb-top" />
+      {lec && <div className="vb-seal"><svg viewBox="0 0 120 120">
+        <defs><path id="vb-ring-pay" d="M60,60 m-44,0 a44,44 0 1,1 88,0 a44,44 0 1,1 -88,0" /></defs>
+        <circle cx="60" cy="60" r="58" fill="#ff6b3d" />
+        <circle cx="60" cy="60" r="51" fill="none" stroke="#131316" strokeOpacity=".35" strokeWidth="1.2" />
+        <circle cx="60" cy="60" r="33" fill="#131316" />
+        <text fontFamily="JetBrains Mono, ui-monospace, monospace" fontSize="8" fontWeight="700" fill="#131316"><textPath href="#vb-ring-pay" textLength="272" lengthAdjust="spacing">365 DAYS · 1:1 SUPPORT · 365 DAYS · 1:1 SUPPORT · </textPath></text>
+        <text x="60" y="63" textAnchor="middle" fontFamily="Pretendard Variable, Pretendard, sans-serif" fontSize="25" fontWeight="800" letterSpacing="-1" fill="#ff6b3d">365</text>
+        <text x="60" y="78" textAnchor="middle" fontFamily="Pretendard Variable, Pretendard, sans-serif" fontSize="10" fontWeight="700" fill="#ecebe6">일 1:1 지원</text>
+      </svg></div>}
+    </div></div>
+    <div className="vk-prod-copy">
+      <p className={lec ? 'for lec' : 'for'}>{lec ? '클로드 코드가 처음이라면' : '클로드 코드에 익숙한 분께 권장'}</p>
+      <h2>{lec ? '키트 + 1:1 강의' : '키트'}</h2>
+      <p className="meta">{lec
+        ? '클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행합니다. 일정은 개별 조율합니다.'
+        : '키트 파일과 사용 설명 eBook을 받아 직접 설치하고 세팅합니다.'}</p>
+      <ul className="inc">
+        <li>키트 파일</li>
+        <li>사용 설명 eBook (PDF · EPUB)</li>
+        {lec && <><li>클로드 코드 사용법</li><li>키트 설치 원격 지원</li><li>{sessions}</li><li className="hl">365일 1:1 지원</li></>}
+      </ul>
+    </div>
+  </section>;
+}
