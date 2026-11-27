@@ -191,3 +191,11 @@
 .vk-pay .receipt .choices .method input{margin-top:0}
 .vk-pay .receipt .choices .method b{font-size:15px}
 @media (max-width:480px){.vk-pay .receipt .choices{grid-template-columns:1fr}}
+/* 키트 다운로드 페이지 /d/<코드> */
+.vk-pay .dl{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:0 0 12px}
+.vk-pay .dl a{display:flex;flex-direction:column;justify-content:center;gap:2px;min-height:76px;padding:14px 20px;border-radius:14px;background:#ff8a3d;color:#16181d;text-decoration:none;font-size:18px;font-weight:750;line-height:1.35}
+.vk-pay .dl a small{font-size:13px;font-weight:550;color:#3b2a1d}
+.vk-pay .dl-note{margin:0 0 24px}
+.vk-pay .dl-expire{padding:14px 16px;border-radius:12px;background:#1b1b20;margin:0 0 20px}
+.vk-pay .dl-expire b{color:#ffb38a;font-weight:700}
+@media (max-width:520px){.vk-pay .dl{grid-template-columns:1fr}}

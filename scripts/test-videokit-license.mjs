@@ -119,6 +119,8 @@ function fakeBackend({ tableMissing = false } = {}) {
     if (url.hostname === 'api.resend.com') { mails.push(JSON.parse(init.body)); return ok({ id: 'm1' }); }
     if (url.pathname.startsWith('/storage/v1/object/sign/')) return ok({ signedURL: `/object/sign/${url.pathname.split('/object/sign/')[1]}?token=t` });
     if (url.pathname === '/storage/v1/object/videokit/releases/latest.json') return new Response(JSON.stringify(LATEST), { status: 200 });
+    // 키트 메일의 짧은 다운로드 링크 표 (자세한 동작은 test-videokit-link.mjs). 여기서는 받기만 한다.
+    if (url.pathname === '/rest/v1/videokit_download_links') return method === 'GET' ? ok([]) : new Response(null, { status: method === 'POST' ? 201 : 204 });
     if (url.pathname === '/rest/v1/videokit_licenses') {
       if (tableMissing) return ok({ code: '42P01', message: 'relation "videokit_licenses" does not exist' }, 404);
       const eq = k => url.searchParams.get(k)?.replace(/^eq\./, '');
@@ -171,11 +173,11 @@ Object.assign(process.env, { SUPABASE_URL: 'https://fake.supabase.co', SUPABASE_
 // ---- 키트 메일에 키 ----
 {
   const o = { orderId: makeOrderId('kit', 's', randomUUID()), plan: 'kit', itemName: plans.kit.name, amount: 100000, name: '김' };
-  const withKey = kitEmail(o, { mac: 'https://l', windows: 'https://w' }, SALE_ENDS, 'VK-ABCD-EFGH-JK23');
+  const withKey = kitEmail(o, 'https://groundrooted.com/d/ABCD2345', SALE_ENDS, 'VK-ABCD-EFGH-JK23');
   assert.ok(withKey.html.includes('VK-ABCD-EFGH-JK23') && withKey.text.includes('구매자 키 (업데이트용): VK-ABCD-EFGH-JK23') && withKey.html.includes('/videokit update'));
-  const noKey = kitEmail(o, { mac: 'https://l', windows: 'https://w' }, SALE_ENDS);
+  const noKey = kitEmail(o, 'https://groundrooted.com/d/ABCD2345', SALE_ENDS);
   assert.ok(!noKey.html.includes('구매자 키') && !noKey.text.includes('구매자 키'));
-  assert.ok(kitEmail(o, { mac: 'l', windows: 'w' }, SALE_ENDS, '<x>').html.includes('&lt;x&gt;'), 'key escaped');
+  assert.ok(kitEmail(o, 'https://groundrooted.com/d/ABCD2345', SALE_ENDS, '<x>').html.includes('&lt;x&gt;'), 'key escaped');
 
   // 결제 후 자동 발송: 키를 만들어 메일에 넣고, 같은 주문으로 다시 보내도(새로고침 · 웹훅 재시도 · 재발송) 같은 키
   const be = fakeBackend();

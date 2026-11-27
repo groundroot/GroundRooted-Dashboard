@@ -10,6 +10,12 @@ export async function proxy(req: NextRequest) {
   if ([...editorialPublicPaths, paperMotionPath, "/favicon.svg", "/licenses/Inter-OFL.txt", "/licenses/Pretendard-OFL.txt", "/media/pdf-explainer/figure-01.svg", "/media/pdf-explainer/photo-01.svg", "/media/pdf-explainer/form-01.svg", "/media/readymd/reading-map.svg", "/videokit", "/videokit/index.html", "/videokit/diagram.html", "/videokit/terms", "/videokit/terms.html", "/videokit/privacy", "/videokit/privacy.html", "/videokit/transfer", "/videokit/transfer.html", "/videokit/logos/final-cut-pro.png", "/videokit/logos/final-cut-pro-subscription.png", "/videokit/logos/capcut.svg", "/videokit/logos/premiere-pro.svg", "/videokit/logos/davinci-resolve.svg", "/videokit/logos/claude.svg", "/videokit/product.png", "/videokit/plan-kit.png", "/videokit/plan-lesson.png", "/videokit/plan-pass.png", "/price", "/price/success", "/price/fail", "/api/videokit/apply"].includes(req.nextUrl.pathname)) return NextResponse.next();
   // 키트의 /videokit update (구매자 키로 확인, products/videokit-license.ts)
   if (req.nextUrl.pathname === "/api/videokit/latest") return NextResponse.next();
+  // 키트 짧은 다운로드 링크 /d/<코드>, /d/<코드>/mac|windows (products/videokit-link.ts)
+  if (/^\/d\/[^/]{1,16}(\/(mac|windows))?$/.test(req.nextUrl.pathname)) {
+    const response = NextResponse.next();
+    response.headers.set("X-Robots-Tag", "noindex, nofollow");
+    return response;
+  }
   // Data-free storefront routes only. Private HQ remains behind the password gate.
   if (["/", "/pdf-to-md", "/youtube-to-md", "/typecut-pro"].includes(req.nextUrl.pathname) &&
       (process.env.NODE_ENV === "development" || process.env.MARKETING_PREVIEW_ENABLED === "true")) {
