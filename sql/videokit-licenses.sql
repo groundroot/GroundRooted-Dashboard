@@ -16,3 +16,5 @@ create table if not exists videokit_licenses (
 -- 서버의 service_role 키만 접근한다(service_role은 RLS를 우회). 대시보드의 'read for authenticated' 정책에 넣지 않는다.
 alter table videokit_licenses enable row level security;
 revoke all on table videokit_licenses from anon, authenticated;
+-- 새 테이블은 Data API 권한을 명시해야 한다(없으면 42501). 서버가 쓰는 만큼만 준다.
+grant select, insert, update on table videokit_licenses to service_role;
