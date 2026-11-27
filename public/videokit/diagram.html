@@ -1833,6 +1833,10 @@ OTHER DEALINGS IN THE FONT SOFTWARE.
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    .semantic-passport-detail[data-node-id="fcp"] {
+      overflow-wrap: anywhere;
+      white-space: normal;
+    }
     .semantic-passport-detail[hidden] { display: none; }
     .semantic-passport-meta {
       display: flex;
@@ -9434,6 +9438,7 @@ svg [data-node-context^="빌드 코어"] > rect:not(.c-mask){stroke-width:2.5px!
         evidence.hidden = false;
       }
       function renderPassport(id, node) {
+        detail.dataset.nodeId = id;
         setPassportValue(detail, node.getAttribute('data-node-sublabel'));
         setPassportValue(kind, viewerKindLabel(node.getAttribute('data-node-kind') || 'node'));
         setPassportValue(context, node.getAttribute('data-node-context'));
