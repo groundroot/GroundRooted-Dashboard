@@ -8,6 +8,7 @@
 // 필요한 환경변수: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, VIDEOKIT_MAIL_FROM
 // 선택: VIDEOKIT_BUCKET(videokit), VIDEOKIT_MAIL_REPLY_TO, VIDEOKIT_MAIL_BCC, VIDEOKIT_NOTICE_URL(공지 오픈카톡방 주소)
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { editorSupport } from './videokit-editor-support.ts';
 import { issueLicense } from './videokit-license.ts';
 import { createLink, kstDay, LINK_DAYS } from './videokit-link.ts';
 
@@ -65,7 +66,7 @@ export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amoun
   ];
   const notes = [
     '이 키트는 Claude Pro 이상 요금제를 직접 구독해서 사용합니다. Claude 구독은 포함되어 있지 않습니다.',
-    '맥(macOS, Apple Silicon)과 윈도우(Windows 10/11 64비트)를 지원합니다. 파이널컷 프로는 맥에서, 캡컷과 프리미어 프로는 맥·윈도우에서 지원합니다. 다빈치 리졸브는 맥·윈도우에서 Free(무료)·Studio(유료) 모두 지원합니다. 캡컷 · 다빈치 리졸브 연동은 베타입니다.',
+    `맥(macOS, Apple Silicon)과 윈도우(Windows 10/11 64비트)를 지원합니다. 편집 프로그램은 ${editorSupport.join(' · ')}입니다. 지원 운영체제는 상품 페이지의 지원 환경을 확인해 주세요.`,
     '키트는 구매자 본인의 영상 제작에 쓸 수 있으며, 다른 사람에게 복제·배포·판매·공유할 수 없습니다.',
   ];
   const linkNote = `다운로드 페이지에서 쓰시는 컴퓨터에 맞는 파일(맥용 · 윈도우용) 하나를 받으면 됩니다. 이 링크는 ${LINK_DAYS}일 뒤(${kstDay(expiresAt)}) 삭제됩니다. 그 뒤에 다시 받으시려면 이 메일에 답장해 주세요.`;

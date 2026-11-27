@@ -6,6 +6,7 @@ import ProductVisual from '@/components/storefront/ProductVisual';
 import WorkExplorer from '@/components/storefront/WorkExplorer';
 import { appCatalog } from '@/products/catalog';
 import { plans, tierAt } from '@/products/videokit';
+import { editorSupport } from '@/products/videokit-editor-support';
 
 // 오픈기념가 마감이 지나면 정가로 다시 그린다.
 export const revalidate = 300;
@@ -53,10 +54,7 @@ export default function HomePage() {
           <p className="fx-kit-status"><span aria-hidden="true" />지금 판매 중</p>
           <h2 id="kit-heading">클로드 비디오 키트</h2>
           <p className="fx-kit-lede">영상 제작은 클로드에게, 검수는 쓰시는 편집 프로그램에서. 자막 · 모션처럼 렌더하는 영상은 편집 프로그램 없이 MP4로 바로 받을 수 있습니다.</p>
-          <p className="fx-kit-new">
-            <b>NEW</b>
-            <span>다빈치 리졸브(베타): 맥·윈도우에서 Free(무료)·Studio(유료) 모두 지원<br />프리미어 프로: 맥·윈도우 지원</span>
-          </p>
+          <p className="fx-kit-support">{editorSupport.join(' · ')}</p>
           <ul className="fx-kit-plans">
             {kitPlans.map((p) => <li key={p.id}>
               <img className="fx-kit-thumb" src={`/videokit/plan-${p.id}.png`} alt={p.alt} width={56} height={56} loading="lazy" decoding="async" />
@@ -68,6 +66,7 @@ export default function HomePage() {
           <p className="fx-kit-note">{sale && <>오픈기념가 · 11월 28일(토) 23:59까지 주문 (마감 전에 연 결제 화면은 30분 유예)<br /></>}Claude 구독 미포함 (Claude Pro 이상 별도 구독) · macOS · Windows(미리보기) 지원</p>
           <div className="fx-kit-actions">
             <a href="/videokit" className="fx-pill fx-pill-videokit">상품 자세히 보기 <ArrowRight size={18} aria-hidden="true" /></a>
+            <a href="/videokit#skills" className="fx-kit-link">스킬 36개 전체 보기 (최신 개발판)</a>
             <a href="/videokit#buy" className="fx-kit-link">구매 안내 · 환불</a>
           </div>
           <p className="fx-kit-note">결제하기에서 계좌이체로 구매합니다(카드 · 간편결제는 심사 중). 입금이 확인되면 이메일로 키트 다운로드 링크(맥용 · 윈도우용)를 보내드립니다.</p>

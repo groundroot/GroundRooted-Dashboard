@@ -95,8 +95,7 @@ a{color:inherit;text-underline-offset:.22em;text-decoration-thickness:1px}
 .hero .actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:36px}
 .note{margin-top:16px;font-size:14px;color:var(--ink-3)}
 /* 업데이트 공지 (2026.11.26) — 기간 할인(p-on)과 무관하게 계속 보인다 */
-.news{margin-top:28px;display:inline-grid;grid-template-columns:auto minmax(0,1fr);column-gap:14px;row-gap:6px;align-items:center;padding:14px 20px 14px 14px;border-radius:12px;background:color-mix(in srgb,var(--head) 8%,var(--panel));border:1px solid color-mix(in srgb,var(--head) 32%,var(--line))}
-.news-tag{grid-row:1/3;align-self:start;font:500 12px/1 var(--mono);letter-spacing:.08em;color:#120600;background:var(--head);padding:6px 8px;border-radius:6px}
+.news{margin-top:28px;display:inline-grid;row-gap:6px;padding:14px 20px 14px 14px;border-radius:12px;background:color-mix(in srgb,var(--head) 8%,var(--panel));border:1px solid color-mix(in srgb,var(--head) 32%,var(--line))}
 .news-date{font:500 13px/1.4 var(--mono);color:#ffb27e}
 .news ul{list-style:none;display:flex;flex-wrap:wrap;column-gap:22px;row-gap:2px;font-size:16px;line-height:1.55;font-weight:600;color:var(--ink)}
 .news li{display:flex;align-items:baseline;gap:9px}
@@ -661,6 +660,18 @@ footer .wrap{align-items:flex-start}
 .maker p{margin:0;max-width:60ch}
 
 /* ---------- 신청 팝업 ---------- */
+.skills{scroll-margin-top:78px;padding:clamp(48px,8vw,96px) 0}
+.skills .sec-head{margin-bottom:28px}
+.skills .sec-head p{font-size:16px;line-height:1.65}
+.skill-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:clamp(24px,5vw,64px);padding:0;list-style:none}
+.skill-list li{border-top:1px solid var(--line);padding:15px 0;min-width:0}
+.skill-list li p{margin-top:5px;color:var(--ink-2);font-size:15px;line-height:1.65}
+.skill-name{display:flex;align-items:baseline;flex-wrap:wrap;gap:4px 10px}
+.skill-name code{font:500 14px/1.5 var(--mono);overflow-wrap:anywhere;color:var(--ink)}
+.skill-name span{font-size:13px;font-weight:600;color:#ffb27e}
+.lp-editor-note{color:var(--ink-2);font-size:14px;line-height:1.6}
+.mix-editor-link{color:var(--ink);text-decoration:underline;text-underline-offset:3px}
+@media(max-width:680px){.skill-list{grid-template-columns:minmax(0,1fr)}}
 </style>
 <script>(function(){if(Date.now()>=Date.parse('2026-11-29T00:00:00+09:00'))document.documentElement.classList.add('promo-end')})();</script>
 <script>(function(){var d=document.documentElement;if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;d.classList.add('rv-on');setTimeout(function(){if(!window.__rv)d.classList.add('rv-done')},2500)})();</script>
@@ -683,6 +694,7 @@ footer .wrap{align-items:flex-start}
     <a class="brand" href="#top"><i class="rec" aria-hidden="true"></i>클로드 비디오 키트</a>
     <nav class="nav" aria-label="섹션">
       <a href="#kit">키트 소개</a>
+      <a href="#skills">스킬 목록</a>
       <a class="p-on" href="#launch">오픈 할인</a>
       <a href="#price">가격</a>
       <a href="#reviews">후기</a>
@@ -701,9 +713,8 @@ footer .wrap{align-items:flex-start}
         영상 편집 20년 차의 노하우를 담아, 반복 작업은 <b>내 컴퓨터에서 직접</b> 돌리고 <b>클로드 토큰 사용량</b>은 줄였습니다.
       </p>
       <div class="news" role="note" aria-label="편집 프로그램 지원 안내">
-        <span class="news-tag">NEW</span>
-        <p class="news-date">편집 프로그램 지원 안내</p>
-        <ul><li>다빈치 리졸브(베타): 맥·윈도우에서 Free(무료)·Studio(유료) 모두 지원</li><li>프리미어 프로: 맥·윈도우 지원</li></ul>
+        <p class="news-date">편집 프로그램 지원</p>
+        <ul><li>정식 지원 · 파이널컷 프로</li><li>베타 · 캡컷, 다빈치 리졸브, 프리미어 프로</li><li>지원 예정 · 필름크래프트</li></ul>
       </div>
       <div class="actions p-on">
         <a class="btn btn-buy" href="/price">결제하기</a>
@@ -726,7 +737,7 @@ footer .wrap{align-items:flex-start}
             <span class="tc" style="left:0">촬영본</span><span class="tc" style="left:20%">장면 분석</span><span class="tc" style="left:40%">콘티</span><span class="tc" style="left:60%">타임라인</span><span class="tc" style="left:80%">검수</span>
           </div></div>
           <div class="track"><span class="tag">V3</span><div class="lane">
-            <a class="clip v2" href="#mix" style="left:30%;width:50%"><b>스킬 31개</b><small>음악 · 자막 · B롤 · 쇼츠</small></a>
+            <a class="clip v2" href="#skills" style="left:30%;width:50%"><b>스킬 36개</b><small>최신 개발판 기준 · 전체 목록</small></a>
           </div></div>
           <div class="track"><span class="tag">V2</span><div class="lane">
             <a class="clip v1" href="#system" style="left:0;width:100%"><b>빌드 코어 9단계</b><small>촬영본에서 타임라인까지 매번</small></a>
@@ -774,6 +785,7 @@ footer .wrap{align-items:flex-start}
         </div></div>
           <p class="lp-for">클로드 코드에 익숙한 분께 권장</p>
           <h3>키트</h3>
+          <p class="lp-editor-note">파이널컷 프로(정식 지원) · 캡컷, 다빈치 리졸브, 프리미어 프로(모두 베타) · 필름크래프트(지원 예정)</p>
           <p class="lp-meta">키트 파일과 사용 설명 eBook을 받아 직접 설치하고 세팅합니다. <b class="lp-nolec">강의는 들어 있지 않으며, 필요하면 1:1 강의권을 따로 구입합니다.</b></p>
           <p class="lp-first">클로드 코드를 처음 접하시면 <a href="#plan-lec-launch">키트 + 1:1 강의</a> 통합본을 구매해 주세요.</p>
           <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook (PDF · EPUB)</span></div>
@@ -811,6 +823,7 @@ footer .wrap{align-items:flex-start}
           </div></div><div class="vl-neck"></div><div class="vl-base"></div></div></div>
           <p class="lp-for">클로드 코드가 처음이라면</p>
           <h3>키트 + 1:1 강의</h3>
+          <p class="lp-editor-note">파이널컷 프로(정식 지원) · 캡컷, 다빈치 리졸브, 프리미어 프로(모두 베타) · 필름크래프트(지원 예정)</p>
           <p class="lp-meta">클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행합니다. 일정은 개별 조율합니다.</p>
           <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook</span><span>클로드 코드 사용법</span><span>키트 설치 원격 지원</span><span>1:1 강의 2회 · 총 2시간</span><span class="hl">365일 1:1 채팅 지원</span></div>
           <p class="lp-price"><s>50만원</s><strong>30<small>만원</small></strong></p>
@@ -871,8 +884,8 @@ footer .wrap{align-items:flex-start}
           <li class="ed ok"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/final-cut-pro-subscription.png" alt="" width="116" height="116" loading="lazy"></span><b>파이널컷 프로</b><span class="ed-sub">구독형 · 맥</span><small>정식 지원</small></div></li>
           <li class="ed ok"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/final-cut-pro.png" alt="" width="116" height="116" loading="lazy"></span><b>파이널컷 프로</b><span class="ed-sub">스탠드얼론 · 맥</span><small>정식 지원</small></div></li>
           <li class="ed beta"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/capcut.svg" alt="" width="116" height="116" loading="lazy"></span><b>캡컷</b><span class="ed-sub">맥 · 윈도우</span><small>베타</small></div></li>
-          <li class="ed beta"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/davinci-resolve.svg" alt="" width="116" height="116" loading="lazy"></span><b>다빈치 리졸브</b><span class="ed-sub">맥 · 윈도우<br>Free · Studio</span><small>베타</small></div></li>
-          <li class="ed"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/premiere-pro.svg" alt="" width="116" height="116" loading="lazy"></span><b>프리미어 프로</b><span class="ed-sub">맥 · 윈도우</span></div></li>
+          <li class="ed beta"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/davinci-resolve.svg" alt="" width="116" height="116" loading="lazy"></span><b>다빈치 리졸브</b><span class="ed-sub">맥 · 윈도우</span><small>베타</small></div></li>
+          <li class="ed beta"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/premiere-pro.svg" alt="" width="116" height="116" loading="lazy"></span><b>프리미어 프로</b><span class="ed-sub">맥 · 윈도우</span><small>베타</small></div></li>
           <li class="ed soon"><div class="fc"><span class="ed-ico"><img src="/videokit/logos/filmcraft.png" alt="" width="116" height="116" loading="lazy"></span><b>필름크래프트</b><span class="ed-sub" aria-hidden="true"></span><small>지원 예정</small></div></li>
         </ul>
         <div class="flow-direct"><div class="fc direct"><div class="files" aria-hidden="true"><span>MP4</span></div><div><b>렌더하는 영상은 MP4로 바로</b><p>자막 · 모션처럼 렌더하는 영상은 편집 프로그램 없이 MP4 파일로 받을 수 있습니다.</p></div></div></div>
@@ -958,6 +971,7 @@ footer .wrap{align-items:flex-start}
         </div></div>
             <p class="lp-for">클로드 코드에 익숙한 분께 권장</p>
             <h3>키트</h3>
+            <p class="lp-editor-note">파이널컷 프로(정식 지원) · 캡컷, 다빈치 리졸브, 프리미어 프로(모두 베타) · 필름크래프트(지원 예정)</p>
             <p class="lp-meta">키트 파일을 받아 직접 설치하고 세팅합니다. <b class="lp-nolec">강의는 들어 있지 않으며, 필요하면 1:1 강의권을 따로 구입합니다.</b></p>
             <p class="lp-first">클로드 코드를 처음 접하시면 <a href="#plan-lec">키트 + 1:1 강의</a> 통합본을 구매해 주세요.</p>
             <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook (PDF · EPUB)</span></div>
@@ -994,6 +1008,7 @@ footer .wrap{align-items:flex-start}
           </div></div><div class="vl-neck"></div><div class="vl-base"></div></div></div>
             <p class="lp-for">클로드 코드가 처음이라면</p>
             <h3>키트 + 1:1 강의</h3>
+            <p class="lp-editor-note">파이널컷 프로(정식 지원) · 캡컷, 다빈치 리졸브, 프리미어 프로(모두 베타) · 필름크래프트(지원 예정)</p>
             <p class="lp-meta">3주 과정. 클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행합니다.</p>
             <div class="lp-inc"><span>키트 파일</span><span>사용 설명 eBook</span><span>클로드 코드 사용법</span><span>키트 설치 원격 지원</span><span>1:1 강의 3회 · 3주</span><span class="hl">365일 1:1 채팅 지원</span></div>
             <p class="lp-price"><strong>50<small>만원</small></strong></p>
@@ -1080,7 +1095,7 @@ footer .wrap{align-items:flex-start}
           <li><b>음악 · 효과음</b>장면 길이와 박자에 맞춰 곡을 고르고 다듬습니다.</li>
           <li><b>소스 가져오기</b>사이트에서 받아 오거나 편집 프로그램 안에서 골라 바로 씁니다.</li>
           <li><b>타이틀 · 모션그래픽</b>구독 템플릿을 활용하거나 키트에서 직접 제작하여 넣습니다.</li>
-          <li><b>편집 프로그램 연동</b>파이널컷 프로, 캡컷, 다빈치 리졸브, 프리미어 프로로 편집 결과를 넘깁니다. 캡컷과 다빈치 리졸브 연동은 베타입니다.</li>
+          <li><b>편집 프로그램 연동</b>편집 결과를 쓰시는 프로그램으로 넘깁니다. 파이널컷 프로(정식 지원) · 캡컷, 다빈치 리졸브, 프리미어 프로(모두 베타) · 필름크래프트(지원 예정).</li>
         </ul>
       </div>
 
@@ -1088,7 +1103,7 @@ footer .wrap{align-items:flex-start}
         <h3>구입하면 받는 것</h3>
         <p>결제가 완료되면 이메일로 아래 파일을 내려받는 링크를 보내드립니다.</p>
         <ul>
-          <li><b>키트 파일</b>스킬 31개(키트 1.3의 스킬 폴더 수), 빌드 코어 스크립트, 스타일 프리셋 12종, 설치 스크립트와 설치 프롬프트. 압축을 풀고 그 폴더에서 클로드 코드를 열면 바로 읽힙니다.</li>
+          <li><b>키트 파일</b>영상 제작 스킬(현재 판매 버전 1.3 · <a href="#skills">최신 개발판 36개 전체 보기</a>), 빌드 코어 스크립트, 스타일 프리셋 12종, 설치 스크립트와 설치 프롬프트. 압축을 풀고 그 폴더에서 클로드 코드를 열면 바로 읽힙니다.</li>
           <li><b>유튜브 학습 데이터</b>한국 · 해외 편집 스타일 분석과 예능 · 브이로그 · 쇼츠 · 제품 리뷰 · 스토리텔링 · 팟캐스트 6개 장르의 레퍼런스 리포트와 체크리스트.</li>
           <li><b>클로드 기반 사용 설명서</b>PDF와 Apple Books에서 읽는 EPUB. 기본 개념, 설치, 첫 편집, 완성본을 고치는 세 가지 방법, 새 스킬 만들기, 설치 오류 해결까지 담았습니다.</li>
           <li><b>업데이트</b>키트 안에서 구매자 키로 <b>/videokit update</b>를 실행해 새 버전을 받습니다(첫 정식 업데이트 1.4.0 배포 예정). 새 버전 소식은 오픈카톡방 공지로 알려 드립니다.</li>
@@ -1100,20 +1115,67 @@ footer .wrap{align-items:flex-start}
     </div>
   </section>
 
+  <section class="skills" id="skills" aria-labelledby="skills-heading" tabindex="-1">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2 id="skills-heading">스킬 36개 전체 목록</h2>
+        <p>최신 개발판의 스킬 폴더 수입니다. 현재 판매 중인 1.3에는 31개가 들어 있으며, 표시된 5개는 정식 1.4.0부터 제공할 예정입니다.</p>
+      </div>
+      <ul class="skill-list" role="list">
+        <li><div class="skill-name"><code lang="en" translate="no">ai-story-scenes</code></div><p>촬영본에 없는 장면의 생성 계획을 세우고, 콘티에 자리를 표시한 뒤 승인받아 AI 영상으로 채웁니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">event-review-edit</code></div><p>행사·여행 촬영본을 정리하고 인터뷰와 자료화면을 엮어 파이널컷 프로용 리뷰 영상으로 구성합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-ad</code></div><p>짧은 광고의 첫 장면과 대본을 구성하고, 여러 화면 비율에 맞춰 광고 영상을 제작합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-broll</code></div><p>촬영본·스톡·AI 소스에서 보조 화면을 골라 인터뷰 위에 배치합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-captions</code></div><p>단어 타이밍에 맞춘 편집 가능한 자막, 이중 자막, 키워드 강조와 이름표를 만듭니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-color</code></div><p>영상의 전체 색감과 샷 간 톤을 맞추고 HDR 변환이나 색보정을 돕습니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-cut-ums</code></div><p>말 영상에서 필러와 긴 무음을 덜어내고 파이널컷 프로에서 편집점을 수정할 수 있게 합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-event-organize</code></div><p>클립과 구간에 키워드나 즐겨찾기를 붙여 편집 프로그램에서 촬영본을 찾기 쉽게 정리합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-explainer</code></div><p>대본, 도표·글자 화면, 내레이션과 자막을 조합해 개념이나 사용법을 설명하는 영상을 만듭니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-internal-sources</code></div><p>편집 프로그램에 내장된 타이틀·전환·색보정·스톡 소스를 먼저 찾아 프로젝트에 적용합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-lesson</code></div><p>강의 영상의 군더더기를 덜고, 슬라이드·핵심 문구·챕터와 자막을 넣습니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-motion-graphics</code></div><p>움직이는 타이틀, 이름표, 지도, 수치 강조와 전환을 만들어 편집에 넣습니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-music-video</code></div><p>곡의 박자에 맞춰 컷을 배치하고 가사 자막이나 음악에 맞춘 그래픽을 만듭니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-openmotion</code><span>1.4.0 추가 예정</span></div><p>참고 영상의 움직임과 타이밍을 분석해 타이틀·차트·전환을 투명 배경 그래픽으로 제작합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-picture-book</code></div><p>삽화나 사진에 페이지 전환, 내레이션과 음악을 더해 그림책 형식의 영상을 만듭니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-product-video</code></div><p>제품 소개 자료에서 기능과 시연 장면을 골라 제품 공개·홍보 영상을 구성합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-shorts</code></div><p>긴 강연이나 인터뷰에서 독립적으로 볼 수 있는 25~60초 구간을 골라 세로 영상과 자막으로 편집합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">fcp-voice-music</code></div><p>내레이션·대사·배경음악·효과음을 정리하고 대사가 나올 때 배경음악을 낮춥니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">filmcraft-live</code><span>1.4.0 추가 예정</span></div><p>필름크래프트에 열린 프로젝트를 읽고, 확인을 거쳐 자막·컷·음량·마커를 수정하도록 설계했습니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">font-apply</code></div><p>사용자 글꼴 모음에서 역할에 맞는 글꼴을 골라 설치하고 자막이나 타이틀에 적용합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">font-copy</code></div><p>참고 화면의 글자 모양을 비교해 영상에 사용할 수 있는 비슷한 무료 글꼴을 찾습니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">interview-documentary</code></div><p>인터뷰를 중심으로 장편 다큐멘터리를 구성하고 질문 카드, 이중 자막과 별도 녹음 음성을 편집합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">mic-sync-dialogue</code></div><p>별도 마이크 녹음과 카메라 음성을 파형으로 맞춘 뒤 대사 음질과 음량을 정리합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">motionvfx-assets</code></div><p>설치된 타이틀·전환·색보정 템플릿을 고르고 편집 프로그램에 맞는 소스를 배치합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">music-sourcing-audition</code></div><p>편집 구간별로 배경음악 후보를 골라 타임라인에서 비교해 들을 수 있게 정리합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">podcast-multicam</code></div><p>여러 카메라의 토크·팟캐스트 영상에서 화자와 반응에 맞춰 앵글을 전환하고 자막을 넣습니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">premiere-live</code><span>1.4.0 추가 예정</span></div><p>열린 프리미어 프로젝트의 편집 연동을 확인하고, 이용할 수 없으면 키트 패널에서 새 시퀀스를 만드는 방법을 안내합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">resolve-finish</code><span>1.4.0 추가 예정</span></div><p>다빈치 리졸브에서 키트 타임라인을 만들고 자막·색보정·음향·렌더 작업을 이어갑니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">resolve-live</code><span>1.4.0 추가 예정</span></div><p>다빈치 리졸브에 열린 타임라인을 읽고, 확인을 거쳐 자막·컷·음량·마커를 수정합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">script-narration</code></div><p>작성한 대본을 음성으로 만들고 파이널컷 프로 타임라인에 내레이션으로 배치합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">sermon-cut</code></div><p>예배 녹화본을 순서별 타임라인과 영상으로 나누고 썸네일 후보와 업로드용 문구를 준비합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">suno-score</code></div><p>콘티의 길이와 분위기에 맞춰 배경음악을 생성하고 박자와 음량을 다듬어 배치합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">talking-head-highlight</code></div><p>한 사람이 말하는 긴 영상에서 핵심 문장을 골라 자막·강조 그래픽·배경음악을 넣은 하이라이트를 만듭니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">videokit</code></div><p>영상 제작 요청을 받아 편집 프로그램과 작업 유형에 맞는 키트 작업을 시작합니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">viral-video-research</code></div><p>공개 영상의 편집 구조와 자막·템포 패턴을 분석해 스타일 프리셋과 콘티 체크리스트를 만듭니다.</p></li>
+        <li><div class="skill-name"><code lang="en" translate="no">voicestudio</code></div><p>저장한 음성이나 설계한 음성으로 내레이션을 만들고 음성 인식과 더빙을 돕습니다.</p></li>
+      </ul>
+    </div>
+  </section>
+
   <!-- 무료·유료 구성 -->
   <section class="band band-mix">
     <div class="wrap">
       <div class="mix" id="mix">
         <div class="mix-head">
           <h3>무료로도, 이미 쓰는 구독으로도</h3>
-          <p>빌드 코어와 플러그인을 항목마다 무료와 유료로 나눠 보여 드립니다. Claude 요금제는 꼭 필요하고, 나머지는 골라 쓸 수 있습니다. 이미 구독 중인 서비스를 그대로 쓰거나, 완전 무료 플랫폼으로만 꾸리거나, 섞어서 설정하세요. 눌러서 바꿔 보세요.</p>
+          <p>빌드 코어와 플러그인을 항목마다 무료와 유료로 나눠 보여 드립니다. Claude 요금제는 꼭 필요하고, 나머지는 골라 쓸 수 있습니다. 이미 구독 중인 서비스를 그대로 쓰거나, 완전 무료 플랫폼으로만 꾸리거나, 섞어서 설정하세요. 눌러서 바꿔 보세요. 편집 프로그램은 <a class="mix-editor-link" href="#env">지원 환경</a>을 확인해 주세요.</p>
         </div>
         <div class="mix-grid" role="group" aria-label="무료·유료 구성 선택">
           <div class="mix-cols" aria-hidden="true"><span></span><span>무료</span><span>유료 · 구독</span></div>
           <div class="mix-group">빌드 코어 <small>매번 실행</small></div>
           <div class="mix-row fixed" data-pick="free"><span class="mix-k">장면 분석 · 음성 인식</span><span class="opt free on">내 컴퓨터에서 로컬 처리</span><span class="opt na">—</span></div>
           <div class="mix-row fixed" data-pick="paid"><span class="mix-k">콘티 · 편집 판단</span><span class="opt na">—</span><span class="opt paid on">Claude 요금제 (필수)</span></div>
-          <div class="mix-row" data-pick="paid"><span class="mix-k">편집 프로그램</span><button type="button" class="opt free">캡컷 · 다빈치 리졸브 Free</button><button type="button" class="opt paid">파이널컷 프로(일반 구매 · 구독제) · 다빈치 리졸브 Studio · 프리미어 프로</button></div>
+          <div class="mix-row" data-pick="paid"><span class="mix-k">편집 프로그램 예시</span><button type="button" class="opt free">캡컷(베타)</button><button type="button" class="opt paid">파이널컷 프로(정식 지원) · 프리미어 프로(베타)</button></div>
           <div class="mix-group">플러그인 <small>필요할 때만</small></div>
           <div class="mix-row" data-pick="free"><span class="mix-k">폰트</span><button type="button" class="opt free">눈누 무료 폰트</button><button type="button" class="opt paid">산돌구름</button></div>
           <div class="mix-row" data-pick="paid"><span class="mix-k">타이틀 · 모션그래픽</span><button type="button" class="opt free">직접 렌더 (HyperFrames · Remotion)</button><button type="button" class="opt paid">파이널컷 프로 구독제 (motionVFX 포함)</button></div>
@@ -1161,8 +1223,8 @@ footer .wrap{align-items:flex-start}
       <dl class="facts">
         <div><dt>상품명</dt><dd>클로드 비디오 키트</dd></div>
         <div><dt>가격</dt><dd><span class="p-on"><b>키트 10만원</b>(정가 30만원) · <b>키트 + 1:1 강의(2회 · 총 2시간) 30만원</b>(정가 50만원). 마켓 오픈 기념 할인으로, 11월 28일(토) 23:59까지 주문하신 분께만 적용됩니다. 마감 전에 연 결제 화면에서는 마감 뒤 30분까지 할인가로 결제할 수 있습니다.</span><span class="p-off"><b>키트 30만원</b> · <b>키트 + 1:1 강의(3주 · 3회) 50만원</b></span> 키트를 이미 구입한 분의 <b>키트 구매자 1:1 강의권(2회 · 총 2시간)은 30만원</b>이며 할인 기간에도 같은 가격입니다.</dd></div>
-        <div><dt>제공 내용</dt><dd>키트 파일(빌드 코어 9단계, 스킬 31개), 바이럴 비디오 공식을 위한 유튜브 학습 데이터, <span class="p-on">클로드 기반 사용 설명 eBook(PDF · EPUB), </span><span class="p-off">설치 · 세팅 안내, </span>구매자 키로 받는 업데이트. <span class="p-on">강의 포함 구성은 클로드 코드 사용법, 키트 설치 원격 지원, 1:1 강의 2회(총 2시간), 365일 1:1 채팅 지원이 더해집니다.</span><span class="p-off">강의 포함 과정은 클로드 코드 사용법, 키트 설치 원격 지원, 3주 동안 1:1 강의 3회, 365일 1:1 채팅 지원이 더해집니다.</span> 키트 상품은 클로드 코드에 익숙한 분께 권장하며 1:1 지원은 포함되지 않습니다. 키트를 먼저 구입한 분은 키트 구매자 1:1 강의권(2회 · 총 2시간, 클로드 코드 사용법 · 키트 설치 원격 지원 포함)으로 강의를 따로 신청할 수 있습니다.</dd></div>
-        <div id="env"><dt>지원 환경</dt><dd><b>운영체제</b>: macOS · Windows(미리보기) (맥용 · 윈도우용을 함께 받습니다)<br><b>편집 프로그램</b>: Final Cut Pro(정식, 맥) · CapCut(베타, 맥·윈도우)<br>다빈치 리졸브(베타): 맥·윈도우에서 Free(무료)·Studio(유료) 모두 지원<br>프리미어 프로: 맥·윈도우 지원<br>필름크래프트(FilmCraft): 지원 예정<br><b>Claude Pro 이상 구독 필요</b> — 클로드 구독은 포함되어 있지 않으며, Claude Pro 이상 요금제를 개인이 직접 구독해야 사용할 수 있습니다.<br>윈도우는 Windows 10/11 64비트, NVIDIA 그래픽카드를 권장합니다(없으면 음성 인식이 느립니다).</dd></div>
+        <div><dt>제공 내용</dt><dd>키트 파일(현재 판매 버전 1.3, 빌드 코어 9단계, <a href="#skills">최신 개발판 스킬 36개 전체 목록</a>), 바이럴 비디오 공식을 위한 유튜브 학습 데이터, <span class="p-on">클로드 기반 사용 설명 eBook(PDF · EPUB), </span><span class="p-off">설치 · 세팅 안내, </span>구매자 키로 받는 업데이트. <span class="p-on">강의 포함 구성은 클로드 코드 사용법, 키트 설치 원격 지원, 1:1 강의 2회(총 2시간), 365일 1:1 채팅 지원이 더해집니다.</span><span class="p-off">강의 포함 과정은 클로드 코드 사용법, 키트 설치 원격 지원, 3주 동안 1:1 강의 3회, 365일 1:1 채팅 지원이 더해집니다.</span> 키트 상품은 클로드 코드에 익숙한 분께 권장하며 1:1 지원은 포함되지 않습니다. 키트를 먼저 구입한 분은 키트 구매자 1:1 강의권(2회 · 총 2시간, 클로드 코드 사용법 · 키트 설치 원격 지원 포함)으로 강의를 따로 신청할 수 있습니다.</dd></div>
+        <div id="env"><dt>지원 환경</dt><dd><b>운영체제</b>: macOS · Windows(미리보기) (맥용 · 윈도우용을 함께 받습니다)<br><b>편집 프로그램</b>: 파이널컷 프로(정식 지원 · 맥)<br>캡컷 · 다빈치 리졸브 · 프리미어 프로(베타 · 맥과 윈도우)<br>필름크래프트(FilmCraft)는 지원 예정<br><b>Claude Pro 이상 구독 필요</b> — 클로드 구독은 포함되어 있지 않으며, Claude Pro 이상 요금제를 개인이 직접 구독해야 사용할 수 있습니다.<br>윈도우는 Windows 10/11 64비트, NVIDIA 그래픽카드를 권장합니다(없으면 음성 인식이 느립니다).</dd></div>
         <div><dt>결제</dt><dd>상품마다 있는 <b>결제하기</b>를 누르면 결제 화면으로 이동합니다. 지금은 <b>계좌이체</b>(토스뱅크, 예금주 그라운드루티드)로 주문하며, 주문 후 안내된 계좌로 입금하시면 판매자가 확인합니다. <b>카드 · 간편결제</b>(토스페이먼츠)는 심사 중이며, 심사가 끝나면 열립니다. 카카오톡은 문의용입니다.</dd></div>
         <div><dt>제공 방법</dt><dd>결제(입금)가 확인되면 결제 화면에 적은 이메일로 키트 다운로드 링크(맥용 · 윈도우용)와 사용 설명 eBook(PDF · EPUB), 설치 안내를 보내드립니다. 링크는 7일 뒤 삭제되며, 맥용 · 윈도우용을 합쳐 10회까지 내려받을 수 있습니다. 링크 기간이 지나면 메일에 답장해 주시면 새 링크를 보내드립니다. 업데이트는 키트 안에서 구매자 키로 받으며, 후속지원은 구매일로부터 1년입니다. 강의 포함 상품과 강의권은 결제 후 카카오톡으로 일정을 잡고, 일정에 따라 조기 마감될 수 있습니다.</dd></div>
         <div id="refund"><dt>환불</dt><dd>키트 파일을 받기 전에는 결제일로부터 7일 안에 요청하시면 전액 환불됩니다. 파일을 받은 뒤에는 디지털 콘텐츠 특성상 청약철회가 제한됩니다. 1:1 강의는 첫 강의 전이면 강의 금액 전액, 진행된 뒤면 남은 회차만큼 환불합니다(자세한 기준은 <a href="/videokit/terms#refund">이용약관 제8조</a>, 12월 4일 시행).</dd></div>
@@ -1179,9 +1241,9 @@ footer .wrap{align-items:flex-start}
       <div class="faq-list">
         <details class="p-on"><summary>오픈 할인은 언제까지인가요?</summary><p>11월 28일(토) 23:59까지 결제하기에서 주문하신 분께 적용됩니다. 마감 전에 연 결제 화면에서는 마감 뒤 30분까지 할인가로 결제할 수 있습니다.</p></details>
         <details class="p-on"><summary>강의 일정은 어떻게 정하나요?</summary><p>강의 시간은 개별로 소통하여 정합니다. 강의는 일정에 따라 조기 마감될 수 있습니다.</p></details>
-        <details><summary>윈도우에서도 쓸 수 있나요?</summary><p>네. 2026년 11월 26일 윈도우 버전을 미리보기로 배포했습니다. 구매하시면 맥용과 윈도우용을 함께 받습니다. 윈도우에서 캡컷, 다빈치 리졸브 Free(무료)·Studio(유료), 프리미어 프로를 지원합니다. 파이널컷 프로는 맥에서만 쓸 수 있습니다. Windows 10/11 64비트, NVIDIA 그래픽카드를 권장합니다.</p></details>
+        <details><summary>윈도우에서도 쓸 수 있나요?</summary><p>네. 2026년 11월 26일 윈도우 버전을 미리보기로 배포했습니다. 구매하시면 맥용과 윈도우용을 함께 받습니다. 윈도우에서 캡컷, 다빈치 리졸브, 프리미어 프로 연동은 베타입니다. 파이널컷 프로는 맥에서 정식 지원합니다. Windows 10/11 64비트, NVIDIA 그래픽카드를 권장합니다.</p></details>
         <details><summary>클로드 요금은 따로 내야 하나요?</summary><p>네. 키트에는 클로드 구독이 포함되어 있지 않습니다. <b>Claude Pro 이상 요금제</b>를 개인이 직접 구독해야 사용할 수 있습니다. 대신 장면 분석과 타임라인 작성처럼 토큰이 많이 드는 일을 내 컴퓨터에서 처리하도록 만들어 사용량을 줄였습니다.</p></details>
-        <details><summary>파이널컷 프로가 없어도 되나요?</summary><p>네. 맥과 윈도우에서 캡컷, 다빈치 리졸브 Free(무료)·Studio(유료), 프리미어 프로로 검수할 수 있습니다. 캡컷과 다빈치 리졸브 연동은 베타입니다. 필름크래프트(FilmCraft)는 지원할 예정입니다.</p></details>
+        <details><summary>파이널컷 프로가 없어도 되나요?</summary><p>네. 맥과 윈도우에서 캡컷, 다빈치 리졸브, 프리미어 프로(모두 베타)로 검수할 수 있습니다. 필름크래프트(FilmCraft)는 지원할 예정입니다.</p></details>
         <details><summary>클로드를 한 번도 안 써 봤어요.</summary><p><span class="p-on">키트에는 기본 제작 개념을 쉽게 풀어 쓴 클로드 기반 사용 설명 eBook(PDF · EPUB)이 함께 갑니다. 직접 배우고 싶다면 키트 + 1:1 강의 상품에서 클로드 기초부터 키트 세팅, 직접 제작까지 함께 진행합니다.</span><span class="p-off">키트 + 1:1 강의(3주 · 3회)는 클로드와 클로드 코드 기초부터 시작해, 키트 세팅과 직접 제작까지 함께 진행합니다.</span></p></details>
         <details><summary>유료 구독 서비스가 꼭 있어야 하나요?</summary><p>아니요. 폰트, 음악, 효과음, 모션그래픽 등 항목마다 무료와 유료를 골라 쓸 수 있습니다. 이미 쓰는 구독이 있다면 그대로 연결하면 됩니다.</p></details>
         <details><summary>업데이트는 어떻게 받나요?</summary><p>키트 안에서 구매자 키로 <b>/videokit update</b>를 실행해 새 버전을 받습니다(첫 정식 업데이트 1.4.0 배포 예정). 새 버전 소식은 오픈카톡방 공지로 알려 드립니다.</p></details>
