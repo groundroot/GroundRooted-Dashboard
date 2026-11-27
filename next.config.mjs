@@ -1,10 +1,10 @@
 /** @type {import('next').NextConfig} */
 // 모든 응답에 붙이는 보안 헤더.
-// CSP는 결제(토스 위젯 · 결제창) · 글꼴 · 카카오 링크를 깨지 않는 항목만 정한다: 다른 사이트의 틀(iframe) 안에 뜨지 않기,
+// CSP는 결제(토스 위젯 · 결제창) · 글꼴 · 카카오 링크를 깨지 않는 항목만 정한다: 다른 사이트의 틀(iframe) 안에 뜨지 않기(같은 사이트 안은 허용: /videokit 이 구조도 diagram.html 을 iframe 으로 끼운다),
 // 플러그인 금지, <base> 바꾸기 금지. 스크립트 출처 · 폼 전송 대상 제한은 결제 화면 검증 후 따로 넣는다.
 const securityHeaders = [
-  { key: 'Content-Security-Policy', value: "frame-ancestors 'none'; object-src 'none'; base-uri 'self'" },
-  { key: 'X-Frame-Options', value: 'DENY' },
+  { key: 'Content-Security-Policy', value: "frame-ancestors 'self'; object-src 'none'; base-uri 'self'" },
+  { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
   { key: 'X-Content-Type-Options', value: 'nosniff' },
   { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
   { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=(), usb=(), interest-cohort=()' },
