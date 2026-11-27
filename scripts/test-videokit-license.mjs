@@ -63,10 +63,29 @@ const call = async (key, q, over) => { const f = fake(over); f.deps.now = (t += 
   assert.equal(r.status, 503); assert.deepEqual(body, { error: 'unavailable' });
   // platform이 없거나 틀림 → 400
   for (const q of ['', 'platform=linux', 'platform=MAC']) { ({ r, body } = await call(`Bearer ${GOOD}`, q)); assert.equal(r.status, 400, q); assert.deepEqual(body, { error: 'bad_platform' }); }
-  // 릴리스가 아직 없거나 latest.json이 이상함 → 503 no_release
-  for (const readLatest of [async () => null, async () => { throw new Error('not found'); }, async () => ({ mac: { ...LATEST.mac, sha256: 'x' } }), async () => ({ mac: { ...LATEST.mac, path: '../kit/claude-video-kit.zip' } }), async () => ({ windows: LATEST.windows })]) {
+  // 릴리스가 아직 없음(latest.json 없음 · 그 플랫폼 항목 없음) → 503 no_release
+  for (const readLatest of [async () => null, async () => { throw new Error('not found'); }, async () => ({ windows: LATEST.windows })]) {
     ({ r, body } = await call(`Bearer ${GOOD}`, 'platform=mac', { readLatest }));
     assert.equal(r.status, 503); assert.deepEqual(body, { error: 'no_release' });
+  }
+  // 항목은 있는데 값이 어긋남(키트가 멈출 값) → 503 unavailable, 서명 링크를 만들지 않음
+  for (const bad of [{ sha256: 'x' }, { sha256: 'g'.repeat(64) }, { path: '../kit/claude-video-kit.zip' }, { version: '1.3.1-beta' }, { version: 'v1.3 ' }, { version: '' }, { version: 131 }, { size: '123' }, { size: 1.5 }, { size: 0 }]) {
+    ({ r, body, calls } = await call(`Bearer ${GOOD}`, 'platform=mac', { readLatest: async () => ({ mac: { ...LATEST.mac, ...bad } }) }));
+    assert.equal(r.status, 503, JSON.stringify(bad)); assert.deepEqual(body, { error: 'unavailable' }); assert.equal(calls.sign.length, 0);
+  }
+  // 플랫폼별 notes가 있으면 그것, 없으면 최상위 notes. sha256은 소문자로
+  {
+    const per = async () => ({ ...LATEST, mac: { ...LATEST.mac, notes: '맥 변경', sha256: 'A'.repeat(64) }, windows: { ...LATEST.windows, notes: '윈도우 변경' } });
+    ({ body } = await call(`Bearer ${GOOD}`, 'platform=mac', { readLatest: per })); assert.equal(body.notes, '맥 변경'); assert.equal(body.sha256, 'a'.repeat(64));
+    ({ body } = await call(`Bearer ${GOOD}`, 'platform=windows', { readLatest: per })); assert.equal(body.notes, '윈도우 변경');
+    ({ body } = await call(`Bearer ${GOOD}`, 'platform=windows', { readLatest: async () => ({ ...LATEST, mac: { ...LATEST.mac, notes: '맥 변경' } }) })); assert.equal(body.notes, '- 새 기능');
+    ({ body } = await call(`Bearer ${GOOD}`, 'platform=mac', { readLatest: async () => ({ mac: LATEST.mac }) })); assert.equal(body.notes, '');
+    assert.ok(Number.isInteger(body.size) && /^[0-9a-f]{64}$/.test(body.sha256) && /^[0-9A-Za-z.]+$/.test(body.version));
+  }
+  // current는 어떤 버전 형식이어도 400이 아니다 (기록만 형식이 맞을 때)
+  for (const cur of ['1.3', '1.3.0', '2026.11.26.2225', '0']) {
+    ({ r, calls } = await call(`Bearer ${GOOD}`, `platform=mac&current=${cur}`));
+    assert.equal(r.status, 200, cur); assert.deepEqual(calls.touch, [[GOOD, cur]]);
   }
   // 서명 링크 실패 → 503
   ({ r } = await call(`Bearer ${GOOD}`, 'platform=mac', { sign: async () => null })); assert.equal(r.status, 503);
