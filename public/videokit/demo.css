@@ -233,24 +233,16 @@ fieldset { min-width: 0; border: 0; margin: 0; padding: 0; display: grid; gap: .
 @media (max-width: 46rem) {
   .interview { grid-template-columns: minmax(0, 1fr); }
   .brief {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: center;
-    gap: .25rem .5rem;
     padding: .75rem .875rem;
     border-radius: .75rem;
     background: var(--panel);
   }
-  .source-label { grid-column: 1 / -1; justify-content: start; }
+  .source-label { justify-content: start; gap: .55rem; }
   .source-art, .source-story { display: none; }
-  .brief h2 { font-size: .9375rem; }
-  .source-file { font-size: .6875rem; margin: 0; }
-  .demo-note { grid-column: 1 / -1; margin: .1rem 0 0; }
+  .brief h2 { margin-top: .15rem; font-size: .9375rem; }
+  .source-file { font-size: .6875rem; margin-top: .12rem; }
+  .demo-note { margin-top: .25rem; }
   #plan-details { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .build-step { grid-template-columns: 1.45rem minmax(0, 1fr); gap: .35rem .625rem; }
   .step-cost { grid-column: 2; justify-content: flex-start; }
-}
-
-@media (max-width: 24rem) {
-  .brief { grid-template-columns: 1fr; }
 }
