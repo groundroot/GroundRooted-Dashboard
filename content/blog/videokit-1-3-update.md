@@ -6,7 +6,7 @@ category: "업데이트"
 slug: "videokit-1-3-update"
 draft: true
 image: "/videokit/product.png"
-imageAlt: "클로드 비디오 키트 for 파이널컷프로 — 자막, 영상, 음악 트랙이 놓인 타임라인 그림"
+imageAlt: "클로드 비디오 키트 — 편집 프로그램 아이콘들과 자막, 영상, 음악 트랙이 놓인 타임라인 그림"
 cta: false
 ---
 
