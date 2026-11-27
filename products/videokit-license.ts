@@ -53,7 +53,7 @@ export async function issueLicense(sb: SupabaseClient, email: string, orderId: s
 
 export const PLATFORMS = ['mac', 'windows'] as const;
 export type Platform = (typeof PLATFORMS)[number];
-export type ReleaseEntry = { version: string; path: string; sha256: string; size: number };
+export type ReleaseEntry = { version: string; path: string; sha256: string; size: number; notes?: string };
 export type LatestJson = Partial<Record<Platform, ReleaseEntry>> & { notes?: string };
 
 export type LatestDeps = {
@@ -84,9 +84,11 @@ const json = (body: unknown, status = 200, headers: Record<string, string> = {})
 const invalid = () => json({ error: 'invalid_key' }, 401);
 
 const VERSION = /^[0-9A-Za-z.+-]{1,40}$/;
+// 키트는 version이 [0-9A-Za-z.]가 아니면 응답 이상으로 멈춘다. latest.json 값이 어긋나면 내보내지 않는다.
+const RELEASE_VERSION = /^[0-9A-Za-z.]{1,40}$/;
 const isEntry = (e: unknown): e is ReleaseEntry => {
   const r = e as ReleaseEntry | undefined;
-  return !!r && typeof r.version === 'string' && typeof r.path === 'string' && r.path.startsWith('releases/') && !r.path.includes('..')
+  return !!r && typeof r.version === 'string' && RELEASE_VERSION.test(r.version) && typeof r.path === 'string' && r.path.startsWith('releases/') && !r.path.includes('..')
     && typeof r.sha256 === 'string' && /^[0-9a-f]{64}$/i.test(r.sha256) && Number.isSafeInteger(r.size) && r.size > 0;
 };
 
@@ -110,12 +112,16 @@ export async function handleLatest(req: Request, deps: LatestDeps): Promise<Resp
   let latest: LatestJson | null = null;
   try { latest = await deps.readLatest(); } catch (e) { console.error('[videokit] latest.json read failed', (e as Error).message); }
   const entry = latest?.[platform];
-  if (!isEntry(entry)) return json({ error: 'no_release' }, 503);
+  if (!entry) return json({ error: 'no_release' }, 503);
+  // 항목은 있는데 형식이 틀림 = 릴리스 업로드 실수. '업데이트 없음'이 아니라 일시 장애로 알린다.
+  if (!isEntry(entry)) { console.error('[videokit] latest.json entry is malformed', platform); return json({ error: 'unavailable' }, 503); }
   const signed = await deps.sign(entry.path, SIGN_SECONDS).catch(() => null);
   if (!signed) { console.error('[videokit] release signed url failed', entry.path); return json({ error: 'unavailable' }, 503); }
 
   await deps.touch(key, version).catch(e => console.error('[videokit] license touch failed', (e as Error).message));
-  return json({ version: entry.version, platform, sha256: entry.sha256, size: entry.size, url: signed, notes: typeof latest?.notes === 'string' ? latest.notes : '' });
+  // 변경 내용: 플랫폼별 notes(mac.notes · windows.notes)가 있으면 그것, 없으면 최상위 notes.
+  const notes = typeof entry.notes === 'string' ? entry.notes : typeof latest?.notes === 'string' ? latest.notes : '';
+  return json({ version: entry.version, platform, sha256: entry.sha256.toLowerCase(), size: entry.size, url: signed, notes });
 }
 
 // 운영용 의존성: Supabase 테이블 + 비공개 버킷.

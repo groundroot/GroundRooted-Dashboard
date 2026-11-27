@@ -59,7 +59,8 @@
 - **테이블**: SQL Editor에서 `sql/videokit-licenses.sql`을 한 번 실행합니다. RLS를 켜고 정책을 두지 않아 서버(service_role)만 읽고 씁니다. 새 환경변수는 없습니다(`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`를 같이 씀).
 - **확인 주소** `GET /api/videokit/latest?platform=mac|windows&current=<버전>`, 헤더 `Authorization: Bearer <키>`. 키가 맞으면 버킷의 `releases/latest.json`을 읽어 10분 서명 링크를 줍니다.
   - 200 `{"version","platform","sha256","size","url","notes"}` · 401 `{"error":"invalid_key"}`(키 없음 · 틀림 · revoked)
-  - 약속 문서에 없는 응답: 429 `{"error":"rate_limited"}`(키 하나당 1분에 10번, `Retry-After: 60`, 서버 인스턴스마다 따로 셈) · 400 `{"error":"bad_platform"}` · 503 `{"error":"no_release"}`(latest.json이 없거나 형식이 틀림) · 503 `{"error":"unavailable"}`(DB · 서명 오류, 설정 없음)
+  - 약속 문서에 없는 응답: 429 `{"error":"rate_limited"}`(키 하나당 1분에 10번, `Retry-After: 60`, 서버 인스턴스마다 따로 셈) · 400 `{"error":"bad_platform"}` · 503 `{"error":"no_release"}`(latest.json이 없거나 그 플랫폼 항목이 없음) · 503 `{"error":"unavailable"}`(DB · 서명 오류, 설정 없음, latest.json 항목 형식이 틀림 — version은 `[0-9A-Za-z.]`만, sha256 64자 hex, size 양의 정수)
+  - `notes`: latest.json에 `mac.notes` · `windows.notes`가 있으면 플랫폼별로, 없으면 최상위 `notes`
   - 확인할 때마다 `last_seen_at`, 형식이 맞는 `current`는 `last_version`에 기록합니다.
 - **기존 구매자 · 계좌이체 구매자 키 발급**: 메일은 보내지 않고 키를 만들어 CSV로 출력합니다. 같은 주문번호를 다시 실행하면 새 키를 만들지 않고 있는 키를 출력합니다(`existing`). 이름은 저장하지 않고 출력에만 씁니다. `--dry-run`은 DB에 쓰지 않고 입력만 확인합니다.
   ```bash
