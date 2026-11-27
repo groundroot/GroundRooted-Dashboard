@@ -38,6 +38,7 @@ export async function proxy(req: NextRequest) {
   }
   if (!PASSWORD) {
     if (process.env.NODE_ENV === "development") return NextResponse.next();
+    if (!isDashboard(req.nextUrl.pathname)) return notFound(req);
     return new NextResponse("DASHBOARD_PASSWORD 환경변수가 설정되지 않았습니다.", { status: 500 });
   }
 

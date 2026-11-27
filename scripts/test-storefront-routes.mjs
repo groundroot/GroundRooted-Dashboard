@@ -113,6 +113,7 @@ await withServer({port:3035,password,preview:true}, async request => {
 await withServer({port:3036,password:'',preview:true}, async request => {
   assert.equal((await request('/')).status,200);
   assert.equal((await request('/admin/hq')).status,500);
+  assert.equal((await request('/unknown')).status,404);
 });
 await withServer({port:3037,password,preview:false}, async request => {
   assert.equal((await request('/')).status,307);
