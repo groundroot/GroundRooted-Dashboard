@@ -29,7 +29,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 // 글 끝 안내는 frontmatter에 cta: true 인 글에만 붙는다(기본은 꺼짐).
 function KitCta() {
   return <aside className="blog-cta" aria-label="클로드 비디오 키트 안내">
-    <h2>이 글에서 쓴 도구</h2>
     <div className="blog-cta-grid">
       <div>
         <h3>클로드 비디오 키트</h3>

@@ -39,6 +39,7 @@ function parseFile(file: string): Post {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) fail(file, 'date는 "2026-11-27" 형식이어야 합니다');
   if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) fail(file, 'slug는 영문 소문자 · 숫자 · 하이픈만 씁니다');
   if (!category) fail(file, 'category가 없습니다');
+  for (const key of ['draft', 'cta'] as const) if (fm[key] !== undefined && typeof fm[key] !== 'boolean') fail(file, `${key}는 따옴표 없이 true 또는 false로 씁니다`);
   const ig = fm.instagram as Record<string, unknown> | undefined;
   const carousel = strList(ig?.carousel);
   if (carousel.length > 10) fail(file, 'instagram.carousel은 최대 10장입니다');
