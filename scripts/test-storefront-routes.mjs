@@ -31,6 +31,7 @@ await withServer({port:3035,password,preview:true}, async request => {
     const r = await request(path); assert.equal(r.status,200,path); assert.match(r.headers.get('x-robots-tag'),/noindex/);
     const html=await r.text(); assert.ok(!html.includes('오늘 매출') && !html.includes('AI 에이전트 비용'), `HQ data in ${path}`);
     if(path==='/') for(const href of ['/pdf-to-md','/youtube-to-md','https://groundroot.github.io/typecut-pro/','/videokit','/price?plan=kit','/price?plan=lesson','/price?plan=pass']) assert.ok(html.includes(`href="${href}"`));
+    if(path==='/') for(const plan of ['kit','lesson','pass']) assert.ok(html.includes(`src="/videokit/plan-${plan}.png"`), `home thumb ${plan}`);
   }
   for (const [path, text] of [['/videokit/terms', '이용약관'], ['/videokit/privacy', '개인정보처리방침'], ['/price', '상품 선택'], ['/price', won(priceOf('kit', tierAt()))], ['/price?plan=kit', won(priceOf('kit', tierAt()))], ['/price?plan=lesson', won(priceOf('lesson', tierAt()))], ['/price?plan=pass', '1:1 강의권 2회'], ['/price?plan=toString', '상품 선택'], ['/price?plan=kit', '계좌이체'], ['/price?plan=kit', '1002-8619-7757'], ['/price?plan=kit', '환불'], ['/price/fail?code=PAY_PROCESS_CANCELED', '결제를 취소했습니다'], ['/price/success', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-x&amount=1&paymentKey=p', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-s-00000000-0000-0000-0000-000000000000&amount=100000&paymentKey=p', '결제를 확인하지 못했습니다']]) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.ok((await r.text()).includes(text), `${path} should include ${text}`);
@@ -39,6 +40,10 @@ await withServer({port:3035,password,preview:true}, async request => {
   for (const path of ['/videokit', '/videokit/diagram.html']) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /text\/html/);
     if (path === '/videokit') { const html = await r.text(); assert.ok(html.includes('src="/videokit/diagram.html"')); assert.ok(html.includes('open.kakao.com')); for (const plan of ['kit', 'lesson', 'pass']) assert.ok(html.includes(`href="/price?plan=${plan}"`), `buy button ${plan}`); assert.ok(!html.includes('신청서 작성')); }
+  }
+  // 상품별 이미지(키트 · 키트 + 강의 · 강의권)는 공개 경로여야 한다. 막히면 307로 이미지가 깨진다.
+  for (const path of ['/videokit/product.png', '/videokit/plan-kit.png', '/videokit/plan-lesson.png', '/videokit/plan-pass.png']) {
+    const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /image\/png/, path);
   }
   const typecut = await request('/typecut-pro');
   assert.equal(typecut.status,307);

@@ -11,9 +11,9 @@ import { plans, tierAt } from '@/products/videokit';
 export const revalidate = 300;
 const won = (n: number) => `${new Intl.NumberFormat('ko-KR').format(n)}원`;
 const kitPlans = [
-  { id: 'kit', label: '키트', ...plans.kit },
-  { id: 'lesson', label: '키트 + 1:1 강의', ...plans.lesson },
-  { id: 'pass', label: '키트 구매자 1:1 강의권 2회', ...plans.pass },
+  { id: 'kit', label: '키트', alt: '클로드 비디오 키트 박스', ...plans.kit },
+  { id: 'lesson', label: '키트 + 1:1 강의', alt: '키트 박스와 1:1 강의 화면', ...plans.lesson },
+  { id: 'pass', label: '키트 구매자 1:1 강의권 2회', alt: '1:1 강의권 2회 티켓', ...plans.pass },
 ] as const;
 export const metadata = {
   title: 'GroundRooted | 자료를 지식으로, 생각을 결과물로',
@@ -56,6 +56,7 @@ export default function HomePage() {
           <p className="fx-kit-new"><b>NEW</b><span>2026.11.26 업데이트 · 윈도우 버전 배포 · 다빈치 리졸브(베타) 버전 공개 — 윈도우판</span></p>
           <ul className="fx-kit-plans">
             {kitPlans.map((p) => <li key={p.id}>
+              <img className="fx-kit-thumb" src={`/videokit/plan-${p.id}.png`} alt={p.alt} width={56} height={56} loading="lazy" decoding="async" />
               <span>{p.label}</span>
               <span className="fx-kit-price">{sale && p.sale < p.regular && <s>{won(p.regular)}</s>}<b>{won(sale ? p.sale : p.regular)}</b></span>
               <a className="fx-kit-buy" href={`/price?plan=${p.id}`}>결제하기<span className="fx-sr-only"> — {p.label}</span></a>

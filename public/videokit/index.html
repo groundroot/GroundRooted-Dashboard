@@ -530,6 +530,29 @@ html:not(.promo-end) .p-off{display:none!important}
 .vb-side p i{width:6px;height:6px;border-radius:50%;background:var(--head)}
 .vb-seal{position:absolute;right:-34px;top:-30px;width:104px;height:104px;transform:translateZ(calc(var(--d)/2 + 14px)) rotate(-10deg);z-index:3}
 .vb-seal svg{width:100%;height:100%;filter:drop-shadow(0 10px 16px rgba(0,0,0,.45))}
+/* 키트 + 1:1 강의: 박스 옆에 1:1 강의 화면(모니터)을 세워 키트만 있는 상품과 구별한다 */
+.vb-stage.has-lesson .vb{translate:44px 6px}
+.vl{position:absolute;left:50%;bottom:10px;width:184px;margin-left:-184px;z-index:4;display:flex;flex-direction:column;align-items:center;filter:drop-shadow(0 14px 18px rgba(0,0,0,.5))}
+.vl-scr{width:100%;aspect-ratio:16/10.4;padding:7px;border-radius:11px;background:#0c0d11;box-shadow:inset 0 0 0 1px rgba(255,255,255,.09)}
+.vl-in{position:relative;height:100%;display:flex;flex-direction:column;gap:7px;padding:8px 9px 9px;border-radius:5px;overflow:hidden;
+  background:radial-gradient(90% 80% at 0% 0%,rgba(47,179,154,.22),transparent 60%),#17181e}
+.vl-bar{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:-.01em;color:#ecebe6;line-height:1}
+.vl-bar i{width:7px;height:7px;border-radius:50%;background:var(--clip-a1);box-shadow:0 0 0 3px rgba(47,179,154,.22)}
+.vl-bar span{margin-left:auto;font:600 8.5px var(--mono);letter-spacing:.08em;color:rgba(236,235,230,.55)}
+.vl-chat{display:grid;gap:4px}
+.vl-chat i{display:block;height:9px;border-radius:5px 5px 5px 2px;background:rgba(47,179,154,.55);width:62%}
+.vl-chat i:nth-child(2){justify-self:end;width:44%;border-radius:5px 5px 2px 5px;background:rgba(236,235,230,.22)}
+.vl-lanes{position:relative;margin-top:auto;display:grid;gap:4px}
+.vl-lanes i{display:block;height:7px;border-radius:2px}
+.vl-lanes i:nth-child(1){background:linear-gradient(90deg,var(--clip-v2) 0 40%,transparent 40% 44%,var(--clip-v2) 44% 72%,transparent 72%)}
+.vl-lanes i:nth-child(2){background:linear-gradient(90deg,var(--clip-v1) 0 30%,transparent 30% 33%,var(--clip-v1) 33% 100%)}
+.vl-lanes i:nth-child(3){background:var(--clip-a1);opacity:.85}
+.vl-lanes b{position:absolute;left:58%;top:-6px;bottom:-3px;width:2px;background:var(--head)}
+.vl-cur{position:absolute;left:62%;bottom:16px;width:15px;height:15px;filter:drop-shadow(0 1px 1px rgba(0,0,0,.6))}
+.vl-neck{width:26px;height:13px;background:linear-gradient(180deg,#0a0b0e,#1d1e25);clip-path:polygon(18% 0,82% 0,100% 100%,0 100%)}
+.vl-base{width:84px;height:6px;border-radius:3px 3px 2px 2px;background:#24252d}
+/* 정가 가격표: 카드가 좁아 화면을 박스 앞쪽으로 당겨 옆 카드를 넘지 않게 한다 */
+@media (min-width:861px){.vb-shelf .vb-stage.has-lesson .vb{translate:22px 6px}.vb-shelf .vl{width:132px;margin-left:-128px}.vb-shelf .vl-in{gap:5px;padding:6px 7px 7px}.vb-shelf .vl-bar{font-size:10px}.vb-shelf .vl-bar span{display:none}}
 .vb-shelf{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px;max-width:980px;margin:0 auto 32px}
 @media (max-width:720px){
   .vb-shelf{grid-template-columns:1fr}
@@ -537,6 +560,8 @@ html:not(.promo-end) .p-off{display:none!important}
   .vb{--w:206px;--h:286px}
   .vb-title{font-size:22px}
   .vb-seal{width:92px;height:92px;right:-24px;top:-22px}
+  .vb-stage.has-lesson .vb{translate:40px 6px}
+  .vl{width:158px;margin-left:-160px;bottom:10px}
 }
 /* ---------- 강의권 (키트 구매자용) ---------- */
 .vt-stage{height:230px;display:grid;place-items:center;position:relative}
@@ -750,7 +775,7 @@ footer .wrap{align-items:flex-start}
           <div class="lp-buy"><a class="btn btn-buy" href="/price?plan=kit" aria-label="키트 결제하기">결제하기</a></div>
         </div>
         <div class="lp lp-lec" id="plan-lec-launch">
-          <div class="vb-stage" aria-hidden="true"><div class="vb vb-lec">
+          <div class="vb-stage has-lesson" aria-hidden="true"><div class="vb vb-lec">
           <div class="vb-f vb-front">
             <p class="vb-brand"><i></i>GroundRooted</p>
             <div class="vb-marks"><span><img src="/videokit/logos/claude.svg" alt="" width="26" height="26" loading="lazy"></span><em></em><span class="fcp"><img src="/videokit/logos/final-cut-pro.png" alt="" width="36" height="36" loading="lazy"></span></div>
@@ -770,7 +795,13 @@ footer .wrap{align-items:flex-start}
             <text x="60" y="63" text-anchor="middle" font-family="Pretendard Variable, Pretendard, sans-serif" font-size="25" font-weight="800" letter-spacing="-1" fill="#ff6b3d">365</text>
             <text x="60" y="78" text-anchor="middle" font-family="Pretendard Variable, Pretendard, sans-serif" font-size="9.5" font-weight="700" fill="#ecebe6">1:1 채팅지원</text>
           </svg></div>
-        </div></div>
+        </div>
+          <div class="vl"><div class="vl-scr"><div class="vl-in">
+            <p class="vl-bar"><i></i>1:1 강의<span>REMOTE</span></p>
+            <div class="vl-chat"><i></i><i></i></div>
+            <div class="vl-lanes"><i></i><i></i><i></i><b></b></div>
+            <svg class="vl-cur" viewBox="0 0 16 16"><path d="M2 1.5 13.5 8 8.4 9.2 5.8 14z" fill="#fff" stroke="#131316" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          </div></div><div class="vl-neck"></div><div class="vl-base"></div></div></div>
           <p class="lp-for">클로드 코드가 처음이라면</p>
           <h3>키트 + 1:1 강의</h3>
           <p class="lp-meta">클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행합니다. 일정은 개별 조율합니다.</p>
@@ -926,7 +957,7 @@ footer .wrap{align-items:flex-start}
             <div class="lp-buy"><a class="btn btn-buy" href="/price?plan=kit" aria-label="키트 결제하기">결제하기</a></div>
           </div>
           <div class="lp lp-lec" id="plan-lec">
-            <div class="vb-stage" aria-hidden="true"><div class="vb vb-lec">
+            <div class="vb-stage has-lesson" aria-hidden="true"><div class="vb vb-lec">
           <div class="vb-f vb-front">
             <p class="vb-brand"><i></i>GroundRooted</p>
             <div class="vb-marks"><span><img src="/videokit/logos/claude.svg" alt="" width="26" height="26" loading="lazy"></span><em></em><span class="fcp"><img src="/videokit/logos/final-cut-pro.png" alt="" width="36" height="36" loading="lazy"></span></div>
@@ -946,7 +977,13 @@ footer .wrap{align-items:flex-start}
             <text x="60" y="63" text-anchor="middle" font-family="Pretendard Variable, Pretendard, sans-serif" font-size="25" font-weight="800" letter-spacing="-1" fill="#ff6b3d">365</text>
             <text x="60" y="78" text-anchor="middle" font-family="Pretendard Variable, Pretendard, sans-serif" font-size="9.5" font-weight="700" fill="#ecebe6">1:1 채팅지원</text>
           </svg></div>
-        </div></div>
+        </div>
+          <div class="vl"><div class="vl-scr"><div class="vl-in">
+            <p class="vl-bar"><i></i>1:1 강의<span>REMOTE</span></p>
+            <div class="vl-chat"><i></i><i></i></div>
+            <div class="vl-lanes"><i></i><i></i><i></i><b></b></div>
+            <svg class="vl-cur" viewBox="0 0 16 16"><path d="M2 1.5 13.5 8 8.4 9.2 5.8 14z" fill="#fff" stroke="#131316" stroke-width="1.2" stroke-linejoin="round"/></svg>
+          </div></div><div class="vl-neck"></div><div class="vl-base"></div></div></div>
             <p class="lp-for">클로드 코드가 처음이라면</p>
             <h3>키트 + 1:1 강의</h3>
             <p class="lp-meta">3주 과정. 클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행합니다.</p>

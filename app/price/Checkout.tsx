@@ -240,6 +240,7 @@ export default function Checkout(p: Props) {
       <legend>상품 선택</legend>
       {p.plans.map((o) => <label key={o.id} className="method">
         <input type="radio" name="plan" value={o.id} checked={o.id === planId} onChange={() => setPlanId(o.id)} />
+        <img className="thumb" src={`/videokit/plan-${o.id}.png`} alt="" width={52} height={52} />
         <span><b>{o.label}</b><small>{o.note}</small></span>
         <em>{o.amount < o.regular && <s>{won(o.regular)}</s>}{won(o.amount)}</em>
       </label>)}

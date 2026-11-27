@@ -22,7 +22,7 @@ export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier })
   const lec = plan === 'lesson';
   const sessions = tier === 's' ? '1:1 강의 2회 · 총 2시간' : '1:1 강의 3회 · 3주';
   return <section className="vk-prod" aria-label="구매 상품">
-    <div className="vb-stage" aria-hidden="true"><div className={lec ? 'vb vb-lec' : 'vb'}>
+    <div className={lec ? 'vb-stage has-lesson' : 'vb-stage'} aria-hidden="true"><div className={lec ? 'vb vb-lec' : 'vb'}>
       <div className="vb-f vb-front">
         <p className="vb-brand"><i />GroundRooted</p>
         <div className="vb-marks"><span><img src="/videokit/logos/claude.svg" alt="" width={26} height={26} /></span><em /><span className="fcp"><img src="/videokit/logos/final-cut-pro.png" alt="" width={36} height={36} /></span></div>
@@ -42,7 +42,14 @@ export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier })
         <text x="60" y="63" textAnchor="middle" fontFamily="Pretendard Variable, Pretendard, sans-serif" fontSize="25" fontWeight="800" letterSpacing="-1" fill="#ff6b3d">365</text>
         <text x="60" y="78" textAnchor="middle" fontFamily="Pretendard Variable, Pretendard, sans-serif" fontSize="9.5" fontWeight="700" fill="#ecebe6">1:1 채팅지원</text>
       </svg></div>}
-    </div></div>
+    </div>
+    {lec && <div className="vl"><div className="vl-scr"><div className="vl-in">
+      <p className="vl-bar"><i />1:1 강의<span>REMOTE</span></p>
+      <div className="vl-chat"><i /><i /></div>
+      <div className="vl-lanes"><i /><i /><i /><b /></div>
+      <svg className="vl-cur" viewBox="0 0 16 16"><path d="M2 1.5 13.5 8 8.4 9.2 5.8 14z" fill="#fff" stroke="#131316" strokeWidth="1.2" strokeLinejoin="round" /></svg>
+    </div></div><div className="vl-neck" /><div className="vl-base" /></div>}
+    </div>
     <div className="vk-prod-copy">
       <p className={lec ? 'for lec' : 'for'}>{lec ? '클로드 코드가 처음이라면' : '클로드 코드에 익숙한 분께 권장'}</p>
       <h2>{lec ? '키트 + 1:1 강의' : '키트'}</h2>
