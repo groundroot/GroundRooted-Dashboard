@@ -15,7 +15,7 @@ const nextConfig = {
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
-  // 클로드 비디오 키트 for 파이널컷프로: 정적 페이지(public/videokit)를 /videokit 주소로 제공한다.
+  // 클로드 비디오 키트: 정적 페이지(public/videokit)를 /videokit 주소로 제공한다.
   async rewrites() {
     return [
       { source: '/videokit', destination: '/videokit/index.html' },

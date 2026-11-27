@@ -42,7 +42,6 @@
 #gr-storefront .fx-kit-status { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 650; color: #ffb27e; }
 #gr-storefront .fx-kit-status span { width: 8px; height: 8px; border-radius: 50%; background: #ff8a3d; }
 #gr-storefront .fx-kit h2 { margin-top: 14px; font-size: clamp(30px, 3.2vw, 42px); line-height: 1.15; letter-spacing: -.045em; font-weight: 730; word-break: keep-all; text-wrap: balance; }
-#gr-storefront .fx-kit h2 em { display: block; font-style: normal; color: #ff8a3d; font-size: .62em; letter-spacing: -.02em; margin-top: 6px; }
 #gr-storefront .fx-kit-lede { margin-top: 16px; font-size: 16px; line-height: 1.65; color: #c9c6bd; word-break: keep-all; max-width: 34em; }
 #gr-storefront .fx-kit-plans { list-style: none; margin: 24px 0 0; padding: 0; }
 #gr-storefront .fx-kit-plans li { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; padding: 13px 0; border-top: 1px solid #2c2f37; font-size: 15px; font-weight: 600; }

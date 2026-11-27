@@ -26,7 +26,7 @@ const faqs = [
   ],
   [
     '지금 다운로드하거나 구매할 수 있나요?',
-    '클로드 비디오 키트 for 파이널컷프로는 지금 구매할 수 있습니다. 위 상품 목록의 결제하기에서 계좌이체 또는 카드 · 간편결제로 결제할 수 있습니다. ReadyMD와 YouTube to MD는 출시 준비 중입니다. 각 소개 페이지에서 사용 흐름을 살펴볼 수 있으며, 가격과 지원 환경은 확정 후 안내합니다. TypeCut Pro의 배포·구매 정보는 연결된 공식 사이트에서 확인해 주세요.',
+    '클로드 비디오 키트는 지금 구매할 수 있습니다. 위 상품 목록의 결제하기에서 계좌이체 또는 카드 · 간편결제로 결제할 수 있습니다. ReadyMD와 YouTube to MD는 출시 준비 중입니다. 각 소개 페이지에서 사용 흐름을 살펴볼 수 있으며, 가격과 지원 환경은 확정 후 안내합니다. TypeCut Pro의 배포·구매 정보는 연결된 공식 사이트에서 확인해 주세요.',
   ],
   [
     '페이지에 보이는 예시는 실제 앱의 결과인가요?',
@@ -51,7 +51,7 @@ export default function HomePage() {
         </a>
         <div className="fx-kit-copy">
           <p className="fx-kit-status"><span aria-hidden="true" />지금 판매 중</p>
-          <h2 id="kit-heading">클로드 비디오 키트 <em>for 파이널컷프로</em></h2>
+          <h2 id="kit-heading">클로드 비디오 키트</h2>
           <p className="fx-kit-lede">영상 제작은 클로드에게, 검수는 파이널컷에서. 편집 프로그램이 없다면 MP4 · MOV 파일로 바로 받을 수 있습니다.</p>
           <p className="fx-kit-new"><b>NEW</b><span>2026.11.26 업데이트 · 윈도우 버전 배포 · 다빈치 리졸브(베타) 버전 공개 — 윈도우판</span></p>
           <ul className="fx-kit-plans">

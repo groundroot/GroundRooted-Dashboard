@@ -25,8 +25,9 @@ export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier })
     <div className={lec ? 'vb-stage has-lesson' : 'vb-stage'} aria-hidden="true"><div className={lec ? 'vb vb-lec' : 'vb'}>
       <div className="vb-f vb-front">
         <p className="vb-brand"><i />GroundRooted</p>
-        <div className="vb-marks"><span><img src="/videokit/logos/claude.svg" alt="" width={26} height={26} /></span><em /><span className="fcp"><img src="/videokit/logos/final-cut-pro.png" alt="" width={36} height={36} /></span></div>
-        <p className="vb-title">클로드<br />비디오 키트<small>for 파이널컷프로</small></p>
+        <div className="vb-marks"><span><img src="/videokit/logos/claude.svg" alt="" width={26} height={26} /></span><em />
+          <span className="vb-eds"><img src="/videokit/logos/final-cut-pro.png" alt="" width={22} height={22} /><img src="/videokit/logos/capcut.svg" alt="" width={22} height={22} /><img src="/videokit/logos/davinci-resolve.svg" alt="" width={22} height={22} /><img className="soon" src="/videokit/logos/premiere-pro.svg" alt="" width={22} height={22} /><img className="soon" src="/videokit/logos/filmcraft.png" alt="" width={22} height={22} /></span></div>
+        <p className="vb-title">클로드<br />비디오 키트</p>
         {lec && <p className="vb-tags"><span>+ 1:1 강의</span><span>원격 설치</span></p>}
         <div className="vb-lanes"><i /><i /><i /></div>
         <p className="vb-ed"><span>{lec ? 'VIDEO KIT + 1:1' : 'VIDEO KIT'}</span><b>macOS · Windows</b></p>

@@ -5,7 +5,6 @@
 .vk-pay-wrap{max-width:720px;margin:0 auto;padding:0 clamp(16px,4vw,32px)}
 .vk-pay-bar .vk-pay-wrap{display:flex;align-items:center;justify-content:space-between;height:60px;font-weight:650}
 .vk-pay-bar .rec{display:inline-block;width:9px;height:9px;border-radius:50%;background:#ff6b3d;margin-right:9px}
-.vk-pay-bar small{font-weight:500;color:#8a8880;margin-left:.3em}
 .vk-pay main{padding:clamp(36px,6vw,64px) 0 80px}
 .vk-pay h1{font-size:clamp(28px,4vw,40px);line-height:1.2;letter-spacing:-.03em;font-weight:750;margin:0 0 10px}
 .vk-pay .lede{color:#b4b2aa;margin:0 0 28px}
@@ -61,14 +60,17 @@
 .vk-pay .vb-lec .vb-top{background:#3d2a68}
 .vk-pay .vb-brand{display:flex;align-items:center;gap:7px;font-size:10.5px;font-weight:650;letter-spacing:.02em;color:rgba(236,235,230,.72)}
 .vk-pay .vb-brand i{width:7px;height:7px;border-radius:50%;background:#ff6b3d}
-.vk-pay .vb-marks{display:flex;align-items:center;gap:8px;margin-top:22px}
-.vk-pay .vb-marks span{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.08);display:grid;place-items:center}
-.vk-pay .vb-marks img{width:26px;height:26px}
-.vk-pay .vb-marks .fcp img{width:36px;height:36px}
+.vk-pay .vb-marks{display:flex;align-items:center;gap:5px;margin-top:22px}
+.vk-pay .vb-marks span{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.08);display:grid;place-items:center}
+.vk-pay .vb-marks img{width:25px;height:25px}
+/* 편집 프로그램 묶음 (public/videokit/index.html 과 같은 규칙): 프리미어 프로 · 필름크래프트는 지원 예정이라 흐리게 */
+.vk-pay .vb-marks .vb-eds{width:auto;display:flex;gap:3px;padding:0 6px}
+.vk-pay .vb-eds img{width:19px;height:19px;object-fit:contain}
+.vk-pay .vb-eds img.soon{filter:grayscale(1);opacity:.42}
+.vk-pay .vb-lec .vb-marks{margin-top:34px}
 .vk-pay .vb-marks em{width:14px;height:2px;background:rgba(255,255,255,.28);position:relative}
 .vk-pay .vb-marks em::after{content:"";position:absolute;right:-1px;top:-3px;border:4px solid transparent;border-left:5px solid rgba(255,255,255,.28);border-right:0}
 .vk-pay .vb-title{margin-top:18px;font-size:25px;line-height:1.12;font-weight:780;letter-spacing:-.035em;color:#ecebe6}
-.vk-pay .vb-title small{display:block;margin-top:5px;font-size:13px;font-weight:550;color:rgba(236,235,230,.66);letter-spacing:-.01em}
 .vk-pay .vb-tags{display:flex;gap:6px;margin-top:14px;font-size:12px;font-weight:650;color:#e5d6ff}
 .vk-pay .vb-tags span{background:rgba(255,255,255,.12);padding:4px 8px;border-radius:6px}
 .vk-pay .vb-lanes{margin-top:auto;display:grid;gap:5px}
@@ -112,10 +114,12 @@
 .vk-pay .vk-prod .vb-lec{--d:68px}
 .vk-pay .vk-prod .vb-front{padding:18px 16px 14px}
 .vk-pay .vk-prod .vb-title{font-size:21px}
-.vk-pay .vk-prod .vb-marks{margin-top:16px}
-.vk-pay .vk-prod .vb-marks span{width:36px;height:36px;border-radius:10px}
-.vk-pay .vk-prod .vb-marks img{width:22px;height:22px}
-.vk-pay .vk-prod .vb-marks .fcp img{width:30px;height:30px}
+.vk-pay .vk-prod .vb-marks{margin-top:16px;gap:4px}
+.vk-pay .vk-prod .vb-marks span{width:34px;height:34px;border-radius:10px}
+.vk-pay .vk-prod .vb-marks img{width:21px;height:21px}
+.vk-pay .vk-prod .vb-marks .vb-eds{width:auto;gap:2px;padding:0 5px}
+.vk-pay .vk-prod .vb-eds img{width:16px;height:16px}
+.vk-pay .vk-prod .vb-lec .vb-marks{margin-top:22px}
 .vk-pay .vk-prod .vb-seal{width:86px;height:86px;right:-28px;top:-24px}
 .vk-pay .vk-prod .vb-stage.has-lesson .vb{translate:36px 6px}
 .vk-pay .vk-prod .vl{width:146px;margin-left:-142px;bottom:14px}
