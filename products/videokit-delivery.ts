@@ -72,7 +72,7 @@ export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amoun
   const html = `<!doctype html><html lang="ko"><body style="margin:0;background:#f4f5f8;font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;color:#1b1d22;word-break:keep-all">
 <div style="max-width:560px;margin:0 auto;padding:32px 20px">
 <div style="background:#fff;border-radius:14px;padding:32px 28px">
-<div style="font-size:12px;font-weight:700;letter-spacing:.06em;color:#e8622c">CLAUDE VIDEO KIT · FOR FINAL CUT PRO</div>
+<div style="font-size:12px;font-weight:700;letter-spacing:.06em;color:#e8622c">CLAUDE VIDEO KIT</div>
 <h1 style="font-size:22px;line-height:1.4;margin:10px 0 18px">${esc(o.name)}님, 결제가 확인되었습니다</h1>
 <p style="margin:0 0 6px;font-size:15px">${esc(item)}</p>
 <p style="margin:0 0 22px;font-size:13px;color:#5d6270">결제 금액 ${won(o.amount)} · 주문번호 ${esc(o.orderId)}</p>

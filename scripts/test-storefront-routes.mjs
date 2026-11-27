@@ -45,6 +45,10 @@ await withServer({port:3035,password,preview:true}, async request => {
   for (const path of ['/videokit/product.png', '/videokit/plan-kit.png', '/videokit/plan-lesson.png', '/videokit/plan-pass.png']) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /image\/png/, path);
   }
+  // 상품 박스 · 편집 프로그램 카드의 편집툴 아이콘도 공개 경로여야 한다.
+  for (const path of ['/videokit/logos/claude.svg', '/videokit/logos/final-cut-pro.png', '/videokit/logos/capcut.svg', '/videokit/logos/davinci-resolve.svg', '/videokit/logos/premiere-pro.svg', '/videokit/logos/filmcraft.png']) {
+    const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /^image\//, path);
+  }
   // 키트 업데이트 확인은 로그인 없이 열려 있고, 키가 없으면 401(발송 설정이 없으면 503)
   { const r = await request('/api/videokit/latest?platform=mac'); assert.ok([401, 503].includes(r.status), `latest ${r.status}`); assert.ok((await r.json()).error); }
   // 키트 짧은 다운로드 링크는 로그인 없이 열린다. 형식이 틀린 코드 = 만료 페이지(404), 형식이 맞으면 DB 조회(설정이 없으면 '잠시 후 다시')

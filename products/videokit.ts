@@ -8,10 +8,10 @@ const SALE_GRACE_MS = 30 * 60 * 1000;
 
 // 강의 구성: 오픈 할인 기간은 1:1 강의 2회(총 2시간), 그 뒤 정가는 3주 과정 3회 강의 (판매 페이지 p-on/p-off와 같음)
 export const plans = {
-  kit: { name: '클로드 비디오 키트 for 파이널컷프로 — 키트', saleName: '클로드 비디오 키트 for 파이널컷프로 — 키트', sale: 100_000, regular: 300_000 },
-  lesson: { name: '클로드 비디오 키트 for 파이널컷프로 — 키트 + 3회 강의(3주 과정)', saleName: '클로드 비디오 키트 for 파이널컷프로 — 키트 + 1:1 강의 2회(총 2시간)', sale: 300_000, regular: 500_000 },
+  kit: { name: '클로드 비디오 키트 — 키트', saleName: '클로드 비디오 키트 — 키트', sale: 100_000, regular: 300_000 },
+  lesson: { name: '클로드 비디오 키트 — 키트 + 3회 강의(3주 과정)', saleName: '클로드 비디오 키트 — 키트 + 1:1 강의 2회(총 2시간)', sale: 300_000, regular: 500_000 },
   // 키트를 먼저 산 분이 나중에 신청하는 강의권. 키트 파일은 들어 있지 않고, 할인 기간에도 가격이 같다.
-  pass: { name: '클로드 비디오 키트 for 파이널컷프로 — 1:1 강의권 2회(키트 구매자용)', saleName: '클로드 비디오 키트 for 파이널컷프로 — 1:1 강의권 2회(키트 구매자용)', sale: 300_000, regular: 300_000 },
+  pass: { name: '클로드 비디오 키트 — 1:1 강의권 2회(키트 구매자용)', saleName: '클로드 비디오 키트 — 1:1 강의권 2회(키트 구매자용)', sale: 300_000, regular: 300_000 },
 } as const;
 // 결제 화면의 상품 선택에 보이는 짧은 이름과 설명
 export const planLabels: Record<keyof typeof plans, { label: string; note: string }> = {

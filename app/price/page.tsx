@@ -5,7 +5,7 @@ import { BANK, cardPending, hasKit, hasLesson, isPlanId, makeOrderId, nameOf, pl
 import { LINK_DAYS, deliveryConfigured } from '@/products/videokit-delivery';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: '결제 | 클로드 비디오 키트 for 파이널컷프로', robots: { index: false, follow: false } };
+export const metadata = { title: '결제 | 클로드 비디오 키트', robots: { index: false, follow: false } };
 
 // 결제 화면: 상품 선택 → 받는 분 정보 → 결제 수단(계좌이체 / 카드 · 간편결제).
 // 금액은 서버 가격표(products/videokit.ts)로만 정한다. 할인 기간과 정가는 tierAt()이 자동으로 바꾼다.
