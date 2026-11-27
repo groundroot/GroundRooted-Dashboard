@@ -1,0 +1,47 @@
+// 키트 다운로드 페이지 https://groundrooted.com/d/<코드> (products/videokit-link.ts).
+// 열람은 세지 않는다(메일 보안 검사기가 미리 열 수 있음). 횟수는 버튼(/d/<코드>/mac|windows)에서만 센다.
+import { headers } from 'next/headers';
+import { notFound } from 'next/navigation';
+import Shell, { KAKAO_URL } from '../../price/Shell';
+import { db } from '@/products/videokit-license';
+import { clientIp, kstDay, loadLink, supabaseLinkDeps, type LinkView } from '@/products/videokit-link';
+
+export const dynamic = 'force-dynamic';
+export const metadata = { title: '키트 내려받기 | 클로드 비디오 키트', robots: { index: false, follow: false }, referrer: 'no-referrer' as const };
+
+export default async function DownloadPage({ params }: { params: Promise<{ code: string }> }) {
+  const { code } = await params;
+  const configured = !!(process.env.SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
+  // 설정이 없어도 형식이 틀린 코드는 '만료' 페이지로(loadLink는 형식이 틀리면 DB에 가지 않는다).
+  const view: LinkView = await loadLink(code, configured ? supabaseLinkDeps(db()) : unconfigured, clientIp(await headers()));
+  if (view.status === 'gone') notFound();
+  if (view.status === 'limited') return <Shell>
+    <h1>요청이 너무 많습니다</h1>
+    <p className="lede">잠시 동안 이 다운로드 페이지를 열 수 없습니다. 10분 뒤에 다시 열어 주세요. 계속 열리지 않으면 키트를 받은 메일에 답장하거나 카카오톡으로 알려 주세요.</p>
+    <a className="btn btn-kakao" href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1 문의</a>
+  </Shell>;
+  if (view.status === 'unavailable') return <Shell>
+    <h1>잠시 후 다시 열어 주세요</h1>
+    <p className="lede">지금 다운로드 정보를 불러오지 못했습니다. 링크는 그대로 유효합니다. 몇 분 뒤에도 같으면 메일에 답장하거나 카카오톡으로 알려 주세요.</p>
+    <a className="btn btn-kakao" href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1 문의</a>
+  </Shell>;
+  return <Shell>
+    <h1>클로드 비디오 키트 내려받기</h1>
+    <p className="lede">{view.name && <>{view.name} 님께 보내드린 링크입니다 · </>}버전 {view.version}<br />본인 구매용 링크입니다. 다른 분과 공유하지 말아 주세요.</p>
+    <div className="dl">
+      <a href={`/d/${view.code}/mac`} rel="nofollow">맥용 내려받기<small>macOS · Apple Silicon</small></a>
+      <a href={`/d/${view.code}/windows`} rel="nofollow">윈도우용 내려받기<small>Windows 10 · 11 (64비트)</small></a>
+    </div>
+    <p className="small dl-note">쓰시는 컴퓨터에 맞는 파일 하나를 받으면 됩니다.</p>
+    <p className="dl-expire">이 링크는 <b>{kstDay(view.expiresAt)}</b>에 삭제됩니다.</p>
+    <p>설치는 압축을 풀고, 맨 위의 「0. Claude Video Kit Manual」 설명서부터 보세요.</p>
+    <p className="small">궁금한 점은 키트를 받은 메일에 답장하거나 카카오톡으로 알려 주세요.</p>
+    <a className="btn btn-kakao" href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1 문의</a>
+  </Shell>;
+}
+
+// Supabase 설정이 없을 때(로컬 미리보기): 형식이 맞는 코드는 '잠시 후 다시'로 보인다.
+const unconfigured = {
+  find: async () => { throw new Error('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not configured'); },
+  remove: async () => {}, hit: async () => {}, readCurrent: async () => null, sign: async () => null,
+};

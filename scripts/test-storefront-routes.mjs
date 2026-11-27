@@ -47,6 +47,11 @@ await withServer({port:3035,password,preview:true}, async request => {
   }
   // 키트 업데이트 확인은 로그인 없이 열려 있고, 키가 없으면 401(발송 설정이 없으면 503)
   { const r = await request('/api/videokit/latest?platform=mac'); assert.ok([401, 503].includes(r.status), `latest ${r.status}`); assert.ok((await r.json()).error); }
+  // 키트 짧은 다운로드 링크는 로그인 없이 열린다. 형식이 틀린 코드 = 만료 페이지(404), 형식이 맞으면 DB 조회(설정이 없으면 '잠시 후 다시')
+  { const r = await request('/d/0000OOOO'); assert.equal(r.status, 404); assert.match(r.headers.get('x-robots-tag'), /noindex/); assert.ok((await r.text()).includes('링크가 만료되었습니다')); }
+  { const r = await request('/d/ABCD2345'); assert.ok([200, 404].includes(r.status), `/d ${r.status}`); assert.match(await r.text(), /잠시 후 다시 열어 주세요|링크가 만료되었습니다|키트 내려받기/); }
+  { const r = await request('/d/ABCD2345/mac'); assert.ok([303, 503].includes(r.status), `/d/mac ${r.status}`); }
+  for (const path of ['/d/ABCD2345/linux', '/d/ABCD2345/mac/x', '/d']) { const r = await request(path); assert.equal(r.status, 307, path); }
   const typecut = await request('/typecut-pro');
   assert.equal(typecut.status,307);
   assert.equal(typecut.headers.get('location'),'https://groundroot.github.io/typecut-pro/');

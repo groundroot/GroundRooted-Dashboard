@@ -10,12 +10,12 @@
   영수증 번호: <010-0000-0000 또는 000-00-00000, 없으면 ->
   ```
   카드 · 간편결제는 영수증 요청을 토스 metadata `receipt`(JSON)로 넘기고, 실제(live) 키로 승인되면 판매자에게 `[결제 완료] <구성> · <이름>` 메일(같은 세 줄 포함, Reply-To 구매자)이 갑니다. 테스트 키 결제에는 가지 않습니다.
-- **카드 · 간편결제(토스페이먼츠)**: 실제(live) 키로 승인되면 결제 화면에 적은 이메일로 키트 다운로드 링크(맥용 · 윈도우용 두 개, 7일 유효)와 OS별 설치 안내가 자동으로 갑니다.
+- **카드 · 간편결제(토스페이먼츠)**: 실제(live) 키로 승인되면 결제 화면에 적은 이메일로 짧은 다운로드 링크(`https://groundrooted.com/d/<코드>`, 7일 뒤 삭제 — 아래 '짧은 다운로드 링크')와 구매자 키, OS별 설치 안내가 자동으로 갑니다.
 - **테스트 키로 승인된 결제에는 키트 메일을 보내지 않습니다**(결제 완료 화면 · 가상계좌 웹훅 모두). 테스트 키이거나 `VIDEOKIT_CARD_PENDING=1`이면 결제 화면이 카드 · 간편결제를 '심사 중 · 곧 열립니다'로 표시하고 계좌이체를 기본으로 둡니다. 결제창 진입은 심사자를 위해 남깁니다. 실제 키를 넣고 `VIDEOKIT_CARD_PENDING`이 없으면 카드 · 간편결제가 기본이 됩니다(코드 수정 없음).
 
 - 코드: `products/videokit-delivery.ts`(발송), `app/price/success/page.tsx`(승인 직후 호출), `products/videokit.ts`(가격·주문 검증)
 - 주문 내역은 자체 DB에 저장하지 않습니다. 결제 내역은 토스 상점관리자에서 봅니다. 자체 DB(Supabase `videokit_licenses`)에는 업데이트용 구매자 키만 둡니다(키 · 이메일 · 주문번호 · 확인 기록, 아래 '온라인 업데이트'). 같은 주문에 두 번 보내지 않는 것은 Resend의 Idempotency-Key(주문번호, 24시간)로 막습니다.
-- 키트 zip은 Supabase Storage **비공개** 버킷 `videokit`에 두 파일로 둡니다(개인정보 없음): 맥용 `kit/claude-video-kit.zip`, 윈도우용 `kit/claude-video-kit-windows.zip`(2026-11-26부터). 메일에는 두 링크가 다 들어가며, 하나라도 서명 링크를 못 만들면 메일을 보내지 않습니다(결제 완료 화면이 카카오톡 안내).
+- 키트 zip은 Supabase Storage **비공개** 버킷 `videokit`에 둡니다(개인정보 없음). 2026-11-27부터 메일에는 짧은 다운로드 링크 하나가 들어가고, 그 페이지가 `kit/current.json`이 가리키는 맥용 · 윈도우용 파일을 내려줍니다(아래 '짧은 다운로드 링크'). 예전 `kit/claude-video-kit.zip` · `kit/claude-video-kit-windows.zip`은 남아 있지만 메일에는 더 쓰지 않습니다.
 - 가격: 2026-11-28(토) 24:00 KST까지 연 결제 화면은 오픈 할인가(키트 10만원, 키트 + 1:1 강의 2회 30만원), 그 뒤로는 정가(30만원 · 50만원). 마감 직전에 연 화면은 30분 안에 결제를 마쳐야 합니다.
 - 발송 설정(환경변수 4개)이 없으면 메일을 보내지 않고, 결제 완료 화면이 카카오톡으로 주문번호를 남기도록 안내합니다. 결제 자체는 그대로 됩니다.
 
@@ -49,7 +49,28 @@
     node scripts/videokit-resend.mjs <주문번호> <이메일> [이름]
   ```
 - 발송 기록은 Resend 대시보드(Emails)에서 봅니다.
-- 테스트: `pnpm test:videokit`(가격 · 주문 검증, 메일 본문, 구매자 키 · 업데이트 확인), `pnpm test:storefront`.
+- 테스트: `pnpm test:videokit`(가격 · 주문 검증, 메일 본문, 구매자 키 · 업데이트 확인, 짧은 다운로드 링크), `pnpm test:storefront`.
+
+## 짧은 다운로드 링크 (`/d/<코드>`, 2026-11-27부터)
+
+메일 첨부 대신 보내는 링크입니다. Gmail이 zip 안의 .ps1/.js를 막아 첨부는 파일 이름을 바꿔야 했지만, 링크는 원래 이름 그대로 내려갑니다. 코드: `products/videokit-link.ts`, `app/d/[code]/`, 표 `sql/videokit-download-links.sql`.
+
+- **링크**: `https://groundrooted.com/d/<코드>` — 코드 8자(대문자 · 숫자, 0/O · 1/I/l 없음, crypto 랜덤 40비트). 페이지에 받는 분 이름 일부(강*철), 버전, 맥용 · 윈도우용 버튼, 삭제 날짜, 설명서 안내, '본인 구매용 링크' 문구, 문의(카카오톡 · 메일 답장)가 있습니다. 검색 제외(noindex).
+- **만료**: 발급일 + 7일, 그날 23:59 KST. 지나면 "링크가 만료되었습니다" 페이지(404). 만료된 행은 새 링크를 발급할 때와 만료된 링크로 요청이 올 때 지웁니다.
+- **버튼**: `/d/<코드>/mac|windows` → 그때 10분짜리 서명 링크로 302(`Cache-Control: no-store`, `Referrer-Policy: no-referrer`). 파일 이름 `ClaudeVideoKit-Mac-<버전>.zip` / `ClaudeVideoKit-Windows-<버전>.zip`. 버튼을 누른 횟수(`download_count`) · 마지막 시각(`last_download_at`)을 남깁니다. 페이지 열람은 세지 않습니다.
+- **제한**: 링크당 받기 횟수 상한 `max_downloads`(기본 10, 넘으면 "다운로드 횟수를 넘었습니다" 안내) · 링크당 1분에 10번 · 한 IP가 10분에 없는/만료 코드를 10번 요청하면 그 IP의 `/d/*`를 10분 동안 막음(코드 추측 막기). 1분 · IP 제한은 서버 인스턴스 메모리라 인스턴스마다 따로 셉니다.
+- **파일 고르기**: 버킷 `kit/current.json` = `{"version":"1.3","mac":{"path":"kit/links/1.3/ClaudeVideoKit-Mac-1.3.zip","sha256","size"},"windows":{...}}`. 새 버전은 아래 명령 한 줄로 올립니다(올린 파일을 다시 받아 sha256이 같을 때만 current.json을 바꿈). 예전 `kit/claude-video-kit*.zip`은 쓰지 않으며 건드리지 않습니다.
+  ```bash
+  node scripts/videokit-upload-link-kit.mjs <버전> <맥용.zip> <윈도우용.zip>
+  ```
+  - 2026-11-27: 1.3 (영문 설명서 폴더 「0. Claude Video Kit Manual」, 확장자 원본) 맥 2,819,516 bytes sha256 `25a1e674…794d440c`, 윈도우 2,709,558 bytes sha256 `9caf3e45…8d7af`.
+- **수동 발급** (운영봇 · 계좌이체 구매자 · 만료된 구매자). 실행마다 새 링크를 만들고, 링크와 삭제 날짜 두 줄을 출력합니다. 메일은 보내지 않습니다.
+  ```bash
+  node scripts/videokit-make-link.mjs --email <이메일> --name <이름> --order <주문번호> [--days 7] [--max 10] [--dry-run]
+  node scripts/videokit-make-link.mjs --revoke <코드>     # 바로 끄기 (환불 · 잘못 보냄 · 공유됨)
+  ```
+  (환경변수 `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY` — 키트 zip 올리기처럼 `vercel env pull`로 받아 쓰고 바로 지웁니다.)
+- **자동 메일**: `deliverKit`이 같은 주문의 살아 있는 링크를 다시 씁니다(결제 완료 화면 새로고침 · 웹훅 재시도 → 같은 링크, 같은 메일 본문). `videokit-resend.mjs`(force)는 새 링크를 만듭니다. 링크 표에 쓰지 못하면 메일을 보내지 않고 failed(결제 완료 화면 카카오톡 안내 · 판매자 알림 '직접 보내야 함' · 웹훅은 500으로 재시도).
 
 ## 온라인 업데이트 (`/videokit update`)
 
