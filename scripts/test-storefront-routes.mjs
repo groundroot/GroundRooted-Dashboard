@@ -45,6 +45,8 @@ await withServer({port:3035,password,preview:true}, async request => {
   for (const path of ['/videokit/product.png', '/videokit/plan-kit.png', '/videokit/plan-lesson.png', '/videokit/plan-pass.png']) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /image\/png/, path);
   }
+  // 키트 업데이트 확인은 로그인 없이 열려 있고, 키가 없으면 401(발송 설정이 없으면 503)
+  { const r = await request('/api/videokit/latest?platform=mac'); assert.ok([401, 503].includes(r.status), `latest ${r.status}`); assert.ok((await r.json()).error); }
   const typecut = await request('/typecut-pro');
   assert.equal(typecut.status,307);
   assert.equal(typecut.headers.get('location'),'https://groundroot.github.io/typecut-pro/');
