@@ -1,4 +1,5 @@
 import type { PlanId, Tier } from '@/products/videokit';
+import { editorSupport } from '@/products/videokit-editor-support';
 
 // 상품 페이지(/videokit)의 상품 박스와 같은 모양. 결제 화면에서 무엇을 사는지 보여 준다.
 export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier }) {
@@ -54,6 +55,7 @@ export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier })
     <div className="vk-prod-copy">
       <p className={lec ? 'for lec' : 'for'}>{lec ? '클로드 코드가 처음이라면' : '클로드 코드에 익숙한 분께 권장'}</p>
       <h2>{lec ? '키트 + 1:1 강의' : '키트'}</h2>
+      <p className="meta">{editorSupport.join(' · ')}</p>
       <p className="meta">{lec
         ? '클로드 코드 사용법부터 배우고, 키트 설치는 원격으로 함께 진행합니다. 일정은 개별 조율합니다.'
         : '키트 파일과 사용 설명 eBook을 받아 직접 설치하고 세팅합니다. 강의는 들어 있지 않으며, 필요하면 1:1 강의권을 따로 구입합니다.'}</p>

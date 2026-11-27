@@ -293,10 +293,6 @@ export default function Checkout(p: Props) {
         <dt>지원 환경</dt>
         <dd>
           macOS · Windows(미리보기) (맥용 · 윈도우용을 함께 받습니다).<br />
-          Final Cut Pro(정식, 맥) · CapCut(베타, 맥·윈도우)<br />
-          다빈치 리졸브(베타): 맥·윈도우에서 Free(무료)·Studio(유료) 모두 지원<br />
-          프리미어 프로: 맥·윈도우 지원<br />
-          필름크래프트(FilmCraft): 지원 예정<br />
           Claude Pro 이상 구독이 필요합니다. 자세한 조건은 <a href="/videokit#env">지원 환경</a>을 확인해 주세요.
         </dd>
       </div>}
