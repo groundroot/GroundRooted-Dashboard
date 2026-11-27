@@ -63,7 +63,7 @@
 .vk-pay .vb-marks{display:flex;align-items:center;gap:5px;margin-top:22px}
 .vk-pay .vb-marks span{width:40px;height:40px;border-radius:12px;background:rgba(255,255,255,.08);display:grid;place-items:center}
 .vk-pay .vb-marks img{width:25px;height:25px}
-/* 편집 프로그램 묶음 (public/videokit/index.html 과 같은 규칙): 프리미어 프로 · 필름크래프트는 지원 예정이라 흐리게 */
+/* 편집 프로그램 묶음 (public/videokit/index.html 과 같은 규칙): 필름크래프트는 지원 예정이라 흐리게 */
 .vk-pay .vb-marks .vb-eds{width:auto;display:flex;gap:3px;padding:0 6px}
 .vk-pay .vb-eds img{width:19px;height:19px;object-fit:contain}
 .vk-pay .vb-eds img.soon{filter:grayscale(1);opacity:.42}

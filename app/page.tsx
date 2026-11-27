@@ -53,7 +53,10 @@ export default function HomePage() {
           <p className="fx-kit-status"><span aria-hidden="true" />지금 판매 중</p>
           <h2 id="kit-heading">클로드 비디오 키트</h2>
           <p className="fx-kit-lede">영상 제작은 클로드에게, 검수는 쓰시는 편집 프로그램에서. 편집 프로그램이 없다면 MP4 · MOV 파일로 바로 받을 수 있습니다.</p>
-          <p className="fx-kit-new"><b>NEW</b><span>2026.11.26 업데이트 · 윈도우 버전 배포 · 다빈치 리졸브(베타) 버전 공개 — 윈도우판</span></p>
+          <p className="fx-kit-new">
+            <b>NEW</b>
+            <span>다빈치 리졸브(베타): 맥·윈도우에서 Free(무료)·Studio(유료) 모두 지원<br />프리미어 프로: 맥·윈도우 지원</span>
+          </p>
           <ul className="fx-kit-plans">
             {kitPlans.map((p) => <li key={p.id}>
               <img className="fx-kit-thumb" src={`/videokit/plan-${p.id}.png`} alt={p.alt} width={56} height={56} loading="lazy" decoding="async" />
