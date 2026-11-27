@@ -14,7 +14,7 @@
 - **테스트 키로 승인된 결제에는 키트 메일을 보내지 않습니다**(결제 완료 화면 · 가상계좌 웹훅 모두). 테스트 키이거나 `VIDEOKIT_CARD_PENDING=1`이면 결제 화면이 카드 · 간편결제를 '심사 중 · 곧 열립니다'로 표시하고 계좌이체를 기본으로 둡니다. 결제창 진입은 심사자를 위해 남깁니다. 실제 키를 넣고 `VIDEOKIT_CARD_PENDING`이 없으면 카드 · 간편결제가 기본이 됩니다(코드 수정 없음).
 
 - 코드: `products/videokit-delivery.ts`(발송), `app/price/success/page.tsx`(승인 직후 호출), `products/videokit.ts`(가격·주문 검증)
-- 주문·구매자 정보는 자체 DB에 저장하지 않습니다. 결제 내역은 토스 상점관리자에서 봅니다. 같은 주문에 두 번 보내지 않는 것은 Resend의 Idempotency-Key(주문번호, 24시간)로 막습니다.
+- 주문 내역은 자체 DB에 저장하지 않습니다. 결제 내역은 토스 상점관리자에서 봅니다. 자체 DB(Supabase `videokit_licenses`)에는 업데이트용 구매자 키만 둡니다(키 · 이메일 · 주문번호 · 확인 기록, 아래 '온라인 업데이트'). 같은 주문에 두 번 보내지 않는 것은 Resend의 Idempotency-Key(주문번호, 24시간)로 막습니다.
 - 키트 zip은 Supabase Storage **비공개** 버킷 `videokit`에 두 파일로 둡니다(개인정보 없음): 맥용 `kit/claude-video-kit.zip`, 윈도우용 `kit/claude-video-kit-windows.zip`(2026-11-26부터). 메일에는 두 링크가 다 들어가며, 하나라도 서명 링크를 못 만들면 메일을 보내지 않습니다(결제 완료 화면이 카카오톡 안내).
 - 가격: 2026-11-28(토) 24:00 KST까지 연 결제 화면은 오픈 할인가(키트 10만원, 키트 + 1:1 강의 2회 30만원), 그 뒤로는 정가(30만원 · 50만원). 마감 직전에 연 화면은 30분 안에 결제를 마쳐야 합니다.
 - 발송 설정(환경변수 4개)이 없으면 메일을 보내지 않고, 결제 완료 화면이 카카오톡으로 주문번호를 남기도록 안내합니다. 결제 자체는 그대로 됩니다.
@@ -49,4 +49,22 @@
     node scripts/videokit-resend.mjs <주문번호> <이메일> [이름]
   ```
 - 발송 기록은 Resend 대시보드(Emails)에서 봅니다.
-- 테스트: `pnpm test:videokit`(가격 · 주문 검증, 메일 본문), `pnpm test:storefront`.
+- 테스트: `pnpm test:videokit`(가격 · 주문 검증, 메일 본문, 구매자 키 · 업데이트 확인), `pnpm test:storefront`.
+
+## 온라인 업데이트 (`/videokit update`)
+
+약속 문서: FCP 키트 저장소 `docs/update_server_contract.md`. 코드: `products/videokit-license.ts`, `app/api/videokit/latest/route.ts`.
+
+- **구매자 키** `VK-XXXX-XXXX-XXXX`: 카드 · 간편결제 키트 메일에 자동으로 들어갑니다(`deliverKit`). 같은 주문번호는 새로고침 · 웹훅 재시도 · `videokit-resend.mjs` 재발송 모두 같은 키입니다. 키를 만들지 못하면(테이블이 없을 때 포함) 키 없이 키트 메일을 보내고 로그에 `license issue failed`를 남깁니다.
+- **테이블**: SQL Editor에서 `sql/videokit-licenses.sql`을 한 번 실행합니다. RLS를 켜고 정책을 두지 않아 서버(service_role)만 읽고 씁니다. 새 환경변수는 없습니다(`SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`를 같이 씀).
+- **확인 주소** `GET /api/videokit/latest?platform=mac|windows&current=<버전>`, 헤더 `Authorization: Bearer <키>`. 키가 맞으면 버킷의 `releases/latest.json`을 읽어 10분 서명 링크를 줍니다.
+  - 200 `{"version","platform","sha256","size","url","notes"}` · 401 `{"error":"invalid_key"}`(키 없음 · 틀림 · revoked)
+  - 약속 문서에 없는 응답: 429 `{"error":"rate_limited"}`(키 하나당 1분에 10번, `Retry-After: 60`, 서버 인스턴스마다 따로 셈) · 400 `{"error":"bad_platform"}` · 503 `{"error":"no_release"}`(latest.json이 없거나 형식이 틀림) · 503 `{"error":"unavailable"}`(DB · 서명 오류, 설정 없음)
+  - 확인할 때마다 `last_seen_at`, 형식이 맞는 `current`는 `last_version`에 기록합니다.
+- **기존 구매자 · 계좌이체 구매자 키 발급**: 메일은 보내지 않고 키를 만들어 CSV로 출력합니다. 같은 주문번호를 다시 실행하면 새 키를 만들지 않고 있는 키를 출력합니다(`existing`). 이름은 저장하지 않고 출력에만 씁니다. `--dry-run`은 DB에 쓰지 않고 입력만 확인합니다.
+  ```bash
+  node scripts/videokit-issue-keys.mjs <이메일> <이름> <주문번호>
+  node scripts/videokit-issue-keys.mjs --csv 구매자.csv > 키.csv     # 머리글 email,name,order_id
+  ```
+  (환경변수는 키트 zip 올리기와 같이 `vercel env pull`로 받아 쓰고 바로 지웁니다.)
+- **키 막기**(환불 등): SQL Editor에서 `update videokit_licenses set revoked = true where order_id = '<주문번호>';`

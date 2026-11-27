@@ -1,11 +1,13 @@
-// 결제가 승인되면 구매자 이메일로 키트 다운로드 링크를 보낸다 (서버 전용).
-// - 주문·구매자 정보는 자체 DB에 저장하지 않는다(토스 상점관리자에서 확인). 같은 주문에 두 번 보내지 않는 것은
+// 결제가 승인되면 구매자 이메일로 키트 다운로드 링크와 업데이트용 구매자 키를 보낸다 (서버 전용).
+// - 주문 내역은 자체 DB에 저장하지 않는다(토스 상점관리자에서 확인). 자체 DB에는 구매자 키(키 · 이메일 · 주문번호)만
+//   videokit_licenses에 둔다(products/videokit-license.ts). 같은 주문에 두 번 보내지 않는 것은
 //   Resend의 Idempotency-Key(주문번호, 24시간 유지)로 막는다.
 // - 키트 파일: Supabase Storage 비공개 버킷의 zip 두 개(맥용 · 윈도우용, 개인정보 없음). 메일에는 7일 동안 열리는 서명 링크를 둘 다 넣는다.
 // - 메일 발송: Resend API.
 // 필요한 환경변수: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, VIDEOKIT_MAIL_FROM
 // 선택: VIDEOKIT_BUCKET(videokit), VIDEOKIT_KIT_PATH(kit/claude-video-kit.zip), VIDEOKIT_KIT_PATH_WINDOWS(kit/claude-video-kit-windows.zip), VIDEOKIT_MAIL_REPLY_TO, VIDEOKIT_MAIL_BCC, VIDEOKIT_NOTICE_URL(공지 오픈카톡방 주소)
 import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { issueLicense } from './videokit-license.ts';
 
 type PlanId = 'kit' | 'lesson' | 'pass';
 
@@ -36,9 +38,11 @@ const CONTENTS = [
   `클로드 기반 사용 설명서: PDF · EPUB (zip 안 「${MANUAL_DIR}」 폴더, 윈도우용 zip에는 윈도우판 설명서)`,
 ];
 export type KitLinks = { mac: string; windows: string };
+const KEY_NOTE = '키트에서 /videokit update를 처음 입력하면 이 키를 한 번 묻습니다. 본인만 쓰고 다른 사람과 나누지 마세요.';
 
 // 메일 본문. 테스트에서 직접 부른다.
-export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amount' | 'name'>, links: KitLinks, expiresAt: number) {
+// licenseKey: 키트의 /videokit update가 한 번 묻는 구매자 키. 발급하지 못했으면 빼고 보낸다.
+export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amount' | 'name'>, links: KitLinks, expiresAt: number, licenseKey?: string) {
   const item = o.itemName;
   const lesson = o.plan === 'lesson';
   const notice = env('VIDEOKIT_NOTICE_URL', '');
@@ -71,6 +75,9 @@ export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amoun
 <p style="margin:0 0 22px;font-size:13px;color:#5d6270">결제 금액 ${won(o.amount)} · 주문번호 ${esc(o.orderId)}</p>
 ${guides.map(g => `<a href="${esc(g.link)}" style="display:block;text-align:center;background:#e8622c;color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:15px;border-radius:10px;margin:0 0 10px">${esc(g.button)}</a>`).join('\n')}
 <p style="margin:0 0 24px;font-size:12px;color:#5d6270;text-align:center">쓰시는 컴퓨터에 맞는 파일 하나를 받으면 됩니다. 두 링크 모두 ${esc(kstDate(expiresAt))}까지 열립니다. 기간이 지나면 이 메일에 답장해 주시면 새 링크를 보내드립니다.</p>
+${licenseKey ? `<h2 style="font-size:15px;margin:0 0 8px">구매자 키 (업데이트용)</h2>
+<p style="margin:0 0 6px;font-family:ui-monospace,Menlo,monospace;font-size:18px;font-weight:700;letter-spacing:.04em;padding:12px 14px;background:#f4f5f8;border-radius:8px;text-align:center">${esc(licenseKey)}</p>
+<p style="margin:0 0 24px;font-size:13px;color:#5d6270">${esc(KEY_NOTE)}</p>` : ''}
 <h2 style="font-size:15px;margin:0 0 8px">들어 있는 것</h2>
 <ul style="margin:0 0 20px;padding-left:20px;font-size:14px;line-height:1.7">
 <li>${esc(CONTENTS[0])}</li>
@@ -87,6 +94,7 @@ ${lesson ? `<p style="margin:0 0 20px;padding:12px 14px;background:#fdf0ea;borde
   const text = [
     `${o.name}님, 결제가 확인되었습니다.`, '', item, `결제 금액 ${won(o.amount)} · 주문번호 ${o.orderId}`, '',
     ...guides.map(g => `${g.button}: ${g.link}`), `쓰시는 컴퓨터에 맞는 파일 하나를 받으면 됩니다. 두 링크 모두 ${kstDate(expiresAt)}까지 열립니다. 기간이 지나면 이 메일에 답장해 주세요.`, '',
+    ...(licenseKey ? [`구매자 키 (업데이트용): ${licenseKey}`, KEY_NOTE, ''] : []),
     '들어 있는 것', ...CONTENTS.map(s => `- ${s}`), '',
     ...guides.flatMap(g => [`시작하기 · ${g.os}`, ...g.steps.map((s, i) => `${i + 1}. ${s}`), '']),
     ...(lesson ? ['강의 일정은 개별로 조율합니다. 곧 연락드리겠습니다.', ''] : []),
@@ -124,12 +132,15 @@ export async function deliverKit(order: Order, { force = false } = {}): Promise<
     [env('VIDEOKIT_KIT_PATH', 'kit/claude-video-kit.zip'), 'claude-video-kit.zip'],
     [env('VIDEOKIT_KIT_PATH_WINDOWS', 'kit/claude-video-kit-windows.zip'), 'claude-video-kit-windows.zip'],
   ] as const;
-  const storage = db().storage.from(bucket);
+  const sb = db();
+  const storage = sb.storage.from(bucket);
   const signed = await Promise.all(files.map(([path, download]) => storage.createSignedUrl(path, LINK_DAYS * 86400, { download })));
   const bad = signed.findIndex(s => s.error || !s.data?.signedUrl);
   if (bad >= 0) { console.error('[videokit] signed url failed', order.orderId, files[bad][0], signed[bad].error?.message); return { status: 'failed', reason: 'signed url' }; }
   const expiresAt = Date.now() + LINK_DAYS * 86400 * 1000;
-  const mail = kitEmail({ ...order, name: order.name.slice(0, 100) }, { mac: signed[0].data!.signedUrl, windows: signed[1].data!.signedUrl }, expiresAt);
+  // 구매자 키: 같은 주문이면 같은 키. 발급에 실패해도(테이블이 아직 없을 때 포함) 키트 메일은 키 없이 보낸다.
+  const license = await issueLicense(sb, order.email, order.orderId).catch(e => { console.error('[videokit] license issue failed', order.orderId, (e as Error).message); return null; });
+  const mail = kitEmail({ ...order, name: order.name.slice(0, 100) }, { mac: signed[0].data!.signedUrl, windows: signed[1].data!.signedUrl }, expiresAt, license?.key);
   const sent = await sendMail(order.email, mail, force ? `vk-mail-${order.orderId}-${Date.now()}` : `vk-mail-${order.orderId}`);
   if (!sent.ok) console.error('[videokit] kit mail failed', order.orderId, sent.reason);
   return sent.ok ? { status: 'sent', email: order.email } : { status: 'failed', reason: sent.reason };
