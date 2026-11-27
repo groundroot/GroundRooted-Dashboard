@@ -34,7 +34,7 @@ export default async function DownloadPage({ params }: { params: Promise<{ code:
     </div>
     <section className="dl-copyright" aria-labelledby="dl-copyright-title">
       <h2 id="dl-copyright-title">저작권 안내</h2>
-      <p>클로드 비디오 키트(설명서·스크립트·스킬·프리셋 포함)는 그라운드루티드의 저작물로 저작권법의 보호를 받습니다. 구매하신 분 본인의 영상 제작에만 쓸 수 있으며, 파일이나 이 링크를 다른 사람에게 공유·복제·재배포·재판매하는 것은 금지됩니다. 위반하면 저작권법에 따라 민사·형사상 책임을 질 수 있습니다. 자세한 내용은 <a href="/videokit/terms#use-scope">이용약관</a>을 확인해 주세요.</p>
+      <p>클로드 비디오 키트(설명서·스크립트·스킬·프리셋 포함)는 그라운드루티드의 저작물로 저작권법의 보호를 받습니다. 구매하신 분 본인의 영상 제작에만 쓸 수 있으며, 파일이나 이 링크를 다른 사람에게 공유·복제·재배포·재판매하는 것은 금지됩니다. 내려받는 파일에는 구매하신 분의 주문번호가 들어 있어, 파일이 유출되면 누가 배포했는지 확인할 수 있습니다. 위반하면 저작권법에 따라 민사·형사상 책임을 질 수 있습니다. 자세한 내용은 <a href="/videokit/terms#use-scope">이용약관</a>을 확인해 주세요.</p>
     </section>
     <p className="small dl-note">쓰시는 컴퓨터에 맞는 파일 하나를 받으면 됩니다.</p>
     <p className="dl-expire">이 링크는 <b>{kstDay(view.expiresAt)}</b>에 삭제됩니다.</p>
@@ -48,4 +48,5 @@ export default async function DownloadPage({ params }: { params: Promise<{ code:
 const unconfigured = {
   find: async () => { throw new Error('SUPABASE_URL / SUPABASE_SERVICE_ROLE_KEY not configured'); },
   remove: async () => {}, hit: async () => {}, readCurrent: async () => null, sign: async () => null,
+  readKit: async () => { throw new Error('not configured'); }, putPersonal: async () => {},
 };

@@ -1,4 +1,4 @@
-// 짧은 다운로드 링크(/d/<코드>)가 내려줄 키트 zip 두 개를 비공개 버킷에 올리고 kit/current.json을 바꾼다. 키트를 새로 낼 때마다 실행한다.
+// 짧은 다운로드 링크(/d/<코드>)가 구매자 표식을 넣어 내려줄 키트 zip 두 개를 비공개 버킷에 올리고 kit/current.json을 바꾼다. 키트를 새로 낼 때마다 실행한다.
 // 올린 파일을 다시 내려받아 sha256이 같을 때만 current.json을 바꾼다(그 전까지는 이전 버전이 계속 나간다).
 // 실행 (환경변수 SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY):
 //   node scripts/videokit-upload-link-kit.mjs <버전> <맥용.zip> <윈도우용.zip>
@@ -9,6 +9,7 @@ import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import { createClient } from '@supabase/supabase-js';
 import { fileName, isCurrent } from '../products/videokit-link.ts';
+import { watermarkKit } from '../products/videokit-watermark.ts';
 
 const [version, macZip, winZip] = process.argv.slice(2);
 const { SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY } = process.env;
@@ -27,6 +28,9 @@ const storage = sb.storage.from(bucket);
 const current = { version };
 for (const [platform, file] of [['mac', macZip], ['windows', winZip]]) {
   const body = await readFile(file);
+  // 다운로드 버튼은 이 zip에 구매자 표식을 넣어 내준다. 넣을 수 없는 zip(MANIFEST 형식이 다름 등)이면 올리지 않는다(올리면 모든 다운로드가 503).
+  try { watermarkKit(body, { orderId: 'CHECK', issued: '2000-01-01', code: 'CHECK000' }); }
+  catch (e) { console.error(`구매자 표식을 넣을 수 없는 zip입니다 (${file}): ${e.message}`); process.exit(1); }
   const path = `kit/links/${version}/${fileName(platform, version)}`;
   const { error } = await storage.upload(path, body, { upsert: true, contentType: 'application/zip' });
   if (error) { console.error(`업로드 실패 (${path}):`, error.message); process.exit(1); }

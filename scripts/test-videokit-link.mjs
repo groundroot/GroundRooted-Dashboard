@@ -3,8 +3,10 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import {
   newCode, normalizeCode, CODE_PATTERN, linkUrl, expiryFor, kstDay, maskName, isCurrent, fileName,
-  loadLink, handleDownload, downloadPage, resetLimits, createLink, revokeLink, supabaseLinkDeps, clientIp, ipBlocked, SIGN_SECONDS, DEFAULT_MAX_DOWNLOADS,
+  loadLink, handleDownload, downloadPage, resetLimits, createLink, revokeLink, supabaseLinkDeps, clientIp, ipBlocked, SIGN_SECONDS, DEFAULT_MAX_DOWNLOADS, markFor,
 } from '../products/videokit-link.ts';
+import { watermarkKit, buildZip, readZipFiles, LICENSE_PATH } from '../products/videokit-watermark.ts';
+import { createHash } from 'node:crypto';
 import { db } from '../products/videokit-license.ts';
 import { deliverKit, kitEmail } from '../products/videokit-delivery.ts';
 import { makeOrderId, plans } from '../products/videokit.ts';
@@ -32,6 +34,50 @@ import { makeOrderId, plans } from '../products/videokit.ts';
   console.log('PASS: link code, expiry date (KST), name mask');
 }
 
+// ---- 구매자 표식 (원본 zip → 개인 zip) ----
+const sha = b => createHash('sha256').update(b).digest('hex');
+const T = 'Claude Video Kit/';
+const ROOT_MD = '# 키트\n본문\n', SYS_MD = '# System\n', SKILL = '---\nname: x\n---\n';
+const KIT = buildZip([
+  { name: `${T}CLAUDE.md`, content: ROOT_MD },
+  { name: `${T}System/CLAUDE.md`, content: SYS_MD },
+  { name: `${T}.claude/skills/x/SKILL.md`, content: SKILL },
+  { name: `${T}System/MANIFEST.json`, content: `{\n"version": "1.3",\n"files": {\n"CLAUDE.md": {\n"sha256": "${sha(Buffer.from(ROOT_MD))}"\n},\n".claude/skills/x/SKILL.md": {\n"sha256": "${sha(Buffer.from(SKILL))}"\n},\n"System/CLAUDE.md": {\n"sha256": "${sha(Buffer.from(SYS_MD))}"\n}\n},\n"default_rules": {}\n}` },
+]);
+{
+  const mark = { orderId: 'VK-KIT-20261127-AB12', issued: '2026-11-27', code: 'ABCD2345' };
+  const { files, comment } = readZipFiles(watermarkKit(KIT, mark));
+  const line = 'Claude Video Kit · order VK-KIT-20261127-AB12 · issued 2026-11-27 · link ABCD2345';
+  assert.equal(comment, line, 'zip comment');
+  const lic = files.get(LICENSE_PATH).content.toString('utf8');
+  assert.ok(lic.startsWith('\uFEFF') && lic.includes('이 키트는 주문번호 VK-KIT-20261127-AB12의 구매자 본인용입니다.') && lic.includes('유출되면 주문번호로 배포자를 확인합니다'), 'visible LICENSE.txt');
+  assert.equal(files.get(LICENSE_PATH).externalAttr >>> 16, 0o100644);
+  const m = JSON.parse(files.get(`${T}System/MANIFEST.json`).content);
+  assert.deepEqual(m.license, { order: 'VK-KIT-20261127-AB12', issued: '2026-11-27', link: 'ABCD2345' });
+  for (const [rel, orig] of [['CLAUDE.md', ROOT_MD], ['System/CLAUDE.md', SYS_MD]]) {
+    const body = files.get(T + rel).content;
+    assert.equal(body.toString(), `${orig}\n<!-- ${line} -->\n`, `${rel} comment`);
+    assert.equal(m.files[rel].sha256, sha(body), `${rel} sha256 in MANIFEST follows the change (update.py sees it as untouched)`);
+  }
+  assert.equal(files.get(`${T}.claude/skills/x/SKILL.md`).content.toString(), SKILL, 'other files unchanged');
+  assert.equal(m.files['.claude/skills/x/SKILL.md'].sha256, sha(Buffer.from(SKILL)));
+  assert.equal(m.version, '1.3'); assert.deepEqual(m.default_rules, {});
+  // 키트 구조가 아니면 표식 없이 내보내지 않는다(throw)
+  assert.throws(() => watermarkKit(buildZip([{ name: `${T}CLAUDE.md`, content: 'x' }]), mark), /MANIFEST/);
+  assert.throws(() => watermarkKit(Buffer.from('not a zip'), mark), /zip/);
+  assert.throws(() => watermarkKit(watermarkKit(KIT, mark), mark), /LICENSE/);
+  // 주문번호 · 발급일: 없으면 TEST-<코드>, 이상한 글자는 _, 발급일은 created_at의 KST 날짜
+  const base = { code: 'ABCD2345', email: 'a@b.co', name: null, expires_at: '', revoked: false, download_count: 0, max_downloads: 10 };
+  assert.deepEqual(markFor({ ...base, order_id: 'VK-1', created_at: '2026-11-27T15:30:00Z' }, 0), { orderId: 'VK-1', issued: '2026-11-28', code: 'ABCD2345' });
+  assert.equal(markFor({ ...base, order_id: null, created_at: null }, Date.parse('2026-11-27T06:00:00Z')).orderId, 'TEST-ABCD2345');
+  assert.equal(markFor({ ...base, order_id: '  ', created_at: null }, 0).orderId, 'TEST-ABCD2345');
+  assert.equal(markFor({ ...base, order_id: 'a --> <b>"', created_at: null }, 0).orderId, 'a_--___b__');
+  const card = makeOrderId('kit', 's', randomUUID());
+  assert.equal(markFor({ ...base, order_id: card, created_at: null }, 0).orderId, card, 'card order id is kept as is');
+  assert.equal(markFor({ ...base, order_id: '계좌이체-홍길동-1127', created_at: null }, 0).orderId, '계좌이체-홍길동-1127', 'manual Korean order id is kept');
+  console.log('PASS: buyer mark (LICENSE.txt, zip comment, MANIFEST license + sha, CLAUDE.md comments)');
+}
+
 const CURRENT = { version: '1.3', mac: { path: 'kit/links/1.3/ClaudeVideoKit-Mac-1.3.zip' }, windows: { path: 'kit/links/1.3/ClaudeVideoKit-Windows-1.3.zip' } };
 {
   assert.ok(isCurrent(CURRENT));
@@ -45,7 +91,7 @@ const NOW = Date.parse('2026-11-27T06:00:00Z');
 const GOOD = 'ABCD2345', OLD = 'QLDC2345', REVOKED = 'REVK2345', FULL = 'FULL2345';
 const row = (code, over = {}) => ({ code, email: 'a@b.co', name: '강성철 (시험)', order_id: 'TEST-LINK-1', expires_at: new Date(expiryFor(NOW)).toISOString(), revoked: false, download_count: 0, max_downloads: 10, ...over });
 function fake(over = {}) {
-  const calls = { find: [], remove: [], hit: [], sign: [] };
+  const calls = { find: [], remove: [], hit: [], sign: [], put: [] };
   const rows = { [GOOD]: row(GOOD), [OLD]: row(OLD, { expires_at: new Date(NOW - 1000).toISOString() }), [REVOKED]: row(REVOKED, { revoked: true }), [FULL]: row(FULL, { download_count: 10 }) };
   const deps = {
     find: async c => { calls.find.push(c); return rows[c] ?? null; },
@@ -53,6 +99,8 @@ function fake(over = {}) {
     hit: async (c, n) => { calls.hit.push([c, n]); },
     readCurrent: async () => CURRENT,
     sign: async (p, s, d) => { calls.sign.push([p, s, d]); return `https://x.supabase.co/storage/v1/object/sign/videokit/${p}?token=t&download=${d}`; },
+    readKit: async p => { assert.ok(p.startsWith('kit/links/1.3/')); return KIT; },
+    putPersonal: async (p, b) => { calls.put.push([p, b]); },
     now: NOW,
     ...over,
   };
@@ -86,19 +134,23 @@ let clock = NOW;
 const dl = async (code, platform, over) => { const f = fake(over); f.deps.now = (clock += 61_000); const r = await handleDownload(code, platform, f.deps); return { r, ...f }; };
 {
   resetLimits();
-  // 정상: 10분 서명 링크로 303, 파일 이름 ClaudeVideoKit-Mac-1.3.zip, 횟수 +1
+  // 정상: 표식을 넣은 개인 zip(kit/personal/<코드>/)을 올리고 그 10분 서명 링크로 303, 파일 이름 ClaudeVideoKit-Mac-1.3.zip, 횟수 +1
   let { r, calls } = await dl('abcd2345', 'mac');
   assert.equal(r.status, 303); assert.equal(r.headers.get('cache-control'), 'no-store');
-  assert.equal(r.headers.get('location'), 'https://x.supabase.co/storage/v1/object/sign/videokit/kit/links/1.3/ClaudeVideoKit-Mac-1.3.zip?token=t&download=ClaudeVideoKit-Mac-1.3.zip');
-  assert.deepEqual(calls.sign, [['kit/links/1.3/ClaudeVideoKit-Mac-1.3.zip', 600, 'ClaudeVideoKit-Mac-1.3.zip']]); assert.equal(SIGN_SECONDS, 600);
+  assert.equal(r.headers.get('location'), 'https://x.supabase.co/storage/v1/object/sign/videokit/kit/personal/ABCD2345/ClaudeVideoKit-Mac-1.3.zip?token=t&download=ClaudeVideoKit-Mac-1.3.zip');
+  assert.deepEqual(calls.sign, [['kit/personal/ABCD2345/ClaudeVideoKit-Mac-1.3.zip', 600, 'ClaudeVideoKit-Mac-1.3.zip']]); assert.equal(SIGN_SECONDS, 600);
+  assert.equal(calls.put.length, 1); assert.equal(calls.put[0][0], 'kit/personal/ABCD2345/ClaudeVideoKit-Mac-1.3.zip');
+  assert.ok(readZipFiles(calls.put[0][1]).comment.includes('order TEST-LINK-1'), 'uploaded zip carries the order id');
   assert.deepEqual(calls.hit, [[GOOD, 1]]);
   ({ r, calls } = await dl(GOOD, 'windows'));
-  assert.equal(r.status, 303); assert.deepEqual(calls.sign, [['kit/links/1.3/ClaudeVideoKit-Windows-1.3.zip', 600, 'ClaudeVideoKit-Windows-1.3.zip']]);
+  assert.equal(r.status, 303); assert.deepEqual(calls.sign, [['kit/personal/ABCD2345/ClaudeVideoKit-Windows-1.3.zip', 600, 'ClaudeVideoKit-Windows-1.3.zip']]);
+  // current.json의 sha256과 원본이 같으면 그대로, 다르면 503
+  ({ r } = await dl(GOOD, 'mac', { readCurrent: async () => ({ ...CURRENT, mac: { ...CURRENT.mac, sha256: sha(KIT).toUpperCase() } }) })); assert.equal(r.status, 303);
   // 만료 · 없음 · 막힘 · 틀린 OS · 틀린 코드 → 페이지로 303 ("링크가 만료되었습니다"), 서명 · 기록 없음
   for (const [code, platform] of [[OLD, 'mac'], ['ZZZZ2345', 'mac'], [REVOKED, 'windows'], [GOOD, 'linux'], [GOOD, 'MAC'], ['0000OOOO', 'mac']]) {
     ({ r, calls } = await dl(code, platform));
     assert.equal(r.status, 303, `${code} ${platform}`); assert.equal(r.headers.get('location'), `/d/${normalizeCode(code)}`);
-    assert.equal(calls.sign.length, 0); assert.equal(calls.hit.length, 0);
+    assert.equal(calls.sign.length, 0); assert.equal(calls.hit.length, 0); assert.equal(calls.put.length, 0);
   }
   ({ calls } = await dl(OLD, 'mac')); assert.deepEqual(calls.remove, [OLD], 'expired link is deleted');
   // 링크당 횟수 상한(기본 10, max_downloads): 10번째까지 받고 넘으면 429 "다운로드 횟수를 넘었습니다" (서명하지 않음)
@@ -112,9 +164,13 @@ const dl = async (code, platform, over) => { const f = fake(over); f.deps.now = 
   // DB 오류 · current.json 문제 · 서명 실패 → 503, 횟수는 올리지 않음
   const quiet = console.error; console.error = () => {};
   try {
-    for (const over of [{ find: async () => { throw new Error('db'); } }, { readCurrent: async () => { throw new Error('missing'); } }, { readCurrent: async () => ({ ...CURRENT, version: 'v 1' }) }, { sign: async () => null }, { sign: async () => { throw new Error('x'); } }]) {
+    for (const over of [{ find: async () => { throw new Error('db'); } }, { readCurrent: async () => { throw new Error('missing'); } }, { readCurrent: async () => ({ ...CURRENT, version: 'v 1' }) }, { sign: async () => null }, { sign: async () => { throw new Error('x'); } },
+      // 표식을 넣지 못하면 원본을 내주지 않는다: 원본 읽기 실패 · 키트가 아닌 zip · sha256 불일치 · 업로드 실패
+      { readKit: async () => { throw new Error('missing'); } }, { readKit: async () => buildZip([{ name: 'x.txt', content: 'x' }]) },
+      { readCurrent: async () => ({ ...CURRENT, mac: { ...CURRENT.mac, sha256: 'f'.repeat(64) } }) }, { putPersonal: async () => { throw new Error('quota'); } }]) {
       ({ r, calls } = await dl(GOOD, 'mac', over));
       assert.equal(r.status, 503); assert.match(r.headers.get('content-type'), /text\/html/); assert.equal(calls.hit.length, 0);
+      assert.ok(!calls.sign.some(([p]) => p.startsWith('kit/links/')), 'never signs the unmarked original');
     }
     // 기록 실패는 다운로드를 막지 않는다
     ({ r } = await dl(GOOD, 'mac', { hit: async () => { throw new Error('x'); } })); assert.equal(r.status, 303);
@@ -187,7 +243,7 @@ function filter(url, rows) {
   return limit ? out.slice(0, Number(limit)) : out;
 }
 function fakeBackend({ linksMissing = false } = {}) {
-  const tables = { videokit_licenses: [], videokit_download_links: [] }, mails = [], log = [];
+  const tables = { videokit_licenses: [], videokit_download_links: [] }, mails = [], log = [], objects = new Map();
   globalThis.fetch = async (input, init = {}) => {
     const url = new URL(typeof input === 'string' ? input : input.url);
     const method = (init.method || 'GET').toUpperCase();
@@ -196,6 +252,18 @@ function fakeBackend({ linksMissing = false } = {}) {
     if (url.hostname === 'api.resend.com') { mails.push(JSON.parse(init.body)); return ok({ id: 'm1' }); }
     if (url.pathname.startsWith('/storage/v1/object/sign/')) return ok({ signedURL: `/object/sign/${url.pathname.split('/object/sign/')[1]}?token=t` });
     if (url.pathname === '/storage/v1/object/videokit/kit/current.json') return new Response(JSON.stringify(CURRENT), { status: 200 });
+    if (method === 'GET' && url.pathname.startsWith('/storage/v1/object/videokit/kit/links/')) return new Response(KIT, { status: 200 });
+    if (method === 'POST' && url.pathname.startsWith('/storage/v1/object/videokit/kit/personal/')) {
+      const key = decodeURIComponent(url.pathname.replace('/storage/v1/object/videokit/', ''));
+      objects.set(key, Buffer.from(await new Response(init.body).arrayBuffer())); return ok({ Key: `videokit/${key}` });
+    }
+    if (method === 'POST' && url.pathname === '/storage/v1/object/list/videokit') {
+      const { prefix } = JSON.parse(init.body);
+      return ok([...objects.keys()].filter(k => k.startsWith(`${prefix}/`)).map(k => ({ name: k.slice(prefix.length + 1) })));
+    }
+    if (method === 'DELETE' && url.pathname === '/storage/v1/object/videokit') {
+      const { prefixes } = JSON.parse(init.body); prefixes.forEach(k => objects.delete(k)); return ok(prefixes.map(name => ({ name })));
+    }
     const table = url.pathname.replace('/rest/v1/', '');
     if (table in tables) {
       if (table === 'videokit_download_links' && linksMissing) return ok({ code: '42P01', message: 'relation "videokit_download_links" does not exist' }, 404);
@@ -209,11 +277,11 @@ function fakeBackend({ linksMissing = false } = {}) {
         return new Response(null, { status: 201 });
       }
       if (method === 'PATCH') { const patch = JSON.parse(init.body); const hit = filter(url, rows); hit.forEach(r => Object.assign(r, patch)); return url.searchParams.has('select') ? ok(hit) : new Response(null, { status: 204 }); }
-      if (method === 'DELETE') { const gone = new Set(filter(url, rows)); tables[table] = rows.filter(r => !gone.has(r)); return new Response(null, { status: 204 }); }
+      if (method === 'DELETE') { const gone = new Set(filter(url, rows)); tables[table] = rows.filter(r => !gone.has(r)); return url.searchParams.has('select') ? ok([...gone]) : new Response(null, { status: 204 }); }
     }
     return ok({ message: `unexpected ${method} ${url.pathname}` }, 500);
   };
-  return { tables, mails, log };
+  return { tables, mails, log, objects };
 }
 Object.assign(process.env, { SUPABASE_URL: 'https://fake.supabase.co', SUPABASE_SERVICE_ROLE_KEY: 'service-role-test', RESEND_API_KEY: 're_test', VIDEOKIT_MAIL_FROM: 'kit@groundrooted.com' });
 
@@ -247,14 +315,27 @@ Object.assign(process.env, { SUPABASE_URL: 'https://fake.supabase.co', SUPABASE_
   assert.equal(view.status, 'ok'); assert.equal(view.name, '강*철 (시험)'); assert.equal(view.version, '1.3');
   const r = await handleDownload(a.code, 'windows', deps);
   assert.equal(r.status, 303);
-  assert.match(r.headers.get('location'), /^https:\/\/fake\.supabase\.co\/storage\/v1\/object\/sign\/videokit\/kit\/links\/1\.3\/ClaudeVideoKit-Windows-1\.3\.zip\?token=t&download=ClaudeVideoKit-Windows-1\.3\.zip$/);
+  const personal = `kit/personal/${a.code}/ClaudeVideoKit-Windows-1.3.zip`;
+  assert.equal(r.headers.get('location'), `https://fake.supabase.co/storage/v1/object/sign/videokit/${personal}?token=t&download=ClaudeVideoKit-Windows-1.3.zip`);
+  assert.equal(JSON.parse(readZipFiles(be.objects.get(personal)).files.get(`${T}System/MANIFEST.json`).content).license.order, 'TEST-LINK-1', 'personal zip in the bucket');
   const hit = be.tables.videokit_download_links.find(x => x.code === a.code);
   assert.equal(hit.download_count, 1); assert.ok(Date.now() - Date.parse(hit.last_download_at) < 5000);
   // 만료된 링크로 요청이 오면 그 행을 지우고 페이지로 보낸다
   hit.expires_at = new Date(Date.now() - 1).toISOString();
   { const gone = await handleDownload(a.code, 'mac', deps); assert.equal(gone.status, 303); assert.equal(gone.headers.get('location'), `/d/${a.code}`); }
   assert.ok(!be.tables.videokit_download_links.some(x => x.code === a.code));
+  assert.ok(!be.objects.has(personal), 'personal zip is deleted with the expired link');
   assert.deepEqual(await loadLink(a.code, deps), { status: 'gone' });
+  // 끄기(--revoke) · 발급 때 만료 정리도 개인 zip을 지운다
+  const c2 = await createLink(sb, { email: 'x@y.co', orderId: 'VK-2' });
+  assert.equal((await handleDownload(c2.code, 'mac', deps)).status, 303);
+  assert.ok(be.objects.has(`kit/personal/${c2.code}/ClaudeVideoKit-Mac-1.3.zip`));
+  assert.equal(await revokeLink(sb, c2.code), true); assert.equal([...be.objects.keys()].filter(k => k.includes(c2.code)).length, 0, 'revoke deletes the personal zip');
+  const c3 = await createLink(sb, { email: 'x@y.co', orderId: 'VK-3' });
+  assert.equal((await handleDownload(c3.code, 'windows', deps)).status, 303);
+  be.tables.videokit_download_links.find(x => x.code === c3.code).expires_at = new Date(Date.now() - 1).toISOString();
+  await createLink(sb, { email: 'x@y.co', orderId: 'VK-4' });
+  assert.equal([...be.objects.keys()].filter(k => k.includes(c3.code)).length, 0, 'issue-time cleanup deletes personal zips of expired links');
   console.log('PASS: createLink (new, reuse, cleanup) and page/button with supabase client');
 }
 
@@ -267,7 +348,7 @@ Object.assign(process.env, { SUPABASE_URL: 'https://fake.supabase.co', SUPABASE_
     assert.ok(part.includes('https://groundrooted.com/d/ABCD2345'));
     assert.ok(part.includes('이 링크는 7일 뒤(2026년 12월 4일) 삭제됩니다'), 'deletion date');
     assert.ok(part.includes('VK-ABCD-EFGH-JK23'));
-    assert.ok(part.includes('※ 키트는 구매하신 분 본인만 쓸 수 있는 저작물입니다. 파일과 링크의 공유·재배포·재판매는 저작권법으로 금지됩니다.'), 'copyright note');
+    assert.ok(part.includes('※ 키트는 구매하신 분 본인만 쓸 수 있는 저작물입니다. 파일마다 주문번호가 들어 있어 유출 시 배포자를 확인할 수 있으며, 공유·재배포·재판매는 저작권법으로 금지됩니다.'), 'copyright note');
     assert.ok(part.indexOf('※ 키트는') > part.indexOf('이 링크는 7일 뒤'), 'copyright note under the link note');
     assert.ok(!part.includes('supabase.co'), 'no long signed url in the mail');
   }

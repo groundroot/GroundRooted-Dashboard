@@ -5,6 +5,8 @@ import { db } from '@/products/videokit-license';
 import { clientIp, downloadPage, handleDownload, supabaseLinkDeps } from '@/products/videokit-link';
 
 export const dynamic = 'force-dynamic';
+// 원본 zip(약 2.8MB)을 받아 표식을 넣고 다시 올린다. 보통 수 초.
+export const maxDuration = 60;
 
 export function GET(_req: Request, { params }: { params: Promise<{ code: string; platform: string }> }) {
   return params.then(({ code }) => downloadPage(code));
