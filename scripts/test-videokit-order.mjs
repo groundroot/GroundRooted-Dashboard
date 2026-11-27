@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
-import { checkOrder, makeOrderId, plans, isPlanId, priceOf, nameOf, tierAt, SALE_ENDS, hasKit, hasLesson } from '../products/videokit.ts';
+import { checkOrder, makeOrderId, plans, isPlanId, priceOf, nameOf, tierAt, transferTier, SALE_ENDS, hasKit, hasLesson } from '../products/videokit.ts';
 import { kitEmail, isEmail, deliverKit, deliveryConfigured } from '../products/videokit-delivery.ts';
 
 const before = SALE_ENDS - 3600_000, after = SALE_ENDS + 3600_000;
@@ -32,6 +32,12 @@ assert.deepEqual(checkOrder(passS, 300000, before), { ok: true, plan: 'pass', ti
 assert.deepEqual(checkOrder(passR, 300000, after), { ok: true, plan: 'pass', tier: 'r', amount: 300000 });
 assert.equal(checkOrder(passS, 100000, before).ok, false); assert.equal(checkOrder(passR, 200000, after).ok, false);
 assert.ok(isPlanId('pass') && !hasKit('pass') && hasLesson('pass') && hasKit('kit') && !hasLesson('kit') && hasKit('lesson') && hasLesson('lesson'));
+// 계좌이체: 할인 기간에 연 화면(주문번호 s)은 마감 + 30분까지 할인가, 그 뒤 · 다른 상품 · 주문번호 없음은 지금 구간
+assert.equal(transferTier(kitS, 'kit', SALE_ENDS + 29 * 60_000), 's');
+assert.equal(transferTier(kitS, 'kit', SALE_ENDS + 31 * 60_000), 'r');
+assert.equal(transferTier(kitS, 'lesson', SALE_ENDS + 10 * 60_000), 'r');
+assert.equal(transferTier(undefined, 'kit', SALE_ENDS + 10 * 60_000), 'r');
+assert.equal(transferTier(kitR, 'kit', before), 's');
 console.log('PASS: videokit order/amount checks');
 
 // 키트 메일
@@ -40,8 +46,8 @@ const m = kitEmail({ orderId: kitS, plan: 'lesson', itemName: nameOf('lesson', '
 assert.ok(m.html.includes('&lt;b&gt;홍길동&lt;/b&gt;') && !m.html.includes('<b>홍길동'), 'name escaped');
 assert.ok(m.html.includes('href="https://groundrooted.com/d/AB?a=1&amp;b=2"'), 'link escaped');
 assert.ok(m.html.includes('키트 내려받기 (맥용 · 윈도우용)') && !m.html.includes('전용입니다'), 'one download button for mac + windows, no mac-only line');
-assert.ok(m.html.includes('300,000원') && m.html.includes('1:1 강의 2회') && m.html.includes('강의 일정은 개별로') && m.text.includes('https://groundrooted.com/d/AB?a=1&b=2'));
-assert.ok(nameOf('lesson', 'r').includes('3회 강의') && nameOf('lesson', 's').includes('2회'));
+assert.ok(m.html.includes('300,000원') && m.html.includes('1:1 강의(2회') && m.html.includes('강의 일정은 개별로') && m.text.includes('https://groundrooted.com/d/AB?a=1&b=2'));
+assert.ok(nameOf('lesson', 'r').includes('3주 · 3회') && nameOf('lesson', 's').includes('2회'));
 const k = kitEmail({ orderId: kitS, plan: 'kit', itemName: plans.kit.name, amount: 100000, name: '김' }, 'https://groundrooted.com/d/ABCD2345', SALE_ENDS);
 assert.ok(!k.html.includes('강의 일정은 개별로'), 'kit mail has no lesson line');
 assert.ok(k.html.includes('0. Claude Video Kit Manual') && k.html.includes('INSTALL.md') && !k.html.includes('docs/manual') && k.text.includes('INSTALL.md'), 'kit mail matches kit layout');

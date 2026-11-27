@@ -6,8 +6,19 @@ import { editorialPublicPaths, paperMotionPath } from "@/products/editorial-medi
 // DASHBOARD_PASSWORD가 없으면 열어두지 않고 막는다(로컬 개발만 예외).
 const PASSWORD = process.env.DASHBOARD_PASSWORD;
 
+// 로그인으로 보내는 곳은 대시보드 경로뿐이다(관리자 · API, 미리보기를 끈 앱 소개). 그 밖의 없는 · 비공개 주소는 404.
+const isDashboard = (path: string) =>
+  path === "/admin" || path.startsWith("/admin/") || path.startsWith("/api/") || ["/", "/pdf-to-md", "/youtube-to-md", "/typecut-pro"].includes(path);
+
+// 없는 경로로 바꿔 써서 Next의 404 페이지(app/not-found.tsx)를 보여 준다. 실제 파일 · 페이지는 로그인 없이 내주지 않는다.
+function notFound(req: NextRequest) {
+  const response = NextResponse.rewrite(new URL("/__not-found", req.url));
+  response.headers.set("X-Robots-Tag", "noindex, nofollow");
+  return response;
+}
+
 export async function proxy(req: NextRequest) {
-  if ([...editorialPublicPaths, paperMotionPath, "/favicon.svg", "/licenses/Inter-OFL.txt", "/licenses/Pretendard-OFL.txt", "/media/pdf-explainer/figure-01.svg", "/media/pdf-explainer/photo-01.svg", "/media/pdf-explainer/form-01.svg", "/media/readymd/reading-map.svg", "/videokit", "/videokit/index.html", "/videokit/diagram.html", "/videokit/terms", "/videokit/terms.html", "/videokit/privacy", "/videokit/privacy.html", "/videokit/transfer", "/videokit/transfer.html", "/videokit/logos/final-cut-pro.png", "/videokit/logos/final-cut-pro-subscription.png", "/videokit/logos/capcut.svg", "/videokit/logos/premiere-pro.svg", "/videokit/logos/davinci-resolve.svg", "/videokit/logos/filmcraft.png", "/videokit/logos/claude.svg", "/videokit/product.png", "/videokit/plan-kit.png", "/videokit/plan-lesson.png", "/videokit/plan-pass.png", "/price", "/price/success", "/price/fail", "/api/videokit/apply"].includes(req.nextUrl.pathname)) return NextResponse.next();
+  if ([...editorialPublicPaths, paperMotionPath, "/favicon.svg", "/licenses/Inter-OFL.txt", "/licenses/Pretendard-OFL.txt", "/media/pdf-explainer/figure-01.svg", "/media/pdf-explainer/photo-01.svg", "/media/pdf-explainer/form-01.svg", "/media/readymd/reading-map.svg", "/videokit", "/videokit/index.html", "/videokit/diagram.html", "/videokit/terms", "/videokit/terms.html", "/videokit/privacy", "/videokit/privacy.html", "/videokit/logos/final-cut-pro.png", "/videokit/logos/final-cut-pro-subscription.png", "/videokit/logos/capcut.svg", "/videokit/logos/premiere-pro.svg", "/videokit/logos/davinci-resolve.svg", "/videokit/logos/filmcraft.png", "/videokit/logos/claude.svg", "/videokit/product.png", "/videokit/plan-kit.png", "/videokit/plan-lesson.png", "/videokit/plan-pass.png", "/price", "/price/success", "/price/fail", "/api/videokit/apply"].includes(req.nextUrl.pathname)) return NextResponse.next();
   // 키트의 /videokit update (구매자 키로 확인, products/videokit-license.ts)
   if (req.nextUrl.pathname === "/api/videokit/latest") return NextResponse.next();
   // 키트 짧은 다운로드 링크 /d/<코드>, /d/<코드>/mac|windows (products/videokit-link.ts)
@@ -27,6 +38,7 @@ export async function proxy(req: NextRequest) {
   }
   if (!PASSWORD) {
     if (process.env.NODE_ENV === "development") return NextResponse.next();
+    if (!isDashboard(req.nextUrl.pathname)) return notFound(req);
     return new NextResponse("DASHBOARD_PASSWORD 환경변수가 설정되지 않았습니다.", { status: 500 });
   }
 
@@ -36,6 +48,8 @@ export async function proxy(req: NextRequest) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
     return response;
   }
+
+  if (!isDashboard(req.nextUrl.pathname)) return notFound(req);
 
   const url = req.nextUrl.clone();
   url.pathname = "/login";

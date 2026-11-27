@@ -13,7 +13,7 @@ const won = (n: number) => `${new Intl.NumberFormat('ko-KR').format(n)}원`;
 const kitPlans = [
   { id: 'kit', label: '키트', alt: '클로드 비디오 키트 박스', ...plans.kit },
   { id: 'lesson', label: '키트 + 1:1 강의', alt: '키트 박스와 1:1 강의 화면', ...plans.lesson },
-  { id: 'pass', label: '키트 구매자 1:1 강의권 2회', alt: '1:1 강의권 2회 티켓', ...plans.pass },
+  { id: 'pass', label: '키트 구매자 1:1 강의권', alt: '키트 구매자 1:1 강의권(2회) 티켓', ...plans.pass },
 ] as const;
 export const metadata = {
   title: 'GroundRooted | 자료를 지식으로, 생각을 결과물로',
@@ -26,7 +26,7 @@ const faqs = [
   ],
   [
     '지금 다운로드하거나 구매할 수 있나요?',
-    '클로드 비디오 키트는 지금 구매할 수 있습니다. 위 상품 목록의 결제하기에서 계좌이체 또는 카드 · 간편결제로 결제할 수 있습니다. ReadyMD와 YouTube to MD는 출시 준비 중입니다. 각 소개 페이지에서 사용 흐름을 살펴볼 수 있으며, 가격과 지원 환경은 확정 후 안내합니다. TypeCut Pro의 배포·구매 정보는 연결된 공식 사이트에서 확인해 주세요.',
+    '클로드 비디오 키트는 지금 구매할 수 있습니다. 위 상품 목록의 결제하기에서 지금은 계좌이체로 결제할 수 있고, 카드 · 간편결제는 심사 중입니다. ReadyMD와 YouTube to MD는 출시 준비 중입니다. 각 소개 페이지에서 사용 흐름을 살펴볼 수 있으며, 가격과 지원 환경은 확정 후 안내합니다. TypeCut Pro의 배포·구매 정보는 연결된 공식 사이트에서 확인해 주세요.',
   ],
   [
     '페이지에 보이는 예시는 실제 앱의 결과인가요?',
@@ -52,7 +52,7 @@ export default function HomePage() {
         <div className="fx-kit-copy">
           <p className="fx-kit-status"><span aria-hidden="true" />지금 판매 중</p>
           <h2 id="kit-heading">클로드 비디오 키트</h2>
-          <p className="fx-kit-lede">영상 제작은 클로드에게, 검수는 쓰시는 편집 프로그램에서. 편집 프로그램이 없다면 MP4 · MOV 파일로 바로 받을 수 있습니다.</p>
+          <p className="fx-kit-lede">영상 제작은 클로드에게, 검수는 쓰시는 편집 프로그램에서. 자막 · 모션처럼 렌더하는 영상은 편집 프로그램 없이 MP4로 바로 받을 수 있습니다.</p>
           <p className="fx-kit-new">
             <b>NEW</b>
             <span>다빈치 리졸브(베타): 맥·윈도우에서 Free(무료)·Studio(유료) 모두 지원<br />프리미어 프로: 맥·윈도우 지원</span>
@@ -65,12 +65,12 @@ export default function HomePage() {
               <a className="fx-kit-buy" href={`/price?plan=${p.id}`}>결제하기<span className="fx-sr-only"> — {p.label}</span></a>
             </li>)}
           </ul>
-          <p className="fx-kit-note">{sale && <>오픈기념가 · 11월 28일(토) 24:00까지<br /></>}Claude 구독 미포함 (Claude Pro 이상 별도 구독) · macOS · Windows 지원</p>
+          <p className="fx-kit-note">{sale && <>오픈기념가 · 11월 28일(토) 23:59까지 주문 (마감 전에 연 결제 화면은 30분 유예)<br /></>}Claude 구독 미포함 (Claude Pro 이상 별도 구독) · macOS · Windows(미리보기) 지원</p>
           <div className="fx-kit-actions">
             <a href="/videokit" className="fx-pill fx-pill-videokit">상품 자세히 보기 <ArrowRight size={18} aria-hidden="true" /></a>
             <a href="/videokit#buy" className="fx-kit-link">구매 안내 · 환불</a>
           </div>
-          <p className="fx-kit-note">결제하기에서 계좌이체 또는 카드 · 간편결제로 구매합니다. 결제(입금)가 확인되면 이메일로 키트 다운로드 링크(맥용 · 윈도우용)를 보내드립니다.</p>
+          <p className="fx-kit-note">결제하기에서 계좌이체로 구매합니다(카드 · 간편결제는 심사 중). 입금이 확인되면 이메일로 키트 다운로드 링크(맥용 · 윈도우용)를 보내드립니다.</p>
         </div>
       </article>
       <article className="fx-typecut-banner">

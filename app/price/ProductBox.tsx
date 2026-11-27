@@ -14,7 +14,7 @@ export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier })
     </div></div>
     <div className="vk-prod-copy">
       <p className="for lec">이미 키트를 구입하셨다면</p>
-      <h2>1:1 강의권 2회</h2>
+      <h2>키트 구매자 1:1 강의권</h2>
       <p className="meta">키트를 먼저 구입한 뒤 강의가 필요해졌을 때 신청합니다. 키트 파일은 들어 있지 않습니다. 일정은 개별 조율합니다.</p>
       <ul className="inc"><li>1:1 강의 2회 · 총 2시간</li><li>클로드 코드 사용법</li><li>키트 설치 원격 지원</li></ul>
     </div>
