@@ -40,7 +40,7 @@ await withServer({port:3035,password,preview:true}, async request => {
   for (const path of ['/price/other', '/videokit/secret.html', '/videokit/instructor']) { const r = await request(path); assert.equal(r.status, 307, path); }
   for (const path of ['/videokit', '/videokit/diagram.html']) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /text\/html/);
-    if (path === '/videokit') { const html = await r.text(); assert.ok(html.includes('src="/videokit/diagram.html"')); assert.ok(html.includes('open.kakao.com')); for (const plan of ['kit', 'lesson', 'pass']) assert.ok(html.includes(`href="/price?plan=${plan}"`), `buy button ${plan}`); assert.ok(!html.includes('신청서 작성')); }
+    if (path === '/videokit') { const html = await r.text(); assert.ok(html.includes('src="/videokit/diagram.html"')); assert.ok(html.includes('href="/blog"'), 'videokit blog link'); assert.ok(html.includes('open.kakao.com')); for (const plan of ['kit', 'lesson', 'pass']) assert.ok(html.includes(`href="/price?plan=${plan}"`), `buy button ${plan}`); assert.ok(!html.includes('신청서 작성')); }
   }
   // 상품별 이미지(키트 · 키트 + 강의 · 강의권)는 공개 경로여야 한다. 막히면 307로 이미지가 깨진다.
   for (const path of ['/videokit/product.png', '/videokit/plan-kit.png', '/videokit/plan-lesson.png', '/videokit/plan-pass.png']) {

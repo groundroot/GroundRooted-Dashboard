@@ -4,7 +4,7 @@ description: "영상을 만들고, 그 영상을 만드는 도구를 만들면�
 date: "2026-11-27"
 category: "소식"
 slug: "opening-groundrooted-blog"
-draft: true
+draft: false
 ---
 
 그라운드루티드는 영상을 만들고, 영상을 만드는 도구도 만듭니다. 지금 만들고 있는 도구는 클로드에게 영상 편집을 맡기는 키트, **클로드 비디오 키트**입니다.

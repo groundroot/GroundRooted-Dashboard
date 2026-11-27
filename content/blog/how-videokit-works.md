@@ -4,7 +4,7 @@ description: "클로드 비디오 키트는 일을 사람, 클로드, 컴퓨터 
 date: "2026-11-27"
 category: "제작 스토리"
 slug: "how-videokit-works"
-draft: true
+draft: false
 cta: true
 ---
 
