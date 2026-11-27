@@ -52,7 +52,7 @@ export default function HomePage() {
         <div className="fx-kit-copy">
           <p className="fx-kit-status"><span aria-hidden="true" />지금 판매 중</p>
           <h2 id="kit-heading">클로드 비디오 키트</h2>
-          <p className="fx-kit-lede">영상 제작은 클로드에게, 검수는 파이널컷에서. 편집 프로그램이 없다면 MP4 · MOV 파일로 바로 받을 수 있습니다.</p>
+          <p className="fx-kit-lede">영상 제작은 클로드에게, 검수는 쓰시는 편집 프로그램에서. 편집 프로그램이 없다면 MP4 · MOV 파일로 바로 받을 수 있습니다.</p>
           <p className="fx-kit-new"><b>NEW</b><span>2026.11.26 업데이트 · 윈도우 버전 배포 · 다빈치 리졸브(베타) 버전 공개 — 윈도우판</span></p>
           <ul className="fx-kit-plans">
             {kitPlans.map((p) => <li key={p.id}>
