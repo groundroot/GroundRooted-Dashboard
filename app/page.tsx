@@ -66,6 +66,7 @@ export default function HomePage() {
           <p className="fx-kit-note">{sale && <>오픈기념가 · 11월 28일(토) 23:59까지 주문 (마감 전에 연 결제 화면은 30분 유예)<br /></>}Claude 구독 미포함 (Claude Pro 이상 별도 구독) · macOS · Windows(미리보기) 지원</p>
           <div className="fx-kit-actions">
             <a href="/videokit" className="fx-pill fx-pill-videokit">상품 자세히 보기 <ArrowRight size={18} aria-hidden="true" /></a>
+            <a href="/videokit/demo" className="fx-kit-link">작동 방식 체험해 보기</a>
             <a href="/videokit#skills" className="fx-kit-link">스킬 36개 전체 보기 (최신 개발판)</a>
             <a href="/videokit#buy" className="fx-kit-link">구매 안내 · 환불</a>
           </div>

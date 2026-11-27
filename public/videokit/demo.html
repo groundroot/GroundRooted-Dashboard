@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="클로드 비디오 키트의 편집자 인터뷰를 체험하고, 답변이 편집 계획으로 이어지는 과정을 살펴보세요.">
+  <title>편집자 인터뷰 데모 | 클로드 비디오 키트</title>
+  <link rel="stylesheet" href="/videokit/demo.css">
+  <script src="/videokit/demo.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <nav class="wrap" aria-label="주 메뉴">
+      <a class="brand" href="/">그라운드루티드</a>
+      <a class="back-link" href="/videokit">클로드 비디오 키트 소개</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <header class="intro">
+      <h1>편집자 인터뷰<span>.</span></h1>
+      <p>편집자에게 브리프를 주듯 답해 보세요. 고른 답이 편집 계획에 반영됩니다.</p>
+    </header>
+
+    <noscript><p class="notice">인터뷰를 진행하려면 자바스크립트를 켜 주세요. <a href="/videokit/diagram.html">빌드 코어 구조도 보기</a></p></noscript>
+
+    <section id="interview" class="interview" aria-labelledby="question" hidden>
+      <aside class="brief">
+        <div class="source-label">가상 촬영본 <span>1개</span></div>
+        <div class="source-art" aria-hidden="true">
+          <svg viewBox="0 0 280 110" fill="none" focusable="false">
+            <path d="M20 22V12h10m220 0h10v10M20 88v10h10m220 0h10V88" stroke="currentColor" stroke-width="2"/>
+            <path d="M30 55h16l6-13 7 31 8-42 8 60 8-70 8 49 7-21 7 6h20l7-14 8 31 8-45 8 61 8-52 8 31 7-21 8 9h10l7-11 8 26 8-40 8 56 8-43 7 12h18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <h2>강연 뒤, 한 사람의 이야기</h2>
+        <p class="source-file">lecture-interview.mov <span>·</span> 18분</p>
+        <p class="source-story">강연자 한 명이 자신의 첫 프로젝트를 돌아보는 인터뷰입니다.</p>
+        <p class="demo-note">선택은 이 화면에서만 처리됩니다. 영상 생성이나 Claude 호출 없이 체험할 수 있습니다.</p>
+      </aside>
+
+      <form id="question-form" class="question-panel">
+        <div class="progress-heading">
+          <span id="topic"></span>
+          <span id="step-count"></span>
+        </div>
+        <progress id="progress" aria-label="인터뷰 진행"></progress>
+        <h2 id="question" tabindex="-1"></h2>
+        <p id="question-help" class="question-help"></p>
+        <fieldset aria-labelledby="question" aria-describedby="question-help" id="options"></fieldset>
+        <div class="actions">
+          <button type="button" class="button secondary" id="previous">이전</button>
+          <button type="submit" class="button primary" id="next" disabled>다음</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="result" aria-labelledby="plan-heading" hidden>
+      <section class="plan">
+        <h2 id="plan-heading" tabindex="-1">이렇게 만들겠습니다</h2>
+        <p id="plan-intro" class="section-copy"></p>
+        <dl id="plan-details"></dl>
+        <h3>적용 규칙</h3>
+        <ul id="plan-rules"></ul>
+      </section>
+
+      <section class="build" aria-labelledby="build-heading">
+        <h2 id="build-heading">빌드 코어의 작업 흐름</h2>
+        <p class="section-copy">실제 키트는 계획을 확인받은 뒤 빌드를 시작합니다. Claude는 장면과 콘티를 판단하고, PC는 받아쓰기와 파일 생성을 맡습니다.</p>
+        <p class="cost-note">‘무료’는 해당 PC 처리에 Claude 사용량이나 별도 API 요금이 없다는 뜻입니다. Claude 구독, 편집 앱, 유료 소스 비용은 별도입니다.</p>
+        <ol id="build-steps"></ol>
+        <a class="detail-link" href="/videokit/diagram.html">전체 구조도 보기</a>
+      </section>
+
+      <section class="finish" aria-labelledby="finish-heading">
+        <h2 id="finish-heading">내 촬영본으로 시작하기</h2>
+        <p class="section-copy">파이널컷 프로는 정식, 캡컷·다빈치 리졸브·프리미어 프로는 베타입니다. FilmCraft는 지원 예정입니다.</p>
+        <div class="finish-actions">
+          <a class="button primary" href="/price?plan=kit">키트 구매</a>
+          <a class="button secondary" href="/price?plan=lesson">키트 + 1:1 강의 통합본</a>
+          <button type="button" class="button text-button" id="reset">처음으로 돌아가기</button>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <footer class="footer wrap">
+    <a href="/videokit">클로드 비디오 키트 소개</a>
+    <a href="/">그라운드루티드 홈</a>
+  </footer>
+
+  <template id="option-template">
+    <label class="option">
+      <input type="radio" name="answer">
+      <span class="option-copy"><strong></strong><span></span></span>
+    </label>
+  </template>
+</body>
+</html>
