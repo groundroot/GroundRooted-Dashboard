@@ -50,7 +50,10 @@ await withServer({port:3035,password,preview:true}, async request => {
   // 키트 짧은 다운로드 링크는 로그인 없이 열린다. 형식이 틀린 코드 = 만료 페이지(404), 형식이 맞으면 DB 조회(설정이 없으면 '잠시 후 다시')
   { const r = await request('/d/0000OOOO'); assert.equal(r.status, 404); assert.match(r.headers.get('x-robots-tag'), /noindex/); assert.ok((await r.text()).includes('링크가 만료되었습니다')); }
   { const r = await request('/d/ABCD2345'); assert.ok([200, 404].includes(r.status), `/d ${r.status}`); assert.match(await r.text(), /잠시 후 다시 열어 주세요|링크가 만료되었습니다|키트 내려받기/); }
-  { const r = await request('/d/ABCD2345/mac'); assert.ok([303, 503].includes(r.status), `/d/mac ${r.status}`); }
+  // 버튼은 POST 폼. GET(메일 검사기 · 미리보기)은 세지 않고 페이지로 303
+  { const r = await request('/d/abcd2345/mac'); assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/d/ABCD2345'); }
+  { const r = await fetch('http://127.0.0.1:3035/d/ABCD2345/mac', { method: 'POST', redirect: 'manual' }); assert.ok([303, 503].includes(r.status), `POST /d/mac ${r.status}`); }
+  { const r = await request('/d/ABCD2345'); assert.ok((await r.text()).match(/잠시 후 다시 열어 주세요|링크가 만료되었습니다|method="post"/)); }
   for (const path of ['/d/ABCD2345/linux', '/d/ABCD2345/mac/x', '/d']) { const r = await request(path); assert.equal(r.status, 307, path); }
   const typecut = await request('/typecut-pro');
   assert.equal(typecut.status,307);
