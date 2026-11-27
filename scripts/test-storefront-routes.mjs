@@ -31,7 +31,7 @@ await withServer({port:3035,password,preview:true}, async request => {
   for (const path of ['/', '/pdf-to-md', '/youtube-to-md']) {
     const r = await request(path); assert.equal(r.status,200,path); assert.match(r.headers.get('x-robots-tag'),/noindex/);
     const html=await r.text(); assert.ok(!html.includes('오늘 매출') && !html.includes('AI 에이전트 비용'), `HQ data in ${path}`);
-    if(path==='/') for(const href of ['/pdf-to-md','/youtube-to-md','https://groundroot.github.io/typecut-pro/','/videokit','/price?plan=kit','/price?plan=lesson','/price?plan=pass']) assert.ok(html.includes(`href="${href}"`));
+    if(path==='/') for(const href of ['/pdf-to-md','/youtube-to-md','https://groundroot.github.io/typecut-pro/','/videokit','/videokit/demo','/price?plan=kit','/price?plan=lesson','/price?plan=pass']) assert.ok(html.includes(`href="${href}"`));
     if(path==='/') for(const plan of ['kit','lesson','pass']) assert.ok(html.includes(`src="/videokit/plan-${plan}.png"`), `home thumb ${plan}`);
   }
   for (const [path, text] of [['/videokit/terms', '이용약관'], ['/videokit/privacy', '개인정보처리방침'], ['/price', '상품 선택'], ['/price', won(priceOf('kit', tierAt()))], ['/price?plan=kit', won(priceOf('kit', tierAt()))], ['/price?plan=lesson', won(priceOf('lesson', tierAt()))], ['/price?plan=pass', '키트 구매자 1:1 강의권'], ['/price?plan=toString', '상품 선택'], ['/price?plan=kit', '계좌이체'], ['/price?plan=kit', '1002-8619-7757'], ['/price?plan=kit', '환불'], ['/price/fail?code=PAY_PROCESS_CANCELED', '결제를 취소했습니다'], ['/price/success', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-x&amount=1&paymentKey=p', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-s-00000000-0000-0000-0000-000000000000&amount=100000&paymentKey=p', '결제를 확인하지 못했습니다']]) {
@@ -52,6 +52,7 @@ await withServer({port:3035,password,preview:true}, async request => {
     const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /text\/html/);
     if (path === '/videokit') { const html = await r.text(); assert.ok(html.includes('src="/videokit/diagram.html"')); assert.ok(html.includes('href="/blog"'), 'videokit blog link'); assert.ok(html.includes('open.kakao.com')); for (const plan of ['kit', 'lesson', 'pass']) assert.ok(html.includes(`href="/price?plan=${plan}"`), `buy button ${plan}`); assert.ok(!html.includes('신청서 작성')); }
   }
+  assert.ok((await (await request('/videokit')).text()).includes('href="/videokit/demo"'), 'videokit demo link');
   // 상품별 이미지(키트 · 키트 + 강의 · 강의권)는 공개 경로여야 한다. 막히면 307로 이미지가 깨진다.
   for (const path of ['/videokit/product.png', '/videokit/plan-kit.png', '/videokit/plan-lesson.png', '/videokit/plan-pass.png']) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /image\/png/, path);
@@ -118,5 +119,17 @@ await withServer({port:3036,password:'',preview:true}, async request => {
 await withServer({port:3037,password,preview:false}, async request => {
   assert.equal((await request('/')).status,307);
   assert.equal((await request('/youtube-to-md')).status,307);
+  const demo = await request('/videokit/demo');
+  assert.equal(demo.status, 200);
+  const html = await demo.text();
+  assert.ok(html.includes('편집자 인터뷰'));
+  for (const plan of ['kit', 'lesson']) assert.ok(html.includes(`href="/price?plan=${plan}"`));
+  for (const [path, type] of [['/videokit/demo.css', /text\/css/], ['/videokit/demo.js', /javascript/]]) {
+    assert.ok(html.includes(path));
+    const asset = await request(path);
+    assert.equal(asset.status, 200);
+    assert.match(asset.headers.get('content-type'), type);
+  }
+  assert.equal((await request('/videokit/demo/private')).status, 404);
 });
 console.log('PASS: storefront allowlist, no HQ content, invalid/missing/valid auth, fail-closed config, preview gate.');
