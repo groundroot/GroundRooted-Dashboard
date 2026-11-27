@@ -162,3 +162,35 @@ export async function notifySeller(o: Pick<Order, 'orderId' | 'plan' | 'amount' 
   if (!res?.ok) console.error('[videokit] seller notice failed', o.orderId, res?.status);
   return !!res?.ok;
 }
+
+// 토스 API가 IP 차단(API_KEY_ACCESS_DENIED)으로 막혔을 때 판매자에게 보내는 알림. 같은 주문 · 같은 단계는 24시간 안에 한 번만 간다.
+// where: 'confirm'(결제 승인 — 승인되지 않아 돈은 빠져나가지 않음) · 'lookup'(결제 조회) · 'webhook'(가상계좌 입금 확인 — 토스가 다시 보냄)
+export type TossBlock = { orderId: string; where: 'confirm' | 'lookup' | 'webhook'; ip: string };
+const BLOCK_NOTE: Record<TossBlock['where'], string> = {
+  confirm: '카드 · 간편결제 승인이 막혔습니다. 승인되지 않았으니 구매자 돈은 빠져나가지 않았고, 화면에서 계좌이체로 안내했습니다.',
+  lookup: '이미 승인된 결제를 조회하지 못했습니다. 토스 상점관리자에서 이 주문을 확인하고 키트를 직접 보내 주세요.',
+  webhook: '가상계좌 입금 알림을 받았지만 결제를 조회하지 못해 키트 메일을 보내지 못했습니다. 토스가 다시 보내지만, 상점관리자에서 입금을 확인하고 키트를 직접 보내 주세요.',
+};
+export function tossBlockNotice(b: TossBlock) {
+  const rows: [string, string][] = [['상황', BLOCK_NOTE[b.where]], ['주문번호', b.orderId], ['토스가 본 요청 IP', b.ip || '알 수 없음'],
+    ['할 일', '토스 개발자센터에서 API 키 허용 IP를 확인하세요 (website/toss-ip-allowlist.md).']];
+  const line = (s: string) => s.replace(/[\r\n]+/g, ' ');
+  return {
+    subject: `[결제 오류] 토스 API IP 차단 · ${line(b.orderId)}`,
+    text: rows.map(([k, v]) => `${k}: ${line(v)}`).join('\n'),
+    html: `<table style="font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;font-size:15px;border-collapse:collapse">${rows.map(([k, v]) => `<tr><td style="padding:6px 16px 6px 0;color:#666">${k}</td><td style="padding:6px 0"><b>${esc(v)}</b></td></tr>`).join('')}</table>`,
+  };
+}
+export async function alertTossBlocked(b: TossBlock) {
+  console.error('[videokit] toss API_KEY_ACCESS_DENIED', b.where, b.orderId, b.ip);
+  const key = env('RESEND_API_KEY'), from = env('VIDEOKIT_MAIL_FROM');
+  if (!key || !from) return false;
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json', 'Idempotency-Key': `vk-tossblock-${b.where}-${b.orderId}` },
+    body: JSON.stringify({ from, to: [env('VIDEOKIT_APPLY_TO', 'sungchulkang@groundrooted.com')], ...tossBlockNotice(b) }),
+    cache: 'no-store',
+  }).catch(() => null);
+  if (!res?.ok) console.error('[videokit] toss block alert failed', b.orderId, res?.status);
+  return !!res?.ok;
+}

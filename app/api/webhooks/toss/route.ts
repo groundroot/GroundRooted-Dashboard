@@ -2,19 +2,19 @@
 // 토스 개발자센터 > 웹훅에 https://groundrooted.com/api/webhooks/toss 를 등록하고 DEPOSIT_CALLBACK 이벤트를 고른다.
 // 본문은 믿지 않는다: 주문번호로 결제를 다시 조회해 secret · 상태 · 금액을 확인한 뒤에만 보낸다 (depositReady).
 // 토스는 10초 안에 200을 받지 못하면 최대 7번 다시 보낸다. 같은 주문 메일은 Resend 멱등 키로 한 번만 나간다.
-import { depositReady, kitMailAllowed, nameOf, paymentSecret, type TossPayment } from '@/products/videokit';
-import { deliverKit } from '@/products/videokit-delivery';
+import { depositReady, isOrderId, kitMailAllowed, nameOf, paymentSecret, type TossPayment } from '@/products/videokit';
+import { alertTossBlocked, deliverKit } from '@/products/videokit-delivery';
+import { deniedIp, ipDenied, tossRequest } from '@/products/toss';
 
 export const dynamic = 'force-dynamic';
 
-async function lookup(orderId: string): Promise<TossPayment | null> {
+// 결제 조회. 토스가 IP 차단(API_KEY_ACCESS_DENIED)으로 막으면 { denied } 를 돌려준다.
+async function lookup(orderId: string): Promise<{ payment: TossPayment | null } | { denied: string }> {
   const { secretKey, consistent } = paymentSecret();
-  if (!consistent) return null;
-  const res = await fetch(`https://api.tosspayments.com/v1/payments/orders/${encodeURIComponent(orderId)}`, {
-    headers: { Authorization: `Basic ${Buffer.from(`${secretKey}:`).toString('base64')}` },
-    cache: 'no-store',
-  });
-  return res.ok ? res.json() : null;
+  if (!consistent) return { payment: null };
+  const r = await tossRequest<TossPayment>(`/v1/payments/orders/${encodeURIComponent(orderId)}`, secretKey);
+  if (ipDenied(r.data)) return { denied: deniedIp(r.data.message) };
+  return { payment: r.ok ? r.data : null };
 }
 
 export async function POST(req: Request) {
@@ -23,7 +23,14 @@ export async function POST(req: Request) {
   if (!body || typeof body.orderId !== 'string' || typeof body.secret !== 'string') return new Response('ignored', { status: 200 });
   if (body.status !== 'DONE') return new Response('not deposited', { status: 200 });
 
-  const payment = await lookup(body.orderId);
+  const found = await lookup(body.orderId);
+  // IP 차단으로 조회가 막히면 입금된 주문을 놓치지 않도록 판매자에게 알리고 500으로 돌려 토스가 다시 보내게 한다.
+  // 웹훅 본문은 누구나 보낼 수 있으므로 우리 주문번호 형식일 때만 알린다.
+  if ('denied' in found) {
+    if (isOrderId(body.orderId)) await alertTossBlocked({ orderId: body.orderId, where: 'webhook', ip: found.denied }).catch(() => false);
+    return new Response('toss api denied', { status: 500 });
+  }
+  const { payment } = found;
   const ready = depositReady(body, payment);
   if (!ready.ok) {
     console.error('[videokit] deposit webhook rejected', body.orderId, ready.reason);

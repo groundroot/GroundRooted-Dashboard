@@ -116,3 +116,54 @@ console.log('PASS: videokit kit email');
   assert.ok(n.text.includes('\n영수증: 간이영수증\n영수증 받는 분: 홍길동\n영수증 번호: -'));
   console.log('PASS: videokit receipt request');
 }
+
+// 토스 API 호출 한 곳 모음 · IP 차단(API_KEY_ACCESS_DENIED) 처리 · 프록시 주소
+{
+  const { tossBase, tossRequest, ipDenied, deniedIp } = await import('../products/toss.ts');
+  const { tossBlockNotice } = await import('../products/videokit-delivery.ts');
+  const { isOrderId } = await import('../products/videokit.ts');
+  for (const k of ['TOSS_API_BASE_URL', 'TOSS_API_PROXY_SECRET']) delete process.env[k];
+  assert.equal(tossBase(), 'https://api.tosspayments.com');
+  process.env.TOSS_API_BASE_URL = 'https://toss-proxy.example.com/';
+  assert.equal(tossBase(), 'https://toss-proxy.example.com');
+  for (const bad of ['http://plain.example.com', 'toss-proxy.example.com', 'https://a b', ' ']) {
+    process.env.TOSS_API_BASE_URL = bad; assert.equal(tossBase(), 'https://api.tosspayments.com', bad);   // https 아닌 주소는 무시
+  }
+  const denied = { code: 'API_KEY_ACCESS_DENIED', message: '허용되지 않은 IP입니다. 요청 IP: 34.201.144.237' };
+  assert.ok(ipDenied(denied) && !ipDenied({ code: 'NOT_FOUND_PAYMENT' }) && !ipDenied(null) && !ipDenied(undefined));
+  assert.equal(deniedIp(denied.message), '34.201.144.237');
+  assert.equal(deniedIp('요청 IP: 2001:db8::1'), '2001:db8::1');
+  assert.equal(deniedIp(undefined), ''); assert.equal(deniedIp('IP 없음'), '');
+  // 실제 요청: 프록시 주소 · 인증 헤더 · 프록시 시크릿 헤더
+  const realFetch = globalThis.fetch;
+  const seen = [];
+  globalThis.fetch = async (url, init) => { seen.push({ url, init }); return new Response(JSON.stringify(denied), { status: 403 }); };
+  try {
+    process.env.TOSS_API_BASE_URL = 'https://toss-proxy.example.com'; process.env.TOSS_API_PROXY_SECRET = 'px';
+    const r = await tossRequest('/v1/payments/confirm', 'live_gsk_x', { paymentKey: 'k', orderId: 'o', amount: 1 });
+    assert.equal(seen[0].url, 'https://toss-proxy.example.com/v1/payments/confirm');
+    assert.equal(seen[0].init.method, 'POST');
+    assert.equal(seen[0].init.headers.Authorization, `Basic ${Buffer.from('live_gsk_x:').toString('base64')}`);
+    assert.equal(seen[0].init.headers['X-Proxy-Secret'], 'px');
+    assert.ok(!r.ok && r.status === 403 && ipDenied(r.data));
+    delete process.env.TOSS_API_BASE_URL;
+    await tossRequest('/v1/payments/orders/x', 'live_gsk_x');
+    assert.equal(seen[1].url, 'https://api.tosspayments.com/v1/payments/orders/x');
+    assert.equal(seen[1].init.method, 'GET');
+    assert.equal(seen[1].init.headers['X-Proxy-Secret'], undefined);                   // 토스에 바로 갈 때는 프록시 시크릿을 보내지 않는다
+    globalThis.fetch = async () => { throw new Error('offline'); };
+    const off = await tossRequest('/v1/payments/x', 'k');
+    assert.ok(!off.ok && off.status === 0 && off.data.code === 'NETWORK_ERROR' && !ipDenied(off.data));
+  } finally {
+    globalThis.fetch = realFetch;
+    for (const k of ['TOSS_API_BASE_URL', 'TOSS_API_PROXY_SECRET']) delete process.env[k];
+  }
+  // 판매자 알림: 제목 [결제 오류], 줄바꿈 끼워 넣기 방지
+  const id = makeOrderId('kit', 's', '123e4567-e89b-42d3-a456-426614174000');
+  const n = tossBlockNotice({ orderId: id, where: 'confirm', ip: '34.201.144.237' });
+  assert.equal(n.subject, `[결제 오류] 토스 API IP 차단 · ${id}`);
+  assert.ok(n.text.includes('돈은 빠져나가지 않았') && n.text.includes('토스가 본 요청 IP: 34.201.144.237'));
+  assert.ok(tossBlockNotice({ orderId: id, where: 'webhook', ip: '' }).text.includes('알 수 없음'));
+  assert.ok(isOrderId(id) && !isOrderId('vk-kit-' + randomUUID()) && !isOrderId(undefined));
+  console.log('PASS: toss api ip-block handling');
+}

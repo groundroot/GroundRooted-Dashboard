@@ -35,6 +35,7 @@ export const nameOf = (plan: PlanId, tier: Tier) => (tier === 's' ? plans[plan].
 
 const ORDER_ID = /^vk-(kit|lesson|pass)-(s|r)-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/;
 export const makeOrderId = (plan: PlanId, tier: Tier, uuid: string) => `vk-${plan}-${tier}-${uuid}`;
+export const isOrderId = (v: unknown): v is string => typeof v === 'string' && ORDER_ID.test(v);
 
 // 승인 요청 전에 주문번호와 금액이 서버 가격표와 맞는지 확인한다.
 // 할인가 주문(s)은 마감 + 30분까지만 받는다.
