@@ -66,7 +66,7 @@ await withServer({port:3035,password,preview:true}, async request => {
     const html = await r.text(); assert.match(html, /<meta name="robots" content="index, follow"/); assert.ok(html.includes('그라운드루티드 블로그'));
     const sitemap = await request('/sitemap.xml'); assert.equal(sitemap.status, 200); const sitemapXml = await sitemap.text(); assert.ok(sitemapXml.includes('https://groundrooted.com/blog</loc>'));
     const rss = await request('/blog/rss.xml'); assert.equal(rss.status, 200); assert.match(rss.headers.get('content-type'), /rss\+xml/); const rssXml = await rss.text();
-    const robots = await request('/robots.txt'); assert.equal(robots.status, 200); assert.ok((await robots.text()).includes('Sitemap: https://groundrooted.com/sitemap.xml'));
+    const robots = await request('/robots.txt'); assert.equal(robots.status, 200); const robotsTxt = await robots.text(); assert.ok(robotsTxt.includes('Sitemap: https://groundrooted.com/sitemap.xml')); for (const d of ['/d/', '/login', '/api/', '/admin']) assert.ok(robotsTxt.includes(`Disallow: ${d}`), `robots ${d}`);
     for (const file of readdirSync('content/blog').filter(f => f.endsWith('.md') && !f.startsWith('_'))) {
       const fm = readFileSync(`content/blog/${file}`, 'utf8').split(/^---$/m)[1];
       const slug = fm.match(/^slug:\s*"?([a-z0-9-]+)"?/m)?.[1] ?? file.replace(/\.md$/, '');
@@ -75,7 +75,10 @@ await withServer({port:3035,password,preview:true}, async request => {
       if (!draft) assert.match(await post.text(), /<meta name="robots" content="index, follow"/, `/blog/${slug} robots`);
       for (const [where, text] of [['/blog', html], ['sitemap', sitemapXml], ['rss', rssXml]]) assert.equal(text.includes(`/blog/${slug}`), !draft, `${slug} in ${where}`);
     }
-    for (const path of ['/blogx', '/blog-admin']) { const x = await request(path); assert.equal(x.status, 307, path); }
+    // 블로그 밖 주소는 열리지 않는다(로그인 307 또는 없는 경로 404).
+    for (const path of ['/blogx', '/blog-admin']) { const x = await request(path); assert.ok([307, 404].includes(x.status), `${path} ${x.status}`); }
+    for (const path of ['/videokit', '/videokit/terms', '/videokit/privacy', '/price', '/pdf-to-md', '/youtube-to-md']) assert.ok(sitemapXml.includes(`https://groundrooted.com${path}</loc>`), `sitemap ${path}`);
+    assert.ok(sitemapXml.includes('<loc>https://groundrooted.com</loc>'), 'sitemap /');
   }
   const typecut = await request('/typecut-pro');
   assert.equal(typecut.status,307);
