@@ -16,6 +16,8 @@ export async function proxy(req: NextRequest) {
     response.headers.set("X-Robots-Tag", "noindex, nofollow");
     return response;
   }
+  // 공개 블로그(/blog, /blog/글, /blog/rss.xml, public/blog/ 이미지)와 검색엔진용 sitemap · robots. "/blogx" 같은 주소는 열지 않는다.
+  if (req.nextUrl.pathname === "/blog" || req.nextUrl.pathname.startsWith("/blog/") || ["/sitemap.xml", "/robots.txt"].includes(req.nextUrl.pathname)) return NextResponse.next();
   // Data-free storefront routes only. Private HQ remains behind the password gate.
   if (["/", "/pdf-to-md", "/youtube-to-md", "/typecut-pro"].includes(req.nextUrl.pathname) &&
       (process.env.NODE_ENV === "development" || process.env.MARKETING_PREVIEW_ENABLED === "true")) {

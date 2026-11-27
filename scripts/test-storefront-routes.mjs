@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
 import { randomBytes } from 'node:crypto';
+import { readdirSync, readFileSync } from 'node:fs';
 import { authToken } from '../lib/auth.ts';
 import { editorialPublicPaths, paperMotionPath } from '../products/editorial-media.ts';
 import { priceOf, tierAt } from '../products/videokit.ts';
@@ -59,6 +60,22 @@ await withServer({port:3035,password,preview:true}, async request => {
   { const r = await fetch('http://127.0.0.1:3035/d/ABCD2345/mac', { method: 'POST', redirect: 'manual' }); assert.ok([303, 503].includes(r.status), `POST /d/mac ${r.status}`); }
   { const r = await request('/d/ABCD2345'); assert.ok((await r.text()).match(/잠시 후 다시 열어 주세요|링크가 만료되었습니다|method="post"/)); }
   for (const path of ['/d/ABCD2345/linux', '/d/ABCD2345/mac/x', '/d']) { const r = await request(path); assert.equal(r.status, 307, path); }
+  // 공개 블로그: 로그인 없이 열리고 색인을 허용한다. 운영(next start, VERCEL_ENV 없음)에서 초안은 목록 · 글 · 사이트맵 · RSS 어디에도 없다.
+  {
+    const r = await request('/blog'); assert.equal(r.status, 200, '/blog'); assert.equal(r.headers.get('x-robots-tag'), null, '/blog robots header');
+    const html = await r.text(); assert.match(html, /<meta name="robots" content="index, follow"/); assert.ok(html.includes('그라운드루티드 블로그'));
+    const sitemap = await request('/sitemap.xml'); assert.equal(sitemap.status, 200); const sitemapXml = await sitemap.text(); assert.ok(sitemapXml.includes('https://groundrooted.com/blog</loc>'));
+    const rss = await request('/blog/rss.xml'); assert.equal(rss.status, 200); assert.match(rss.headers.get('content-type'), /rss\+xml/); const rssXml = await rss.text();
+    const robots = await request('/robots.txt'); assert.equal(robots.status, 200); assert.ok((await robots.text()).includes('Sitemap: https://groundrooted.com/sitemap.xml'));
+    for (const file of readdirSync('content/blog').filter(f => f.endsWith('.md') && !f.startsWith('_'))) {
+      const fm = readFileSync(`content/blog/${file}`, 'utf8').split(/^---$/m)[1];
+      const slug = fm.match(/^slug:\s*"?([a-z0-9-]+)"?/m)?.[1] ?? file.replace(/\.md$/, '');
+      const draft = /^draft:\s*true\s*$/m.test(fm);
+      const post = await request(`/blog/${slug}`); assert.equal(post.status, draft ? 404 : 200, `/blog/${slug}`);
+      for (const [where, text] of [['/blog', html], ['sitemap', sitemapXml], ['rss', rssXml]]) assert.equal(text.includes(`/blog/${slug}`), !draft, `${slug} in ${where}`);
+    }
+    for (const path of ['/blogx', '/blog-admin']) { const x = await request(path); assert.equal(x.status, 307, path); }
+  }
   const typecut = await request('/typecut-pro');
   assert.equal(typecut.status,307);
   assert.equal(typecut.headers.get('location'),'https://groundroot.github.io/typecut-pro/');
