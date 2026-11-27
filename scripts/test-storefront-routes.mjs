@@ -8,7 +8,7 @@ import { priceOf, tierAt } from '../products/videokit.ts';
 const won = n => `${new Intl.NumberFormat('ko-KR').format(n)}원`;
 
 async function withServer({ port, password, preview }, run) {
-  const server = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', '127.0.0.1', '--port', String(port)], {
+  const server = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', 'localhost', '--port', String(port)], {
     env: { ...process.env, NODE_ENV: 'production', DASHBOARD_PASSWORD: password, MARKETING_PREVIEW_ENABLED: String(preview) },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
@@ -21,7 +21,7 @@ async function withServer({ port, password, preview }, run) {
       server.stdout.on('data', chunk => { if (chunk.toString().includes('Ready in')) { ready = true; clearTimeout(timer); resolve(); } });
       server.stderr.on('data', () => {});
     });
-    await run(async (path, cookie) => fetch(`http://127.0.0.1:${port}${path}`, { redirect: 'manual', headers: cookie ? { cookie } : {} }));
+    await run(async (path, cookie) => fetch(`http://localhost:${port}${path}`, { redirect: 'manual', headers: cookie ? { cookie } : {} }));
   } finally {
     if (server.exitCode === null) { server.kill('SIGTERM'); const killTimer = setTimeout(() => server.kill('SIGKILL'), 3000); await new Promise(resolve => server.once('exit',resolve)); clearTimeout(killTimer); }
   }
@@ -34,10 +34,20 @@ await withServer({port:3035,password,preview:true}, async request => {
     if(path==='/') for(const href of ['/pdf-to-md','/youtube-to-md','https://groundroot.github.io/typecut-pro/','/videokit','/price?plan=kit','/price?plan=lesson','/price?plan=pass']) assert.ok(html.includes(`href="${href}"`));
     if(path==='/') for(const plan of ['kit','lesson','pass']) assert.ok(html.includes(`src="/videokit/plan-${plan}.png"`), `home thumb ${plan}`);
   }
-  for (const [path, text] of [['/videokit/terms', '이용약관'], ['/videokit/privacy', '개인정보처리방침'], ['/price', '상품 선택'], ['/price', won(priceOf('kit', tierAt()))], ['/price?plan=kit', won(priceOf('kit', tierAt()))], ['/price?plan=lesson', won(priceOf('lesson', tierAt()))], ['/price?plan=pass', '1:1 강의권 2회'], ['/price?plan=toString', '상품 선택'], ['/price?plan=kit', '계좌이체'], ['/price?plan=kit', '1002-8619-7757'], ['/price?plan=kit', '환불'], ['/price/fail?code=PAY_PROCESS_CANCELED', '결제를 취소했습니다'], ['/price/success', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-x&amount=1&paymentKey=p', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-s-00000000-0000-0000-0000-000000000000&amount=100000&paymentKey=p', '결제를 확인하지 못했습니다']]) {
+  for (const [path, text] of [['/videokit/terms', '이용약관'], ['/videokit/privacy', '개인정보처리방침'], ['/price', '상품 선택'], ['/price', won(priceOf('kit', tierAt()))], ['/price?plan=kit', won(priceOf('kit', tierAt()))], ['/price?plan=lesson', won(priceOf('lesson', tierAt()))], ['/price?plan=pass', '키트 구매자 1:1 강의권'], ['/price?plan=toString', '상품 선택'], ['/price?plan=kit', '계좌이체'], ['/price?plan=kit', '1002-8619-7757'], ['/price?plan=kit', '환불'], ['/price/fail?code=PAY_PROCESS_CANCELED', '결제를 취소했습니다'], ['/price/success', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-x&amount=1&paymentKey=p', '결제를 확인하지 못했습니다'], ['/price/success?orderId=vk-kit-s-00000000-0000-0000-0000-000000000000&amount=100000&paymentKey=p', '결제를 확인하지 못했습니다']]) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.ok((await r.text()).includes(text), `${path} should include ${text}`);
   }
-  for (const path of ['/price/other', '/videokit/secret.html', '/videokit/instructor']) { const r = await request(path); assert.equal(r.status, 307, path); }
+  // 대시보드가 아닌 없는 · 비공개 주소는 로그인(307) 대신 404 화면. 허용 목록에 없는 실제 파일도 내주지 않는다.
+  for (const path of ['/price/other', '/videokit/secret.html', '/videokit/instructor', '/media/readymd/astra-200-page-estimates.csv']) {
+    const r = await request(path); assert.equal(r.status, 404, path); assert.match(r.headers.get('x-robots-tag'), /noindex/, path);
+    const html = await r.text(); assert.ok(html.includes('페이지를 찾을 수 없습니다'), `${path} 404 page`); assert.ok(!html.includes('pages,'), `${path} leaked file`);
+  }
+  // 옛 계좌이체 안내 → 결제 화면(키트)으로 영구 이동
+  for (const path of ['/videokit/transfer', '/videokit/transfer.html']) { const r = await request(path); assert.equal(r.status, 308, path); assert.equal(r.headers.get('location'), '/price?plan=kit', path); }
+  // /price?plan: 옛 ticket → 강의권, 모르는 값 → 아무것도 고르지 않음
+  { const html = await (await request('/price?plan=ticket')).text(); assert.match(html, /name="plan" checked="" value="pass"/); }
+  for (const path of ['/price?plan=zzz', '/price?plan=toString']) { const html = await (await request(path)).text(); assert.ok(!/name="plan" checked=""/.test(html), path); assert.ok(html.includes('위 목록에서 상품을 골라 주세요'), path); }
+  { const html = await (await request('/price')).text(); assert.match(html, /name="plan" checked="" value="kit"/); }
   for (const path of ['/videokit', '/videokit/diagram.html']) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /text\/html/);
     if (path === '/videokit') { const html = await r.text(); assert.ok(html.includes('src="/videokit/diagram.html"')); assert.ok(html.includes('href="/blog"'), 'videokit blog link'); assert.ok(html.includes('open.kakao.com')); for (const plan of ['kit', 'lesson', 'pass']) assert.ok(html.includes(`href="/price?plan=${plan}"`), `buy button ${plan}`); assert.ok(!html.includes('신청서 작성')); }
@@ -57,9 +67,9 @@ await withServer({port:3035,password,preview:true}, async request => {
   { const r = await request('/d/ABCD2345'); assert.ok([200, 404].includes(r.status), `/d ${r.status}`); assert.match(await r.text(), /잠시 후 다시 열어 주세요|링크가 만료되었습니다|키트 내려받기/); }
   // 버튼은 POST 폼. GET(메일 검사기 · 미리보기)은 세지 않고 페이지로 303
   { const r = await request('/d/abcd2345/mac'); assert.equal(r.status, 303); assert.equal(r.headers.get('location'), '/d/ABCD2345'); }
-  { const r = await fetch('http://127.0.0.1:3035/d/ABCD2345/mac', { method: 'POST', redirect: 'manual' }); assert.ok([303, 503].includes(r.status), `POST /d/mac ${r.status}`); }
+  { const r = await fetch('http://localhost:3035/d/ABCD2345/mac', { method: 'POST', redirect: 'manual' }); assert.ok([303, 503].includes(r.status), `POST /d/mac ${r.status}`); }
   { const r = await request('/d/ABCD2345'); assert.ok((await r.text()).match(/잠시 후 다시 열어 주세요|링크가 만료되었습니다|method="post"/)); }
-  for (const path of ['/d/ABCD2345/linux', '/d/ABCD2345/mac/x', '/d']) { const r = await request(path); assert.equal(r.status, 307, path); }
+  for (const path of ['/d/ABCD2345/linux', '/d/ABCD2345/mac/x', '/d']) { const r = await request(path); assert.equal(r.status, 404, path); }
   // 공개 블로그: 로그인 없이 열리고 색인을 허용한다. 운영(next start, VERCEL_ENV 없음)에서 초안은 목록 · 글 · 사이트맵 · RSS 어디에도 없다.
   {
     const r = await request('/blog'); assert.equal(r.status, 200, '/blog'); assert.equal(r.headers.get('x-robots-tag'), null, '/blog robots header');
@@ -88,8 +98,12 @@ await withServer({port:3035,password,preview:true}, async request => {
     assert.equal(asset.status, 200, path);
     assert.match(asset.headers.get('content-type'), path.endsWith('.mp4') ? /video\/mp4/ : /image\/webp/);
   }
-  for (const path of ['/admin/hq','/admin/hq?x=1','/pdf-to-md/private','/youtube-to-md/private','/media/editorial-v1/private','/media/private.png','/unknown']) {
-    for (const cookie of [undefined,'hq_auth=invalid']) { const r=await request(path,cookie); assert.equal(r.status,307,path); assert.equal(new URL(r.headers.get('location'), 'http://127.0.0.1').pathname,'/login'); }
+  // 로그인으로 보내는 곳은 대시보드(관리자 · API)뿐
+  for (const path of ['/admin','/admin/hq','/admin/hq?x=1','/api/unknown']) {
+    for (const cookie of [undefined,'hq_auth=invalid']) { const r=await request(path,cookie); assert.equal(r.status,307,path); assert.equal(new URL(r.headers.get('location'), 'http://localhost').pathname,'/login'); }
+  }
+  for (const path of ['/pdf-to-md/private','/youtube-to-md/private','/media/editorial-v1/private','/media/private.png','/unknown','/administrator']) {
+    for (const cookie of [undefined,'hq_auth=invalid']) { const r=await request(path,cookie); assert.equal(r.status,404,path); assert.equal(r.headers.get('location'),null,path); }
   }
   // Valid cookie must pass the gate; use a missing admin route to avoid reading HQ data.
   const allowed=await request('/admin/auth-probe',`hq_auth=${await authToken(password)}`);

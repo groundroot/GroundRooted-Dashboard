@@ -1,0 +1,5 @@
+/* 404 화면: 공개 사이트 공통 테마(flexibits-theme.css)의 색 · 버튼을 그대로 쓴다. */
+#gr-storefront .gr-not-found { padding-block: clamp(72px, 12vw, 140px); text-align: center; }
+#gr-storefront .gr-not-found h1 { font-size: clamp(30px, 4vw, 44px); font-weight: 730; letter-spacing: -.04em; line-height: 1.2; text-wrap: balance; }
+#gr-storefront .gr-not-found p { max-width: 34em; margin: 14px auto 0; color: var(--site-muted); font-size: 17px; line-height: 1.6; text-wrap: pretty; }
+#gr-storefront .gr-not-found .gr-not-found-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin-top: 32px; }

@@ -2,6 +2,12 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AUTH_COOKIE, authToken } from "@/lib/auth";
 
+export const metadata = {
+  title: "로그인 | GroundRooted HQ",
+  description: "GroundRooted 운영 대시보드 로그인 화면입니다.",
+  robots: { index: false, follow: false },
+};
+
 export default async function LoginPage({
   searchParams,
 }: {

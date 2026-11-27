@@ -28,7 +28,7 @@ function loadSdk(): Promise<void> {
 
 export type PlanOption = { id: PlanId; label: string; note: string; amount: number; regular: number; orderId: string; orderName: string; kit: boolean; lesson: boolean };
 type Props = {
-  plans: PlanOption[]; initial: PlanId; tier: Tier;
+  plans: PlanOption[]; initial: PlanId | null; tier: Tier;
   mode: 'widget' | 'window'; clientKey: string;
   // open: 카드 · 간편결제 사용 / pending: 심사 중(화면은 보이되 계좌이체를 기본으로) / off: 결제 설정 점검 중
   card: 'open' | 'pending' | 'off'; testKeys: boolean;
@@ -135,8 +135,10 @@ function Account({ bank, amount, name }: { bank: Props['bank']; amount: number; 
 }
 
 export default function Checkout(p: Props) {
-  const [planId, setPlanId] = useState<PlanId>(p.initial);
-  const plan = p.plans.find((x) => x.id === planId) ?? p.plans[0];
+  // 주소의 plan 값을 모르면(initial = null) 아무 상품도 고르지 않은 채로 연다. 고르기 전에는 상품 목록만 보인다.
+  const [planId, setPlanId] = useState<PlanId | null>(p.initial);
+  const chosen = p.plans.find((x) => x.id === planId);
+  const plan = chosen ?? p.plans[0];
   const [method, setMethod] = useState<'transfer' | 'card'>(p.card === 'open' ? 'card' : 'transfer');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<{ msg: string; mail?: string } | null>(null);
@@ -154,6 +156,7 @@ export default function Checkout(p: Props) {
 
   // 주소창의 ?plan= 을 고른 상품에 맞춘다 (새로고침해도 같은 상품)
   useEffect(() => {
+    if (!planId) return;
     const u = new URL(location.href);
     if (u.searchParams.get('plan') !== planId) { u.searchParams.set('plan', planId); history.replaceState(null, '', u); }
   }, [planId]);
@@ -163,7 +166,7 @@ export default function Checkout(p: Props) {
   amount.current = plan.amount;
   const loading = useRef(false);
   useEffect(() => {
-    if (!card || p.mode !== 'widget' || loading.current) return;
+    if (!card || !chosen || p.mode !== 'widget' || loading.current) return;
     loading.current = true;
     loadSdk().then(async () => {
       const toss = window.TossPayments!;
@@ -175,7 +178,7 @@ export default function Checkout(p: Props) {
       ]);
       widgets.current = w; setWidgetReady(true);
     }).catch(() => { loading.current = false; setError({ msg: '결제 화면을 불러오지 못했습니다. 새로고침하거나 계좌이체로 주문해 주세요.' }); });
-  }, [card, p.mode, p.clientKey]);
+  }, [card, !!chosen, p.mode, p.clientKey]);
   useEffect(() => { if (widgetReady) widgets.current?.setAmount({ currency: 'KRW', value: plan.amount }); }, [widgetReady, plan.amount]);
 
   async function submit(e: React.FormEvent<HTMLFormElement>) {
@@ -188,7 +191,7 @@ export default function Checkout(p: Props) {
     try {
       if (!card) {
         // 계좌이체 주문: 주문 정보를 판매자 메일로 보낸다 (제목 "[구매 신청] <구성> · <이름>").
-        const data = { name: String(f.get('name')).trim(), email: String(f.get('email')).trim(), phone: String(f.get('phone')).trim(), plan: plan.id, receipt, website: String(f.get('website') ?? '') };
+        const data = { name: String(f.get('name')).trim(), email: String(f.get('email')).trim(), phone: String(f.get('phone')).trim(), plan: plan.id, orderId: plan.orderId, receipt, website: String(f.get('website') ?? '') };
         if (!sameEmail(data.email, String(f.get('email2') ?? ''))) throw new Error('email-mismatch');
         const r = await fetch('/api/videokit/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
         if (!r.ok) throw new Error(r.status === 429 ? 'busy' : 'mail');
@@ -246,12 +249,13 @@ export default function Checkout(p: Props) {
       </label>)}
     </fieldset>
 
+    {!chosen ? <p className="small" role="note">위 목록에서 상품을 골라 주세요.</p> : <>
     <ProductBox plan={plan.id} tier={p.tier} />
     <div className="order">
       <b>{plan.orderName}</b>
       <span>{plan.kit ? `결제가 확인되면 적어 주신 이메일로 키트 다운로드 링크(맥용 · 윈도우용, ${p.linkDays}일 동안 열림)와 사용 설명서를 보내드립니다.` : '키트를 이미 구입하신 분을 위한 강의권입니다. 키트 파일은 들어 있지 않습니다.'}{plan.lesson && ' 강의 일정은 카카오톡으로 따로 조율합니다.'}</span>
       <div className="amt" aria-live="polite"><span className="sr">결제 금액 </span>{sale && <s className="was">{won(plan.regular)}</s>}{won(plan.amount)}</div>
-      {sale && <span className="sale">마켓 오픈 할인 · 11월 28일(토) 밤 24:00까지</span>}
+      {sale && <span className="sale">마켓 오픈 할인 · 11월 28일(토) 23:59까지 주문 · 이 화면은 마감 뒤 30분까지 할인가</span>}
     </div>
 
     <Buyer kit={plan.kit} onName={setBuyerName} onPhone={setBuyerPhone} />
@@ -283,20 +287,22 @@ export default function Checkout(p: Props) {
 
     <dl className="terms-box">
       <div><dt>제공 방법</dt><dd>{plan.kit
-        ? <>결제(입금)가 확인되면 적어 주신 이메일로 키트 다운로드 링크(맥용 · 윈도우용, {p.linkDays}일 동안 열림)와 사용 설명 eBook(PDF · EPUB), 설치 안내를 보내드립니다.{plan.lesson && ' 강의는 카카오톡으로 일정을 조율합니다.'} 업데이트 파일도 같은 이메일로 보내드리며, 후속지원은 구매일로부터 1년입니다.</>
-        : '결제(입금)가 확인되면 카카오톡으로 1:1 강의 일정(2회 · 총 2시간)을 조율합니다. 키트 파일은 들어 있지 않습니다.'}</dd></div>
+        ? <>결제(입금)가 확인되면 적어 주신 이메일로 키트 다운로드 링크(맥용 · 윈도우용)와 사용 설명 eBook(PDF · EPUB), 설치 안내를 보내드립니다. 링크는 {p.linkDays}일 뒤 삭제되며, 맥용 · 윈도우용을 합쳐 10회까지 내려받을 수 있습니다.{plan.lesson && ' 강의는 카카오톡으로 일정을 조율합니다.'} 업데이트는 키트 안에서 구매자 키로 /videokit update를 실행해 받고(새 버전 소식은 오픈카톡방 공지), 후속지원은 구매일로부터 1년입니다.</>
+        : '결제(입금)가 확인되면 카카오톡으로 1:1 강의 일정(2회 · 총 2시간)을 조율합니다. 키트 파일은 들어 있지 않습니다.'}{plan.lesson && ' 1:1 강의는 대표 강성철이 직접 실시간으로 진행합니다. 점프데스크탑 원격 연결과 카카오톡 보이스톡을 쓰며, 회당 1시간입니다.'}</dd></div>
       {plan.kit && <div>
         <dt>지원 환경</dt>
         <dd>
-          macOS · Windows (맥용 · 윈도우용을 함께 받습니다).<br />
+          macOS · Windows(미리보기) (맥용 · 윈도우용을 함께 받습니다).<br />
           Final Cut Pro(정식, 맥) · CapCut(베타, 맥·윈도우)<br />
           다빈치 리졸브(베타): 맥·윈도우에서 Free(무료)·Studio(유료) 모두 지원<br />
           프리미어 프로: 맥·윈도우 지원<br />
+          필름크래프트(FilmCraft): 지원 예정<br />
           Claude Pro 이상 구독이 필요합니다. 자세한 조건은 <a href="/videokit#env">지원 환경</a>을 확인해 주세요.
         </dd>
       </div>}
       <div><dt>영수증</dt><dd>간이영수증 또는 현금영수증을 결제 화면에서 신청할 수 있습니다.</dd></div>
-      <div><dt>환불</dt><dd>키트 파일을 받기 전에는 결제일로부터 7일 안에 요청하시면 전액 환불됩니다. 파일을 받은 뒤에는 디지털 콘텐츠 특성상 청약철회가 제한됩니다. 자세한 내용은 <a href="/videokit#refund">환불 안내</a>와 <a href="/videokit/terms">이용약관</a> 제8조를 확인해 주세요.</dd></div>
+      <div><dt>환불</dt><dd>키트 파일을 받기 전에는 결제일로부터 7일 안에 요청하시면 전액 환불됩니다. 파일을 받은 뒤에는 디지털 콘텐츠 특성상 청약철회가 제한됩니다.{plan.lesson && ' 1:1 강의는 첫 강의 전이면 강의 금액 전액, 진행된 뒤면 남은 회차만큼 환불합니다.'} 자세한 내용은 <a href="/videokit#refund">환불 안내</a>와 <a href="/videokit/terms#refund">이용약관</a> 제8조를 확인해 주세요.</dd></div>
     </dl>
+    </>}
   </form>;
 }

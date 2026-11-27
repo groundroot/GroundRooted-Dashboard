@@ -2,7 +2,7 @@
 // 필요한 환경변수: RESEND_API_KEY, VIDEOKIT_MAIL_FROM (Resend에서 인증한 보내는 주소)
 // 선택: VIDEOKIT_APPLY_TO (받는 주소, 기본 sungchulkang@groundrooted.com)
 import { isEmail } from '@/products/videokit-delivery';
-import { priceOf, tierAt } from '@/products/videokit';
+import { priceOf, transferTier } from '@/products/videokit';
 import { parseReceipt, receiptRows } from '@/products/videokit-receipt';
 
 export const dynamic = 'force-dynamic';
@@ -48,7 +48,8 @@ export async function POST(req: Request) {
   }
   const to = process.env.VIDEOKIT_APPLY_TO || 'sungchulkang@groundrooted.com';
   const at = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'medium', timeStyle: 'short' }).format(Date.now());
-  const amount = `${new Intl.NumberFormat('ko-KR').format(priceOf(plan, tierAt()))}원`;
+  // 마감 전에 연 결제 화면에서 낸 주문은 마감 뒤 30분까지 할인가로 적는다 (화면에 보인 입금액과 같게).
+  const amount = `${new Intl.NumberFormat('ko-KR').format(priceOf(plan, transferTier(body.orderId, plan)))}원`;
   const rows: [string, string][] = [['이름', name], ['이메일', email], ['전화번호', phone], ['상품', PLANS[plan]], ['금액', amount], ['신청 시각', at], ...receiptRows(receipt)];
 
   const res = await fetch('https://api.resend.com/emails', {

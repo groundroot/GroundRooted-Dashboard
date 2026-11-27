@@ -9,9 +9,9 @@ const SALE_GRACE_MS = 30 * 60 * 1000;
 // 강의 구성: 오픈 할인 기간은 1:1 강의 2회(총 2시간), 그 뒤 정가는 3주 과정 3회 강의 (판매 페이지 p-on/p-off와 같음)
 export const plans = {
   kit: { name: '클로드 비디오 키트 — 키트', saleName: '클로드 비디오 키트 — 키트', sale: 100_000, regular: 300_000 },
-  lesson: { name: '클로드 비디오 키트 — 키트 + 3회 강의(3주 과정)', saleName: '클로드 비디오 키트 — 키트 + 1:1 강의 2회(총 2시간)', sale: 300_000, regular: 500_000 },
+  lesson: { name: '클로드 비디오 키트 — 키트 + 1:1 강의(3주 · 3회)', saleName: '클로드 비디오 키트 — 키트 + 1:1 강의(2회 · 총 2시간)', sale: 300_000, regular: 500_000 },
   // 키트를 먼저 산 분이 나중에 신청하는 강의권. 키트 파일은 들어 있지 않고, 할인 기간에도 가격이 같다.
-  pass: { name: '클로드 비디오 키트 — 1:1 강의권 2회(키트 구매자용)', saleName: '클로드 비디오 키트 — 1:1 강의권 2회(키트 구매자용)', sale: 300_000, regular: 300_000 },
+  pass: { name: '클로드 비디오 키트 — 키트 구매자 1:1 강의권(2회 · 총 2시간)', saleName: '클로드 비디오 키트 — 키트 구매자 1:1 강의권(2회 · 총 2시간)', sale: 300_000, regular: 300_000 },
 } as const;
 // 결제 화면의 상품 선택에 보이는 짧은 이름과 설명
 export const planLabels: Record<keyof typeof plans, { label: string; note: string }> = {
@@ -19,7 +19,7 @@ export const planLabels: Record<keyof typeof plans, { label: string; note: strin
   lesson: { label: '키트 + 1:1 강의', note: '키트 + 클로드 코드 사용법 · 키트 설치 원격 지원 · 365일 1:1 채팅 지원' },
   pass: { label: '키트 구매자 1:1 강의권', note: '이미 키트를 구입한 분 · 1:1 강의 2회(총 2시간) · 키트 파일 없음' },
 };
-// 계좌이체 입금 계좌 (/videokit/transfer 와 같음)
+// 계좌이체 입금 계좌
 export const BANK = { bank: '토스뱅크', number: '1002-8619-7757', holder: '그라운드루티드' } as const;
 // 강의 일정을 따로 조율하는 상품
 export const hasLesson = (plan: PlanId) => plan === 'lesson' || plan === 'pass';
@@ -48,6 +48,16 @@ export function checkOrder(orderId: unknown, amount: unknown, now = Date.now(), 
   const value = Number(amount);
   if (!Number.isInteger(value) || value !== priceOf(plan, tier)) return { ok: false };
   return { ok: true, plan, tier, amount: value };
+}
+
+// 계좌이체 주문의 가격 구간. 할인 기간에 연 결제 화면의 주문번호(tier s)면 마감 + 30분까지 할인가로 받는다(약관 제4조).
+// 그 밖에는(주문번호가 없거나 · 상품이 다르거나 · 유예가 지났으면) 지금 시각의 구간.
+export function transferTier(orderId: unknown, plan: PlanId, now = Date.now()): Tier {
+  if (typeof orderId === 'string' && ORDER_ID.test(orderId)) {
+    const [, p, tier] = orderId.split('-');
+    if (p === plan && tier === 's' && now < SALE_ENDS + SALE_GRACE_MS) return 's';
+  }
+  return tierAt(now);
 }
 
 // 토스페이먼츠 결제위젯 키. 환경변수가 없으면 토스 문서에 공개된 테스트 키를 쓴다(실제 돈이 오가지 않음).

@@ -21,8 +21,13 @@ const nextConfig = {
       { source: '/videokit', destination: '/videokit/index.html' },
       { source: '/videokit/terms', destination: '/videokit/terms.html' },
       { source: '/videokit/privacy', destination: '/videokit/privacy.html' },
-      // 계좌이체 안내: 링크로만 공유한다 (페이지 어디에도 연결하지 않음, noindex).
-      { source: '/videokit/transfer', destination: '/videokit/transfer.html' },
+    ];
+  },
+  // 옛 계좌이체 안내 페이지는 결제 화면(키트)으로 영구 이동한다. 계좌이체도 결제 화면에서 주문한다.
+  async redirects() {
+    return [
+      { source: '/videokit/transfer', destination: '/price?plan=kit', permanent: true },
+      { source: '/videokit/transfer.html', destination: '/price?plan=kit', permanent: true },
     ];
   },
 };

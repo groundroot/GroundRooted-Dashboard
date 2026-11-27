@@ -92,7 +92,7 @@ ${guides.map(g => `<h2 style="font-size:15px;margin:0 0 8px">시작하기 · ${g
 <ol style="margin:0 0 20px;padding-left:20px;font-size:14px;line-height:1.7">${g.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>`).join('\n')}
 ${lesson ? `<p style="margin:0 0 20px;padding:12px 14px;background:#fdf0ea;border-radius:8px;font-size:14px">강의 일정은 개별로 조율합니다. 곧 연락드리겠습니다.</p>` : ''}
 <ul style="margin:0 0 20px;padding-left:20px;font-size:13px;line-height:1.7;color:#5d6270">${notes.map(s => `<li>${esc(s)}</li>`).join('')}</ul>
-<p style="margin:0;font-size:14px;line-height:1.7">궁금한 점은 이 메일에 답장하거나 카카오톡 1:1 문의로 알려 주세요. 새 버전이 나오면 업데이트 파일을 이 메일 주소로 보내드리고, 공지는 ${notice ? `<a href="${esc(notice)}" style="color:#e8622c">오픈카톡방</a>` : '오픈카톡방'}에 올립니다. 후속지원은 구매일로부터 1년입니다.</p>
+<p style="margin:0;font-size:14px;line-height:1.7">궁금한 점은 이 메일에 답장하거나 카카오톡 1:1 문의로 알려 주세요. 새 버전은 키트 안에서 /videokit update로 받으며(첫 정식 업데이트 1.4.0 배포 예정), 소식은 ${notice ? `<a href="${esc(notice)}" style="color:#e8622c">오픈카톡방</a>` : '오픈카톡방'}에 올립니다. 후속지원은 구매일로부터 1년입니다.</p>
 </div>
 <p style="font-size:11px;color:#8a8f9c;line-height:1.6;margin:16px 4px 0">그라운드루티드 (GroundRooted) · 대표 강성철 · 사업자등록번호 543-09-03526 · ${esc(reply)}</p>
 </div></body></html>`;
@@ -104,7 +104,7 @@ ${lesson ? `<p style="margin:0 0 20px;padding:12px 14px;background:#fdf0ea;borde
     ...guides.flatMap(g => [`시작하기 · ${g.os}`, ...g.steps.map((s, i) => `${i + 1}. ${s}`), '']),
     ...(lesson ? ['강의 일정은 개별로 조율합니다. 곧 연락드리겠습니다.', ''] : []),
     ...notes.map(s => `- ${s}`), '',
-    `궁금한 점은 이 메일에 답장하거나 카카오톡 1:1 문의로 알려 주세요. 새 버전이 나오면 업데이트 파일을 이 메일 주소로 보내드리고, 공지는 오픈카톡방${notice ? `(${notice})` : ''}에 올립니다. 후속지원은 구매일로부터 1년입니다.`,
+    `궁금한 점은 이 메일에 답장하거나 카카오톡 1:1 문의로 알려 주세요. 새 버전은 키트 안에서 /videokit update로 받으며(첫 정식 업데이트 1.4.0 배포 예정), 소식은 오픈카톡방${notice ? `(${notice})` : ''}에 올립니다. 후속지원은 구매일로부터 1년입니다.`,
     '', `그라운드루티드 (GroundRooted) · ${reply}`,
   ].join('\n');
   return { subject, html, text };

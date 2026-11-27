@@ -1,6 +1,6 @@
 import Shell, { KAKAO_URL } from '../Shell';
 
-export const metadata = { title: '결제 실패 | 클로드 비디오 키트', robots: { index: false, follow: false } };
+export const metadata = { title: '결제 실패 | 클로드 비디오 키트', description: '클로드 비디오 키트 결제를 마치지 못했을 때의 안내 화면입니다.', robots: { index: false, follow: false } };
 
 export default async function FailPage({ searchParams }: { searchParams: Promise<{ message?: string; code?: string }> }) {
   const { message, code } = await searchParams;

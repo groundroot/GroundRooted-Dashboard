@@ -5,7 +5,7 @@ import { deniedIp, ipDenied, tossRequest } from '@/products/toss';
 import { parseReceipt, receiptRows } from '@/products/videokit-receipt';
 
 export const dynamic = 'force-dynamic';
-export const metadata = { title: '결제 결과 | 클로드 비디오 키트', robots: { index: false, follow: false } };
+export const metadata = { title: '결제 결과 | 클로드 비디오 키트', description: '클로드 비디오 키트 결제 결과 확인 화면입니다.', robots: { index: false, follow: false } };
 
 type Payment = { status?: string; orderId?: string; totalAmount?: number; code?: string; message?: string; metadata?: Record<string, string> | null;
   virtualAccount?: { accountNumber?: string; bankCode?: string; customerName?: string; dueDate?: string } | null };
