@@ -197,6 +197,10 @@
 .vk-pay .dl button{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:2px;width:100%;min-height:76px;padding:14px 20px;border:0;border-radius:14px;background:#ff8a3d;color:#16181d;font:inherit;font-size:18px;font-weight:750;line-height:1.35;text-align:left;cursor:pointer}
 .vk-pay .dl button small{font-size:13px;font-weight:550;color:#3b2a1d}
 .vk-pay .dl-note{margin:0 0 24px}
+.vk-pay .dl-copyright{margin:0 0 14px;padding:16px 18px;border:1px solid #6b4a1e;border-radius:12px;background:#2a2014;color:#e9dcc6;font-size:14px;line-height:1.7}
+.vk-pay .dl-copyright h2{margin:0 0 4px;font-size:15px;font-weight:700;color:#f3c98b}
+.vk-pay .dl-copyright p{margin:0}
+.vk-pay .dl-copyright a{color:#ffd9a8;font-weight:650;text-underline-offset:3px}
 .vk-pay .dl-expire{padding:14px 16px;border-radius:12px;background:#1b1b20;margin:0 0 20px}
 .vk-pay .dl-expire b{color:#ffb38a;font-weight:700}
 @media (max-width:520px){.vk-pay .dl{grid-template-columns:1fr}}
