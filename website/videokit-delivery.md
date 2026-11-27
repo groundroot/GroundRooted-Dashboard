@@ -66,6 +66,7 @@
   node scripts/videokit-upload-link-kit.mjs <버전> <맥용.zip> <윈도우용.zip>
   ```
   - 2026-11-27: 1.3 (영문 설명서 폴더 「0. Claude Video Kit Manual」, 확장자 원본) 맥 2,819,516 bytes sha256 `25a1e674…794d440c`, 윈도우 2,709,558 bytes sha256 `9caf3e45…8d7af`.
+- **구매자 표식 (2026-11-27)**: 버튼을 누르면 원본 zip을 그대로 내주지 않고, 그 링크의 주문번호(`order_id`, 없으면 `TEST-<코드>`) · 발급일(`created_at`의 KST 날짜) · 링크 코드를 넣은 개인 zip을 만들어 `kit/personal/<코드>/ClaudeVideoKit-<OS>-<버전>.zip`에 올리고 그 파일로 서명합니다(`products/videokit-watermark.ts`). 자동 메일 · `scripts/videokit-make-link.mjs` 수동 발급 모두 이 버튼을 거치므로 같은 표식이 붙습니다. 표식 위치: 보이는 `Claude Video Kit/LICENSE.txt`, 숨은 zip 주석 · `System/MANIFEST.json`의 `"license"` 필드 · `CLAUDE.md`와 `System/CLAUDE.md` 끝 HTML 주석(MANIFEST의 두 파일 sha256도 함께 바꿔 `update.py`가 '고치지 않은 키트 파일'로 봄). 나머지 파일은 바이트 그대로입니다. 원본 sha256이 current.json과 다르거나 표식 · 업로드가 실패하면 503이고 횟수를 세지 않습니다(원본을 대신 내주지 않음). 개인 zip은 링크가 만료돼 지워질 때 · `--revoke` · 발급 때 만료 정리에서 함께 지웁니다. 유출본을 받으면 zip 주석(`unzip -z`)이나 LICENSE.txt · MANIFEST.json의 주문번호로 확인합니다. 키트 업데이트(구매자 키 `/api/videokit/latest`)로 받는 업데이트 zip에는 표식이 없고(sha256 검증 때문), 업데이트 뒤에는 MANIFEST · CLAUDE.md 표식이 새 파일로 바뀌고 LICENSE.txt만 남습니다.
 - **수동 발급** (운영봇 · 계좌이체 구매자 · 만료된 구매자). 실행마다 새 링크를 만들고, 링크와 삭제 날짜 두 줄을 출력합니다. 메일은 보내지 않습니다.
   ```bash
   node scripts/videokit-make-link.mjs --email <이메일> --name <이름> --order <주문번호> [--days 7] [--max 10] [--dry-run]

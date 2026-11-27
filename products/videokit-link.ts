@@ -1,6 +1,8 @@
 // 클로드 비디오 키트 짧은 다운로드 링크 https://groundrooted.com/d/<코드> (서버 전용).
 // - 링크 하나 = 구매자 한 명. 페이지(/d/<코드>)에 맥용 · 윈도우용 버튼이 있고, 버튼(/d/<코드>/mac|windows)을 누르면
-//   그때 비공개 버킷의 파일로 10분짜리 서명 링크를 만들어 보낸다. 파일은 버킷의 kit/current.json이 고른다.
+//   그때 비공개 버킷의 원본 zip(kit/current.json이 고름)에 그 링크의 주문번호 · 발급일을 넣은 개인 zip을 만들어
+//   kit/personal/<코드>/에 올리고(products/videokit-watermark.ts), 그 파일로 10분짜리 서명 링크를 만들어 보낸다.
+//   표식을 넣지 못하면 원본을 내주지 않고 503(횟수도 세지 않음). 개인 zip은 링크를 지우거나 끌 때 함께 지운다.
 // - 링크는 expires_at(발급일 + 7일, 그날 23:59 KST)에 무효가 된다. 만료된 행은 새 링크를 발급할 때와
 //   만료된 링크로 요청이 올 때 지운다. 표: videokit_download_links (sql/videokit-download-links.sql).
 // - 버튼을 누른 횟수(download_count) · 마지막 시각을 남긴다. 같은 링크는 1분에 10번, 모두 합쳐 max_downloads번(기본 10)까지 받는다.
@@ -8,6 +10,8 @@
 //   10번 요청하면 그 IP의 /d/* 요청을 10분 동안 막는다(맞는 코드도). 서버 인스턴스 메모리에 두므로 인스턴스마다 따로 센다.
 import { randomBytes } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { createHash } from 'node:crypto';
+import { watermarkKit, type Mark } from './videokit-watermark.ts';
 
 const env = (k: string, d = '') => process.env[k] || d;
 
@@ -61,13 +65,15 @@ export function isCurrent(c: unknown): c is KitCurrent {
   });
 }
 
-export type LinkRow = { code: string; email: string; name: string | null; order_id: string | null; expires_at: string; revoked: boolean; download_count: number; max_downloads: number };
+export type LinkRow = { code: string; email: string; name: string | null; order_id: string | null; created_at?: string | null; expires_at: string; revoked: boolean; download_count: number; max_downloads: number };
 export type LinkDeps = {
   find: (code: string) => Promise<LinkRow | null>;   // 없으면 null, DB 오류면 throw
   remove: (code: string) => Promise<void>;
   hit: (code: string, count: number) => Promise<void>;
   readCurrent: () => Promise<unknown>;               // 없으면 throw
   sign: (path: string, seconds: number, download: string) => Promise<string | null>;
+  readKit: (path: string) => Promise<Buffer>;                  // 원본 zip. 없으면 throw
+  putPersonal: (path: string, body: Buffer) => Promise<void>;  // 개인 zip 올리기(덮어씀). 실패하면 throw
   now?: number;
 };
 
@@ -124,6 +130,18 @@ async function current(deps: LinkDeps): Promise<KitCurrent | null> {
   return isCurrent(c) ? c : null;
 }
 
+// ---- 구매자 표식 ----
+// 주문번호가 없는 링크(시험 등)는 TEST-<코드>. 주문번호는 zip 주석 · JSON · HTML 주석에 들어가므로 글자 · 숫자 · . _ -만 남긴다
+// (카드 주문 vk-kit-s-<uuid>, 수동 발급 --order의 한글 그대로).
+// 발급일 = 링크를 만든 날(KST).
+export const personalPath = (code: string, name: string) => `kit/personal/${code}/${name}`;
+const kstDate = (ms: number) => new Date(ms + KST).toISOString().slice(0, 10);
+export function markFor(row: LinkRow, now: number): Mark {
+  const order = (row.order_id ?? '').trim().replace(/[^\p{L}\p{N}._-]/gu, '_').slice(0, 100);
+  const created = row.created_at ? Date.parse(row.created_at) : NaN;
+  return { orderId: order || `TEST-${row.code}`, issued: kstDate(Number.isFinite(created) ? created : now), code: row.code };
+}
+
 // ---- 페이지 /d/<코드> ----
 export type LinkView =
   | { status: 'ok'; code: string; name: string; version: string; expiresAt: number }
@@ -167,28 +185,50 @@ export async function handleDownload(rawCode: unknown, rawPlatform: unknown, dep
     return notice(429, '다운로드 횟수를 넘었습니다. 다시 받으시려면 키트를 받은 메일에 답장하거나 카카오톡으로 알려 주세요.', code);
 
   const c = await current(deps);
-  const signed = c ? await deps.sign(c[platform].path, SIGN_SECONDS, fileName(platform, c.version)).catch(() => null) : null;
-  if (!signed) {
-    if (c) console.error('[videokit] kit signed url failed', c[platform].path);
-    return notice(503, '지금 파일을 준비하지 못했습니다. 잠시 후 다시 눌러 주세요.', code);
+  let signed: string | null = null;
+  if (c) {
+    const name = fileName(platform, c.version), path = personalPath(code, name);
+    try {
+      const kit = await deps.readKit(c[platform].path);
+      const want = c[platform].sha256;
+      if (want && createHash('sha256').update(kit).digest('hex') !== want.toLowerCase()) throw new Error('original zip sha256 mismatch');
+      await deps.putPersonal(path, watermarkKit(kit, markFor(r.row, deps.now ?? Date.now())));
+      signed = await deps.sign(path, SIGN_SECONDS, name);
+      if (!signed) throw new Error('sign failed');
+    } catch (e) { console.error('[videokit] personal kit failed', c[platform].path, (e as Error).message); signed = null; }
   }
+  if (!signed) return notice(503, '지금 파일을 준비하지 못했습니다. 잠시 후 다시 눌러 주세요.', code);
   await deps.hit(code, r.row.download_count + 1).catch(e => console.error('[videokit] link hit failed', (e as Error).message));
   // POST → 303: 브라우저가 서명 링크를 GET으로 연다.
   return new Response(null, { status: 303, headers: { Location: signed, 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } });
 }
 
 // ---- 운영용 의존성: Supabase 표 + 비공개 버킷 ----
+const bucket = (sb: SupabaseClient) => sb.storage.from(env('VIDEOKIT_BUCKET', 'videokit'));
+// 그 링크의 개인 zip(kit/personal/<코드>/)을 지운다. 실패해도 링크 처리는 계속(로그만).
+async function removePersonal(sb: SupabaseClient, codes: string[]) {
+  for (const code of codes) {
+    const dir = `kit/personal/${code}`;
+    const { data, error } = await bucket(sb).list(dir);
+    if (error) { console.error('[videokit] personal kit list failed', code, error.message); continue; }
+    if (!data?.length) continue;
+    const { error: e2 } = await bucket(sb).remove(data.map(f => `${dir}/${f.name}`));
+    if (e2) console.error('[videokit] personal kit delete failed', code, e2.message);
+  }
+}
+
 export function supabaseLinkDeps(sb: SupabaseClient): LinkDeps {
-  const storage = sb.storage.from(env('VIDEOKIT_BUCKET', 'videokit'));
+  const storage = bucket(sb);
   return {
     async find(code) {
-      const { data, error } = await sb.from(TABLE).select('code,email,name,order_id,expires_at,revoked,download_count,max_downloads').eq('code', code).maybeSingle();
+      const { data, error } = await sb.from(TABLE).select('code,email,name,order_id,created_at,expires_at,revoked,download_count,max_downloads').eq('code', code).maybeSingle();
       if (error) throw new Error(error.message);
       return (data as LinkRow | null) ?? null;
     },
     async remove(code) {
       const { error } = await sb.from(TABLE).delete().eq('code', code);
       if (error) throw new Error(error.message);
+      await removePersonal(sb, [code]);
     },
     async hit(code, count) {
       const { error } = await sb.from(TABLE).update({ download_count: count, last_download_at: new Date().toISOString() }).eq('code', code);
@@ -203,6 +243,15 @@ export function supabaseLinkDeps(sb: SupabaseClient): LinkDeps {
       const { data, error } = await storage.createSignedUrl(path, seconds, { download });
       return error ? null : data?.signedUrl ?? null;
     },
+    async readKit(path) {
+      const { data, error } = await storage.download(path);
+      if (error || !data) throw new Error(error?.message || 'missing');
+      return Buffer.from(await data.arrayBuffer());
+    },
+    async putPersonal(path, body) {
+      const { error } = await storage.upload(path, body, { upsert: true, contentType: 'application/zip', cacheControl: '0' });
+      if (error) throw new Error(error.message);
+    },
   };
 }
 
@@ -213,8 +262,9 @@ export async function createLink(sb: SupabaseClient, o: { email: string; name?: 
   const now = o.now ?? Date.now();
   const nowIso = new Date(now).toISOString();
   // 만료된 링크 정리 (실패해도 발급은 계속)
-  const { error: cleanup } = await sb.from(TABLE).delete().lte('expires_at', nowIso);
+  const { data: expired, error: cleanup } = await sb.from(TABLE).delete().lte('expires_at', nowIso).select('code');
   if (cleanup) console.error('[videokit] expired links cleanup failed', cleanup.message);
+  else await removePersonal(sb, (expired ?? []).map(r => r.code));
   if (o.reuse && o.orderId) {
     const { data, error } = await sb.from(TABLE).select('code,expires_at').eq('order_id', o.orderId).eq('revoked', false).gt('expires_at', nowIso)
       .order('expires_at', { ascending: false }).limit(1).maybeSingle();
@@ -237,5 +287,6 @@ export async function revokeLink(sb: SupabaseClient, raw: string): Promise<boole
   if (!CODE_PATTERN.test(code)) return false;
   const { data, error } = await sb.from(TABLE).update({ revoked: true }).eq('code', code).select('code');
   if (error) throw new Error(`link revoke: ${error.message}`);
+  if ((data ?? []).length) await removePersonal(sb, [code]);
   return (data ?? []).length > 0;
 }

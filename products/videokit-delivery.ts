@@ -3,7 +3,7 @@
 //   videokit_licenses)와 다운로드 링크(코드 · 이메일 · 이름 · 주문번호, 만료되면 지움, videokit_download_links)만 둔다. 같은 주문에 두 번 보내지 않는 것은
 //   Resend의 Idempotency-Key(주문번호, 24시간 유지)로 막는다.
 // - 키트 파일: 메일에는 짧은 다운로드 링크 https://groundrooted.com/d/<코드> 하나를 넣는다(7일 뒤 삭제, products/videokit-link.ts).
-//   그 페이지의 맥용 · 윈도우용 버튼이 비공개 버킷의 파일(kit/current.json이 고름)로 10분 서명 링크를 만든다.
+//   그 페이지의 맥용 · 윈도우용 버튼이 비공개 버킷의 파일(kit/current.json이 고름)에 주문번호 표식을 넣은 개인 zip으로 10분 서명 링크를 만든다.
 // - 메일 발송: Resend API.
 // 필요한 환경변수: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, RESEND_API_KEY, VIDEOKIT_MAIL_FROM
 // 선택: VIDEOKIT_BUCKET(videokit), VIDEOKIT_MAIL_REPLY_TO, VIDEOKIT_MAIL_BCC, VIDEOKIT_NOTICE_URL(공지 오픈카톡방 주소)
@@ -38,7 +38,7 @@ const CONTENTS = [
   '키트 파일: 영상 제작 스킬, 빌드 스크립트, 스타일 프리셋, 유튜브 학습 데이터, 설치 스크립트 (맥용 · 윈도우용)',
   `클로드 기반 사용 설명서: PDF · EPUB (zip 안 「${MANUAL_DIR}」 폴더, 윈도우용 zip에는 윈도우판 설명서)`,
 ];
-const COPYRIGHT_NOTE = '※ 키트는 구매하신 분 본인만 쓸 수 있는 저작물입니다. 파일과 링크의 공유·재배포·재판매는 저작권법으로 금지됩니다.';
+const COPYRIGHT_NOTE = '※ 키트는 구매하신 분 본인만 쓸 수 있는 저작물입니다. 파일마다 주문번호가 들어 있어 유출 시 배포자를 확인할 수 있으며, 공유·재배포·재판매는 저작권법으로 금지됩니다.';
 const KEY_NOTE = '키트에서 /videokit update를 처음 입력하면 이 키를 한 번 묻습니다. 본인만 쓰고 다른 사람과 나누지 마세요.';
 
 // 메일 본문. 테스트에서 직접 부른다.
