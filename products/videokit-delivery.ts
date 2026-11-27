@@ -38,6 +38,7 @@ const CONTENTS = [
   '키트 파일: 영상 제작 스킬, 빌드 스크립트, 스타일 프리셋, 유튜브 학습 데이터, 설치 스크립트 (맥용 · 윈도우용)',
   `클로드 기반 사용 설명서: PDF · EPUB (zip 안 「${MANUAL_DIR}」 폴더, 윈도우용 zip에는 윈도우판 설명서)`,
 ];
+const COPYRIGHT_NOTE = '※ 키트는 구매하신 분 본인만 쓸 수 있는 저작물입니다. 파일과 링크의 공유·재배포·재판매는 저작권법으로 금지됩니다.';
 const KEY_NOTE = '키트에서 /videokit update를 처음 입력하면 이 키를 한 번 묻습니다. 본인만 쓰고 다른 사람과 나누지 마세요.';
 
 // 메일 본문. 테스트에서 직접 부른다.
@@ -77,7 +78,8 @@ export function kitEmail(o: Pick<Order, 'orderId' | 'plan' | 'itemName' | 'amoun
 <p style="margin:0 0 22px;font-size:13px;color:#5d6270">결제 금액 ${won(o.amount)} · 주문번호 ${esc(o.orderId)}</p>
 <a href="${esc(link)}" style="display:block;text-align:center;background:#e8622c;color:#fff;text-decoration:none;font-weight:700;font-size:16px;padding:15px;border-radius:10px;margin:0 0 8px">키트 내려받기 (맥용 · 윈도우용)</a>
 <p style="margin:0 0 6px;font-size:13px;text-align:center"><a href="${esc(link)}" style="color:#1b1d22">${esc(link)}</a></p>
-<p style="margin:0 0 24px;font-size:12px;color:#5d6270;text-align:center">${esc(linkNote)}</p>
+<p style="margin:0 0 6px;font-size:12px;color:#5d6270;text-align:center">${esc(linkNote)}</p>
+<p style="margin:0 0 24px;font-size:12px;color:#1b1d22;font-weight:600;text-align:center">${esc(COPYRIGHT_NOTE)}</p>
 ${licenseKey ? `<h2 style="font-size:15px;margin:0 0 8px">구매자 키 (업데이트용)</h2>
 <p style="margin:0 0 6px;font-family:ui-monospace,Menlo,monospace;font-size:18px;font-weight:700;letter-spacing:.04em;padding:12px 14px;background:#f4f5f8;border-radius:8px;text-align:center">${esc(licenseKey)}</p>
 <p style="margin:0 0 24px;font-size:13px;color:#5d6270">${esc(KEY_NOTE)}</p>` : ''}
@@ -96,7 +98,7 @@ ${lesson ? `<p style="margin:0 0 20px;padding:12px 14px;background:#fdf0ea;borde
 </div></body></html>`;
   const text = [
     `${o.name}님, 결제가 확인되었습니다.`, '', item, `결제 금액 ${won(o.amount)} · 주문번호 ${o.orderId}`, '',
-    `키트 내려받기 (맥용 · 윈도우용): ${link}`, linkNote, '',
+    `키트 내려받기 (맥용 · 윈도우용): ${link}`, linkNote, COPYRIGHT_NOTE, '',
     ...(licenseKey ? [`구매자 키 (업데이트용): ${licenseKey}`, KEY_NOTE, ''] : []),
     '들어 있는 것', ...CONTENTS.map(s => `- ${s}`), '',
     ...guides.flatMap(g => [`시작하기 · ${g.os}`, ...g.steps.map((s, i) => `${i + 1}. ${s}`), '']),

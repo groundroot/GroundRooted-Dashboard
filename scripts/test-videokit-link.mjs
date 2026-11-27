@@ -267,6 +267,8 @@ Object.assign(process.env, { SUPABASE_URL: 'https://fake.supabase.co', SUPABASE_
     assert.ok(part.includes('https://groundrooted.com/d/ABCD2345'));
     assert.ok(part.includes('이 링크는 7일 뒤(2026년 12월 4일) 삭제됩니다'), 'deletion date');
     assert.ok(part.includes('VK-ABCD-EFGH-JK23'));
+    assert.ok(part.includes('※ 키트는 구매하신 분 본인만 쓸 수 있는 저작물입니다. 파일과 링크의 공유·재배포·재판매는 저작권법으로 금지됩니다.'), 'copyright note');
+    assert.ok(part.indexOf('※ 키트는') > part.indexOf('이 링크는 7일 뒤'), 'copyright note under the link note');
     assert.ok(!part.includes('supabase.co'), 'no long signed url in the mail');
   }
   assert.ok(m.html.includes('키트 내려받기 (맥용 · 윈도우용)') && m.html.includes('0. Claude Video Kit Manual'));
