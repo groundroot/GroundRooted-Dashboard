@@ -141,7 +141,7 @@ export async function loadLink(raw: unknown, deps: LinkDeps, ip?: string): Promi
   return { status: 'ok', code, name: maskName(r.row.name), version: c.version, expiresAt: Date.parse(r.row.expires_at) };
 }
 
-// ---- 버튼 /d/<코드>/<mac|windows> ----
+// ---- 버튼 POST /d/<코드>/<mac|windows> (GET은 downloadPage로 페이지에 돌려보냄) ----
 const esc = (s: string) => s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
 function notice(status: number, message: string, code: string, headers: Record<string, string> = {}) {
   const html = `<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>클로드 비디오 키트</title></head>
@@ -151,6 +151,8 @@ function notice(status: number, message: string, code: string, headers: Record<s
   return new Response(html, { status, headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', ...headers } });
 }
 const toPage = (code: string) => new Response(null, { status: 303, headers: { Location: `/d/${encodeURIComponent(code)}`, 'Cache-Control': 'no-store' } });
+// GET /d/<코드>/<os>: 세지 않고 페이지로. 메일 보안 검사기 · 미리보기는 폼을 보내지 않으므로 횟수가 줄지 않는다.
+export const downloadPage = (rawCode: unknown) => toPage(normalizeCode(rawCode));
 
 export async function handleDownload(rawCode: unknown, rawPlatform: unknown, deps: LinkDeps, ip?: string): Promise<Response> {
   const code = normalizeCode(rawCode);
@@ -171,7 +173,8 @@ export async function handleDownload(rawCode: unknown, rawPlatform: unknown, dep
     return notice(503, '지금 파일을 준비하지 못했습니다. 잠시 후 다시 눌러 주세요.', code);
   }
   await deps.hit(code, r.row.download_count + 1).catch(e => console.error('[videokit] link hit failed', (e as Error).message));
-  return new Response(null, { status: 302, headers: { Location: signed, 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } });
+  // POST → 303: 브라우저가 서명 링크를 GET으로 연다.
+  return new Response(null, { status: 303, headers: { Location: signed, 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } });
 }
 
 // ---- 운영용 의존성: Supabase 표 + 비공개 버킷 ----

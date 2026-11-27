@@ -24,14 +24,16 @@
 1. **Supabase**
    - 프로젝트를 고르고(대시보드용 프로젝트를 써도 됩니다) SQL Editor에서 `sql/videokit-storage.sql`을 실행합니다. 비공개 버킷 `videokit`이 생깁니다.
    - Project Settings → API에서 `SUPABASE_URL`과 `service_role` 키를 확인합니다. service_role 키는 서버 전용이라 어디에도 공개하지 않습니다.
-2. **키트 zip 올리기** (키트를 새로 만들 때마다 반복). 원본 빌드 두 개를 올립니다: 맥용 `dist/ClaudeVideoKit-YYYY.MM.DD.HHMM.zip`, 윈도우용 `dist/ClaudeVideoKit-Windows-YYYY.MM.DD.HHMM.zip`. 메일 첨부용 zip(`ClaudeVideoKit-YYYY.MM.DD.zip`)이 아닙니다. 아래 명령은 시각이 붙은 가장 최근 빌드를 OS별로 따로 고릅니다(맥은 `ClaudeVideoKit-[0-9]*`, 윈도우는 `ClaudeVideoKit-Windows-*` — 한 패턴으로 고르면 같은 시각의 윈도우 zip이 맥 경로에 올라갈 수 있습니다).
-   이 저장소 폴더에서 한 줄로 실행합니다(운영 Supabase 키를 Vercel에서 받아 쓰고 바로 지움, 맥 · 윈도우 최신 빌드를 각각 올림):
+2. **키트 zip 올리기** (새 버전을 낼 때마다 반복, 2026-11-27부터). 맥용 · 윈도우용 zip 두 개와 버전 번호(`[0-9A-Za-z.]`, 예: `1.3`)를 넘깁니다. 설명서 폴더 · 스크립트 확장자를 바꾸지 않은 원본 zip을 올립니다(링크로 보내므로 Gmail 첨부 제한과 상관없음).
+   `scripts/videokit-upload-link-kit.mjs`가 `kit/links/<버전>/ClaudeVideoKit-Mac-<버전>.zip` · `ClaudeVideoKit-Windows-<버전>.zip`으로 올리고, 다시 내려받아 크기 · sha256이 같을 때만 `kit/current.json`을 새 버전으로 바꿉니다. 바뀐 순간부터 **이미 보낸 링크도 포함해** 모든 `/d/<코드>` 버튼이 새 버전을 내려줍니다. 실패하면 current.json은 이전 버전 그대로입니다.
+   이 저장소 폴더에서 한 줄로 실행합니다(운영 Supabase 키를 Vercel에서 받아 쓰고 바로 지움):
    ```bash
-   D="$HOME/코딩/FCP claude editing/dist"; vercel env pull /tmp/vk.env --environment=production --yes --scope groundroots-projects >/dev/null && (set -a; . /tmp/vk.env; set +a; rm -f /tmp/vk.env; node scripts/videokit-upload-kit.mjs "$(ls -t "$D"/ClaudeVideoKit-[0-9]*.*.*.*.zip | head -1)" && VIDEOKIT_KIT_PATH=kit/claude-video-kit-windows.zip node scripts/videokit-upload-kit.mjs "$(ls -t "$D"/ClaudeVideoKit-Windows-*.*.*.*.zip | head -1)")
+   V=1.4; MAC=<맥용.zip>; WIN=<윈도우용.zip>; F=$(mktemp); vercel env pull "$F" --environment=production --yes --scope groundroots-projects >/dev/null && (set -a; . "$F"; set +a; rm -f "$F"; node scripts/videokit-upload-link-kit.mjs "$V" "$MAC" "$WIN"); rm -f "$F"
    ```
-   (vercel CLI가 이 프로젝트에 연결돼 있어야 합니다: 처음 한 번 `vercel link --yes --project groundrooted-dashboard --scope groundroots-projects`.)
-   같은 경로(`videokit/kit/claude-video-kit.zip`, `videokit/kit/claude-video-kit-windows.zip`)에 덮어쓰므로, 이미 보낸 링크가 유효한 동안에는 새 파일이 내려받아집니다.
-   올린 뒤 메일 본문(`products/videokit-delivery.ts`의 `MANUAL_DIR` · 시작하기 단계)이 키트 구성과 맞는지 확인합니다.
+   (vercel CLI가 이 프로젝트에 연결돼 있어야 합니다: 처음 한 번 `vercel link --yes --project groundrooted-dashboard --scope groundroots-projects`. 프로젝트 이름 없이 `vercel link`를 하면 새 프로젝트가 생길 수 있습니다.)
+   올린 뒤 시험 링크(`scripts/videokit-make-link.mjs`)로 맥 · 윈도우 버튼을 눌러 버전 · 파일 이름을 확인하고, 메일 본문(`products/videokit-delivery.ts`의 `MANUAL_DIR` · 시작하기 단계)과 다운로드 페이지 안내(「0. Claude Video Kit Manual」)가 키트 구성과 맞는지 확인합니다.
+   - 2026-11-27: 1.3 올림 (아래 '짧은 다운로드 링크' 절에 크기 · sha256).
+   - 예전 방식(2026-11-26까지): `scripts/videokit-upload-kit.mjs`로 `kit/claude-video-kit.zip` · `kit/claude-video-kit-windows.zip`에 덮어썼습니다. 이 경로는 이제 메일 · 링크 어디에서도 쓰지 않으며, 파일은 지우지 않고 남겨 두었습니다.
    - 2026-11-26: 운영 Supabase에 비공개 버킷 `videokit` 생성(sql/videokit-storage.sql과 같은 설정), `ClaudeVideoKit-2026.11.26.1802.zip`(2,822,597 bytes, sha256 `ebeecf8c…c71f7c6`) 올림. 7일 서명 링크로 내려받아 크기 · sha256 일치, 서명 없는 주소는 막힘 확인.
    - 2026-11-26 (윈도우 버전 출시): 맥용 `ClaudeVideoKit-2026.11.26.2225.zip`(2,834,350 bytes, sha256 `c2aad1d9…6a870686`) → `kit/claude-video-kit.zip`, 윈도우용 `ClaudeVideoKit-Windows-2026.11.26.2225.zip`(2,721,661 bytes, sha256 `79db224b…a54b62`) → `kit/claude-video-kit-windows.zip`. 두 파일 모두 7일 서명 링크로 내려받아 크기 · sha256 일치, 서명 없는 주소는 막힘(400) 확인.
 3. **Resend**
@@ -57,7 +59,7 @@
 
 - **링크**: `https://groundrooted.com/d/<코드>` — 코드 8자(대문자 · 숫자, 0/O · 1/I/l 없음, crypto 랜덤 40비트). 페이지에 받는 분 이름 일부(강*철), 버전, 맥용 · 윈도우용 버튼, 삭제 날짜, 설명서 안내, '본인 구매용 링크' 문구, 문의(카카오톡 · 메일 답장)가 있습니다. 검색 제외(noindex).
 - **만료**: 발급일 + 7일, 그날 23:59 KST. 지나면 "링크가 만료되었습니다" 페이지(404). 만료된 행은 새 링크를 발급할 때와 만료된 링크로 요청이 올 때 지웁니다.
-- **버튼**: `/d/<코드>/mac|windows` → 그때 10분짜리 서명 링크로 302(`Cache-Control: no-store`, `Referrer-Policy: no-referrer`). 파일 이름 `ClaudeVideoKit-Mac-<버전>.zip` / `ClaudeVideoKit-Windows-<버전>.zip`. 버튼을 누른 횟수(`download_count`) · 마지막 시각(`last_download_at`)을 남깁니다. 페이지 열람은 세지 않습니다.
+- **버튼**: 페이지의 POST 폼 `/d/<코드>/mac|windows` → 그때 10분짜리 서명 링크로 303(`Cache-Control: no-store`, `Referrer-Policy: no-referrer`). 같은 주소로 GET이 오면(메일 보안 검사기 · 미리보기가 따라감) 세지 않고 페이지로 303 — 검사기가 다운로드 횟수를 소진하지 못합니다. 파일 이름 `ClaudeVideoKit-Mac-<버전>.zip` / `ClaudeVideoKit-Windows-<버전>.zip`. 버튼을 누른 횟수(`download_count`) · 마지막 시각(`last_download_at`)을 남깁니다. 페이지 열람은 세지 않습니다.
 - **제한**: 링크당 받기 횟수 상한 `max_downloads`(기본 10, 넘으면 "다운로드 횟수를 넘었습니다" 안내) · 링크당 1분에 10번 · 한 IP가 10분에 없는/만료 코드를 10번 요청하면 그 IP의 `/d/*`를 10분 동안 막음(코드 추측 막기). 1분 · IP 제한은 서버 인스턴스 메모리라 인스턴스마다 따로 셉니다.
 - **파일 고르기**: 버킷 `kit/current.json` = `{"version":"1.3","mac":{"path":"kit/links/1.3/ClaudeVideoKit-Mac-1.3.zip","sha256","size"},"windows":{...}}`. 새 버전은 아래 명령 한 줄로 올립니다(올린 파일을 다시 받아 sha256이 같을 때만 current.json을 바꿈). 예전 `kit/claude-video-kit*.zip`은 쓰지 않으며 건드리지 않습니다.
   ```bash

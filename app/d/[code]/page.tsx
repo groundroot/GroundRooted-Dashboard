@@ -1,5 +1,5 @@
 // 키트 다운로드 페이지 https://groundrooted.com/d/<코드> (products/videokit-link.ts).
-// 열람은 세지 않는다(메일 보안 검사기가 미리 열 수 있음). 횟수는 버튼(/d/<코드>/mac|windows)에서만 센다.
+// 열람은 세지 않는다(메일 보안 검사기가 미리 열 수 있음). 횟수는 버튼(POST /d/<코드>/mac|windows 폼)에서만 센다.
 import { headers } from 'next/headers';
 import { notFound } from 'next/navigation';
 import Shell, { KAKAO_URL } from '../../price/Shell';
@@ -29,8 +29,8 @@ export default async function DownloadPage({ params }: { params: Promise<{ code:
     <h1>클로드 비디오 키트 내려받기</h1>
     <p className="lede">{view.name && <>{view.name} 님께 보내드린 링크입니다 · </>}버전 {view.version}<br />본인 구매용 링크입니다. 다른 분과 공유하지 말아 주세요.</p>
     <div className="dl">
-      <a href={`/d/${view.code}/mac`} rel="nofollow">맥용 내려받기<small>macOS · Apple Silicon</small></a>
-      <a href={`/d/${view.code}/windows`} rel="nofollow">윈도우용 내려받기<small>Windows 10 · 11 (64비트)</small></a>
+      <form method="post" action={`/d/${view.code}/mac`}><button type="submit">맥용 내려받기<small>macOS · Apple Silicon</small></button></form>
+      <form method="post" action={`/d/${view.code}/windows`}><button type="submit">윈도우용 내려받기<small>Windows 10 · 11 (64비트)</small></button></form>
     </div>
     <p className="small dl-note">쓰시는 컴퓨터에 맞는 파일 하나를 받으면 됩니다.</p>
     <p className="dl-expire">이 링크는 <b>{kstDay(view.expiresAt)}</b>에 삭제됩니다.</p>

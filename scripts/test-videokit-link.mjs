@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { randomUUID } from 'node:crypto';
 import {
   newCode, normalizeCode, CODE_PATTERN, linkUrl, expiryFor, kstDay, maskName, isCurrent, fileName,
-  loadLink, handleDownload, resetLimits, createLink, revokeLink, supabaseLinkDeps, clientIp, ipBlocked, SIGN_SECONDS, DEFAULT_MAX_DOWNLOADS,
+  loadLink, handleDownload, downloadPage, resetLimits, createLink, revokeLink, supabaseLinkDeps, clientIp, ipBlocked, SIGN_SECONDS, DEFAULT_MAX_DOWNLOADS,
 } from '../products/videokit-link.ts';
 import { db } from '../products/videokit-license.ts';
 import { deliverKit, kitEmail } from '../products/videokit-delivery.ts';
@@ -86,14 +86,14 @@ let clock = NOW;
 const dl = async (code, platform, over) => { const f = fake(over); f.deps.now = (clock += 61_000); const r = await handleDownload(code, platform, f.deps); return { r, ...f }; };
 {
   resetLimits();
-  // 정상: 10분 서명 링크로 302, 파일 이름 ClaudeVideoKit-Mac-1.3.zip, 횟수 +1
+  // 정상: 10분 서명 링크로 303, 파일 이름 ClaudeVideoKit-Mac-1.3.zip, 횟수 +1
   let { r, calls } = await dl('abcd2345', 'mac');
-  assert.equal(r.status, 302); assert.equal(r.headers.get('cache-control'), 'no-store');
+  assert.equal(r.status, 303); assert.equal(r.headers.get('cache-control'), 'no-store');
   assert.equal(r.headers.get('location'), 'https://x.supabase.co/storage/v1/object/sign/videokit/kit/links/1.3/ClaudeVideoKit-Mac-1.3.zip?token=t&download=ClaudeVideoKit-Mac-1.3.zip');
   assert.deepEqual(calls.sign, [['kit/links/1.3/ClaudeVideoKit-Mac-1.3.zip', 600, 'ClaudeVideoKit-Mac-1.3.zip']]); assert.equal(SIGN_SECONDS, 600);
   assert.deepEqual(calls.hit, [[GOOD, 1]]);
   ({ r, calls } = await dl(GOOD, 'windows'));
-  assert.equal(r.status, 302); assert.deepEqual(calls.sign, [['kit/links/1.3/ClaudeVideoKit-Windows-1.3.zip', 600, 'ClaudeVideoKit-Windows-1.3.zip']]);
+  assert.equal(r.status, 303); assert.deepEqual(calls.sign, [['kit/links/1.3/ClaudeVideoKit-Windows-1.3.zip', 600, 'ClaudeVideoKit-Windows-1.3.zip']]);
   // 만료 · 없음 · 막힘 · 틀린 OS · 틀린 코드 → 페이지로 303 ("링크가 만료되었습니다"), 서명 · 기록 없음
   for (const [code, platform] of [[OLD, 'mac'], ['ZZZZ2345', 'mac'], [REVOKED, 'windows'], [GOOD, 'linux'], [GOOD, 'MAC'], ['0000OOOO', 'mac']]) {
     ({ r, calls } = await dl(code, platform));
@@ -106,9 +106,9 @@ const dl = async (code, platform, over) => { const f = fake(over); f.deps.now = 
   ({ r, calls } = await dl(FULL, 'mac'));
   assert.equal(r.status, 429); assert.match(await r.text(), /다운로드 횟수를 넘었습니다.*메일에 답장하거나 카카오톡/); assert.equal(calls.sign.length, 0); assert.equal(calls.hit.length, 0);
   ({ r, calls } = await dl(FULL, 'mac', { find: async () => row(FULL, { download_count: 9 }) }));
-  assert.equal(r.status, 302); assert.deepEqual(calls.hit, [[FULL, 10]], '10th download is allowed');
+  assert.equal(r.status, 303); assert.deepEqual(calls.hit, [[FULL, 10]], '10th download is allowed');
   ({ r } = await dl(FULL, 'mac', { find: async () => row(FULL, { download_count: 10, max_downloads: 25 }) }));
-  assert.equal(r.status, 302, 'custom --max is respected');
+  assert.equal(r.status, 303, 'custom --max is respected');
   // DB 오류 · current.json 문제 · 서명 실패 → 503, 횟수는 올리지 않음
   const quiet = console.error; console.error = () => {};
   try {
@@ -117,9 +117,11 @@ const dl = async (code, platform, over) => { const f = fake(over); f.deps.now = 
       assert.equal(r.status, 503); assert.match(r.headers.get('content-type'), /text\/html/); assert.equal(calls.hit.length, 0);
     }
     // 기록 실패는 다운로드를 막지 않는다
-    ({ r } = await dl(GOOD, 'mac', { hit: async () => { throw new Error('x'); } })); assert.equal(r.status, 302);
+    ({ r } = await dl(GOOD, 'mac', { hit: async () => { throw new Error('x'); } })); assert.equal(r.status, 303);
   } finally { console.error = quiet; }
-  console.log('PASS: download button (ok, expired, missing, revoked, platform, cap, errors)');
+  // GET /d/<코드>/<os>(메일 검사기 · 미리보기가 주소를 따라감)는 세지 않고 페이지로 돌려보낸다. DB에도 가지 않는다.
+  { const g = downloadPage('abcd2345'); assert.equal(g.status, 303); assert.equal(g.headers.get('location'), `/d/${GOOD}`); assert.equal(g.headers.get('cache-control'), 'no-store'); }
+  console.log('PASS: download button (ok, expired, missing, revoked, platform, cap, errors, GET not counted)');
 }
 
 // ---- 요청 수 제한: 링크 하나당 1분에 10번 ----
@@ -127,12 +129,12 @@ const dl = async (code, platform, over) => { const f = fake(over); f.deps.now = 
   resetLimits();
   const { deps, calls } = fake();
   const at = async (now, code = GOOD) => { deps.now = now; return handleDownload(code, 'mac', deps); };
-  for (let i = 0; i < 10; i++) assert.equal((await at(NOW + i * 1000)).status, 302, `req ${i + 1}`);
+  for (let i = 0; i < 10; i++) assert.equal((await at(NOW + i * 1000)).status, 303, `req ${i + 1}`);
   const r = await at(NOW + 10_000);
   assert.equal(r.status, 429); assert.equal(r.headers.get('retry-after'), '60'); assert.match(await r.text(), /요청이 너무 많습니다/);
   assert.equal(calls.find.length, 10, 'limited request does not hit the DB');
-  assert.equal((await at(NOW + 10_000, 'ZZZZ2345')).status, 303, 'other codes are counted separately');
-  assert.equal((await at(NOW + 61_000)).status, 302, 'window slides after a minute');
+  { const other = await at(NOW + 10_000, 'ZZZZ2345'); assert.equal(other.status, 303, 'other codes are counted separately'); assert.equal(other.headers.get('location'), '/d/ZZZZ2345'); }
+  assert.equal((await at(NOW + 61_000)).status, 303, 'window slides after a minute');
   console.log('PASS: download rate limit');
 }
 
@@ -157,7 +159,7 @@ const dl = async (code, platform, over) => { const f = fake(over); f.deps.now = 
   assert.equal(blocked.status, 429); assert.equal(blocked.headers.get('retry-after'), '600'); assert.equal(blocked.headers.get('cache-control'), 'no-store');
   assert.equal(calls.find.length, before, 'blocked IP does not reach the DB');
   // 다른 IP · 맞는 코드는 그대로
-  assert.equal((await handleDownload(GOOD, 'mac', deps, OTHER)).status, 302);
+  assert.equal((await handleDownload(GOOD, 'mac', deps, OTHER)).status, 303);
   // 맞는 코드 요청은 실패로 세지 않는다
   for (let i = 0; i < 9; i++) { deps.now = NOW + 20_000 + i * 1000; assert.equal((await loadLink(GOOD, deps, OTHER)).status, 'ok'); }
   assert.equal(ipBlocked(OTHER, deps.now), false);
@@ -244,13 +246,13 @@ Object.assign(process.env, { SUPABASE_URL: 'https://fake.supabase.co', SUPABASE_
   const view = await loadLink(a.code, deps);
   assert.equal(view.status, 'ok'); assert.equal(view.name, '강*철 (시험)'); assert.equal(view.version, '1.3');
   const r = await handleDownload(a.code, 'windows', deps);
-  assert.equal(r.status, 302);
+  assert.equal(r.status, 303);
   assert.match(r.headers.get('location'), /^https:\/\/fake\.supabase\.co\/storage\/v1\/object\/sign\/videokit\/kit\/links\/1\.3\/ClaudeVideoKit-Windows-1\.3\.zip\?token=t&download=ClaudeVideoKit-Windows-1\.3\.zip$/);
   const hit = be.tables.videokit_download_links.find(x => x.code === a.code);
   assert.equal(hit.download_count, 1); assert.ok(Date.now() - Date.parse(hit.last_download_at) < 5000);
   // 만료된 링크로 요청이 오면 그 행을 지우고 페이지로 보낸다
   hit.expires_at = new Date(Date.now() - 1).toISOString();
-  assert.equal((await handleDownload(a.code, 'mac', deps)).status, 303);
+  { const gone = await handleDownload(a.code, 'mac', deps); assert.equal(gone.status, 303); assert.equal(gone.headers.get('location'), `/d/${a.code}`); }
   assert.ok(!be.tables.videokit_download_links.some(x => x.code === a.code));
   assert.deepEqual(await loadLink(a.code, deps), { status: 'gone' });
   console.log('PASS: createLink (new, reuse, cleanup) and page/button with supabase client');
