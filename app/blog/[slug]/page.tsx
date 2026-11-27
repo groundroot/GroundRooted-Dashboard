@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     description: post.description || undefined,
     alternates: { canonical: url },
     // 프리뷰에서만 보이는 초안은 색인하지 않는다.
-    robots: post.draft ? { index: false, follow: false } : undefined,
+    robots: post.draft ? { index: false, follow: false } : { index: true, follow: true },
     openGraph: {
       type: 'article', url, title: post.title, description: post.description || undefined,
       publishedTime: post.date, section: post.category,

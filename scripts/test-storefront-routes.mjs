@@ -72,6 +72,7 @@ await withServer({port:3035,password,preview:true}, async request => {
       const slug = fm.match(/^slug:\s*"?([a-z0-9-]+)"?/m)?.[1] ?? file.replace(/\.md$/, '');
       const draft = /^draft:\s*true\s*$/m.test(fm);
       const post = await request(`/blog/${slug}`); assert.equal(post.status, draft ? 404 : 200, `/blog/${slug}`);
+      if (!draft) assert.match(await post.text(), /<meta name="robots" content="index, follow"/, `/blog/${slug} robots`);
       for (const [where, text] of [['/blog', html], ['sitemap', sitemapXml], ['rss', rssXml]]) assert.equal(text.includes(`/blog/${slug}`), !draft, `${slug} in ${where}`);
     }
     for (const path of ['/blogx', '/blog-admin']) { const x = await request(path); assert.equal(x.status, 307, path); }
