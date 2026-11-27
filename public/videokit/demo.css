@@ -221,6 +221,19 @@ fieldset { min-width: 0; border: 0; margin: 0; padding: 0; display: grid; gap: .
   font-weight: 700;
 }
 .cost.claude { color: var(--claude); background: var(--claude-bg); }
+.cost.service { color: #ffc9a8; background: #45291c; }
+.cost.note { color: var(--muted); background: var(--raised); }
+.option-tags { display: flex; flex-wrap: wrap; gap: .3rem; margin-top: .3rem; }
+.option-tags .cost { font-size: .75rem; padding: .1rem .45rem; }
+.step-attach { margin-top: .3rem; color: var(--ink); font-size: .875rem; }
+.step-attach strong { color: var(--accent); font-weight: 700; }
+.plan-extra { margin-top: 1.75rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
+.extra-intro { color: var(--muted); font-size: .875rem; margin-top: .35rem; }
+#plan-extra-list { list-style: none; padding: 0; }
+.extra-group { margin-top: 1.25rem; }
+.extra-group h4 { font-size: 1rem; }
+.extra-steps { list-style: none; padding: 0; margin-top: .5rem; border-top: 1px solid var(--line); }
+.extra-note { color: var(--muted); font-size: .8125rem; margin-top: .5rem; }
 .detail-link { display: inline-flex; align-items: center; min-height: 2.75rem; color: var(--muted); }
 .finish-actions { display: flex; flex-wrap: wrap; gap: .5rem; margin-top: 1rem; }
 .footer {

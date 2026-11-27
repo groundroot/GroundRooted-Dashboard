@@ -63,12 +63,17 @@
         <dl id="plan-details"></dl>
         <h3>적용 규칙</h3>
         <ul id="plan-rules"></ul>
+        <section id="plan-extra" class="plan-extra" aria-labelledby="plan-extra-heading" hidden>
+          <h3 id="plan-extra-heading">선택해서 더해지는 작업</h3>
+          <p class="extra-intro">선택에 따라 달라지는 예시입니다. 이 화면에서는 음성, 음악, 영상을 만들지 않습니다.</p>
+          <ul id="plan-extra-list"></ul>
+        </section>
       </section>
 
       <section class="build" aria-labelledby="build-heading">
         <h2 id="build-heading">빌드 코어의 작업 흐름</h2>
-        <p class="section-copy">실제 키트는 계획을 확인받은 뒤 빌드를 시작합니다. Claude는 장면과 콘티를 판단하고, PC는 받아쓰기와 파일 생성을 맡습니다.</p>
-        <p class="cost-note">‘무료’는 해당 PC 처리에 Claude 사용량이나 별도 API 요금이 없다는 뜻입니다. Claude 구독, 편집 앱, 유료 소스 비용은 별도입니다.</p>
+        <p class="section-copy">실제 키트는 계획을 확인받은 뒤 빌드를 시작합니다. Claude는 장면과 콘티를 판단하고, 컴퓨터가 받아쓰기와 파일 생성을 처리합니다. 자막, 모션 그래픽, 효과음, EQ, 덕킹이 붙는 단계도 함께 표시했습니다.</p>
+        <p class="cost-note">‘무료’는 컴퓨터가 처리하는 단계에 Claude 사용량이나 별도 API 요금이 없다는 뜻입니다. Claude 구독, 편집 앱, 유료 소스 비용은 별도입니다.</p>
         <ol id="build-steps"></ol>
         <a class="detail-link" href="/videokit/diagram.html">전체 구조도 보기</a>
       </section>

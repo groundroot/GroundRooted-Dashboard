@@ -50,9 +50,27 @@ await withServer({port:3035,password,preview:true}, async request => {
   { const html = await (await request('/price')).text(); assert.match(html, /name="plan" checked="" value="kit"/); }
   for (const path of ['/videokit', '/videokit/diagram.html']) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /text\/html/);
-    if (path === '/videokit') { const html = await r.text(); assert.ok(html.includes('src="/videokit/diagram.html"')); assert.ok(html.includes('href="/blog"'), 'videokit blog link'); assert.ok(html.includes('open.kakao.com')); for (const plan of ['kit', 'lesson', 'pass']) assert.ok(html.includes(`href="/price?plan=${plan}"`), `buy button ${plan}`); assert.ok(!html.includes('신청서 작성')); }
+    if (path === '/videokit') {
+      const html = await r.text();
+      assert.ok(html.includes('src="/videokit/diagram.html"'));
+      assert.ok(html.includes('href="/blog"'), 'videokit blog link');
+      assert.ok(html.includes('href="/videokit/demo"'), 'videokit demo link');
+      assert.ok(html.includes('코덱스와 제미나이로는 작업이 안 되나요?'), 'videokit Codex and Gemini FAQ');
+      assert.equal((html.match(/class="skill-name"/g) ?? []).length, 36, 'videokit skill catalog');
+      assert.ok(html.includes('open.kakao.com'));
+      for (const plan of ['kit', 'lesson', 'pass']) assert.ok(html.includes(`href="/price?plan=${plan}"`), `buy button ${plan}`);
+      assert.ok(!html.includes('신청서 작성'));
+    }
   }
-  assert.ok((await (await request('/videokit')).text()).includes('href="/videokit/demo"'), 'videokit demo link');
+  {
+    const response = await request('/videokit/demo.js');
+    assert.equal(response.status, 200);
+    const js = await response.text();
+    assert.ok(js.includes('다빈치 리졸브(베타)'), 'demo Resolve beta');
+    assert.doesNotMatch(js, /\b(?:Free|Studio)\b/, 'demo Resolve without edition split');
+    assert.ok(js.includes('내 목소리로 내레이션 만들기'), 'demo own-voice option');
+    assert.ok(js.includes('컴퓨터에서 배경 음원 만들기'), 'demo computer-generated music example');
+  }
   // 상품별 이미지(키트 · 키트 + 강의 · 강의권)는 공개 경로여야 한다. 막히면 307로 이미지가 깨진다.
   for (const path of ['/videokit/product.png', '/videokit/plan-kit.png', '/videokit/plan-lesson.png', '/videokit/plan-pass.png']) {
     const r = await request(path); assert.equal(r.status, 200, path); assert.match(r.headers.get('content-type'), /image\/png/, path);
