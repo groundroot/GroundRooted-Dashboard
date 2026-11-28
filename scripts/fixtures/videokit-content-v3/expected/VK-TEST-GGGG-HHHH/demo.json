@@ -1,0 +1,13 @@
+{
+ "loudness_lufs": -16.0,
+ "subtitle": {
+  "size": 64,
+  "scale": 1.0,
+  "font": "Pretendard"
+ },
+ "about": {
+  "name": "데모",
+  "look": "검정 외곽선의 흰 글씨",
+  "fits": "강의"
+ }
+}

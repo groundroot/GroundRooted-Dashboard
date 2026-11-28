@@ -12,6 +12,7 @@ import { randomBytes } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { createHash } from 'node:crypto';
 import { watermarkKit, type Mark } from './videokit-watermark.ts';
+import { linkTag } from './videokit-mark.ts';
 
 const env = (k: string, d = '') => process.env[k] || d;
 
@@ -74,6 +75,8 @@ export type LinkDeps = {
   sign: (path: string, seconds: number, download: string) => Promise<string | null>;
   readKit: (path: string) => Promise<Buffer>;                  // 원본 zip. 없으면 throw
   putPersonal: (path: string, body: Buffer) => Promise<void>;  // 개인 zip 올리기(덮어씀). 실패하면 throw
+  // VIDEOKIT_MARK_SECRET: 있으면 스킬 · 설명서에 링크 태그(계약 v3 §5)도 넣는다. 없으면 종전 표식만(다운로드는 막지 않음).
+  markSecret?: string;
   now?: number;
 };
 
@@ -192,7 +195,9 @@ export async function handleDownload(rawCode: unknown, rawPlatform: unknown, dep
       const kit = await deps.readKit(c[platform].path);
       const want = c[platform].sha256;
       if (want && createHash('sha256').update(kit).digest('hex') !== want.toLowerCase()) throw new Error('original zip sha256 mismatch');
-      await deps.putPersonal(path, watermarkKit(kit, markFor(r.row, deps.now ?? Date.now())));
+      if (!deps.markSecret) console.error('[videokit] VIDEOKIT_MARK_SECRET is not set: personal kit without v3 link tags');
+      const secret = deps.markSecret;
+      await deps.putPersonal(path, await watermarkKit(kit, markFor(r.row, deps.now ?? Date.now()), secret ? { linkTag: p => linkTag(secret, code, p) } : {}));
       signed = await deps.sign(path, SIGN_SECONDS, name);
       if (!signed) throw new Error('sign failed');
     } catch (e) { console.error('[videokit] personal kit failed', c[platform].path, (e as Error).message); signed = null; }
@@ -220,6 +225,7 @@ async function removePersonal(sb: SupabaseClient, codes: string[]) {
 export function supabaseLinkDeps(sb: SupabaseClient): LinkDeps {
   const storage = bucket(sb);
   return {
+    markSecret: env('VIDEOKIT_MARK_SECRET') || undefined,
     async find(code) {
       const { data, error } = await sb.from(TABLE).select('code,email,name,order_id,created_at,expires_at,revoked,download_count,max_downloads').eq('code', code).maybeSingle();
       if (error) throw new Error(error.message);
