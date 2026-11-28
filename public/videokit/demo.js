@@ -6,7 +6,7 @@ const questions = [
     help: "영상의 목적을 정하면 핵심 장면을 고르는 기준이 생깁니다.",
     options: [
       { label: "유튜브 강연 하이라이트", detail: "강연을 놓친 사람에게 핵심 메시지를 전합니다.", skill: "하이라이트", id: "talking-head-highlight" },
-      { label: "인스타그램 릴스", detail: "처음 보는 사람에게 기억할 만한 한 가지를 전합니다.", skill: "쇼츠", id: "fcp-shorts" },
+      { label: "인스타그램 릴스", detail: "처음 보는 사람에게 기억할 만한 한 가지를 전합니다.", skill: "쇼츠", id: "shorts" },
       { label: "내부 교육용 요약", detail: "팀원이 사례에서 배운 점을 회의 전에 훑어볼 수 있게 합니다.", skill: "하이라이트", id: "talking-head-highlight" },
     ],
   },
@@ -101,7 +101,7 @@ const questions = [
     options: [
       { label: "컷 편집과 자막만", detail: "인터뷰에서 핵심을 고르고 선택한 자막을 만듭니다.", skills: [] },
       { label: "제목에 지정 글꼴 적용", detail: "영상 첫머리에 정해 둔 글꼴로 제목을 넣습니다.", skills: ["글꼴 적용 (font-apply)"] },
-      { label: "첫 장면에 제목 넣기", detail: "영상 첫머리에 내용을 소개하는 모션 타이틀을 더합니다.", skills: ["모션그래픽 (fcp-motion-graphics)"] },
+      { label: "첫 장면에 제목 넣기", detail: "영상 첫머리에 내용을 소개하는 모션 타이틀을 더합니다.", skills: ["모션그래픽 (motion-graphics)"] },
       {
         label: "레퍼런스 영상의 편집 스타일 참고",
         detail: "공개 유튜브 레퍼런스의 도입 · 리듬 · 구성을 분석해 이 프로젝트에 맞는 새 기획과 편집 스타일을 만듭니다.",
@@ -228,7 +228,7 @@ function renderPlan() {
       ? "Suno는 별도 서비스입니다. 키트의 suno-score 스킬을 쓰며 요금과 크레딧은 서비스 구독 조건을 따릅니다."
       : "보유 음원을 쓰면 별도 음악 서비스 요금이 들지 않습니다.",
   } : audio;
-  const skills = [`${goal.skill} (${goal.id})`, "자막 (fcp-captions)", ...(audio.skills ?? []), ...extras.skills];
+  const skills = [`${goal.skill} (${goal.id})`, "자막 (captions)", ...(audio.skills ?? []), ...extras.skills];
   const details = [
     ["길이", format.length],
     ["화면비", format.ratio],
