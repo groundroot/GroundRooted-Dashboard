@@ -646,6 +646,16 @@ html:not(.promo-end) .p-off{display:none!important}
 .rv .stars{display:flex;gap:3px;color:var(--head)}
 .rv .stars svg{width:18px;height:18px}
 @media (max-width:760px){.reviews{grid-template-columns:1fr}.rv,.rv:nth-child(even){padding:24px 0;border-left:0}}
+/* 레퍼런스 영상: 구매자가 키트로 만든 결과 (영상은 누를 때만 받는다: preload="none" + poster) */
+.refs{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,2.4vw,32px)}
+.ref{display:flex;flex-direction:column;gap:10px;min-width:0}
+.ref video{display:block;width:100%;height:auto;aspect-ratio:16/9;border-radius:14px;background:#000;margin-bottom:6px}
+.ref-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
+.ref-title h3{font-size:19px;line-height:1.35;letter-spacing:-.02em;font-weight:700;text-wrap:balance}
+.ref-title time{flex:none;font-family:var(--mono);font-size:13px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.ref p{color:var(--ink-2);font-size:15px;line-height:1.6}
+.ref .who{font-size:13px;color:var(--ink-3);font-family:var(--mono)}
+@media (max-width:960px){.refs{grid-template-columns:1fr;max-width:640px}}
 .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));border-top:1px solid var(--line)}
 .facts>div{display:grid;grid-template-columns:7.5em 1fr;gap:16px;padding:22px 24px 22px 0;border-bottom:1px solid var(--line)}
 .facts>div:nth-child(even){padding-left:24px;border-left:1px solid var(--line)}
@@ -1230,6 +1240,36 @@ footer .wrap{align-items:flex-start}
     </div>
   </section>
 
+  <!-- 레퍼런스 영상 -->
+  <section id="reference" class="band">
+    <div class="wrap">
+      <div class="sec-head">
+        <h2>레퍼런스 영상</h2>
+        <p>구매자가 별도 세팅 없이 키트를 그대로 돌려 만든 유튜브 영상입니다.</p>
+      </div>
+      <ul class="refs">
+        <li class="ref">
+          <video controls playsinline preload="none" width="1280" height="720" poster="/videokit/reference/used-car-budget-v1.jpg" aria-label="월급 250만 원, 중고차 얼마짜리까지 영상"><source src="https://ezotlilwikhhwloejnei.supabase.co/storage/v1/object/public/site-media/videokit/reference/used-car-budget-v1.mp4" type="video/mp4"></video>
+          <div class="ref-title"><h3>월급 250만 원, 중고차 얼마짜리까지</h3><time datetime="PT6M51S">6:51</time></div>
+          <p>중고차 채널 · 월급과 할부금으로 살 수 있는 차를 매물 비교로 풀어 준 영상</p>
+          <span class="who">구매자 김*준 님 채널</span>
+        </li>
+        <li class="ref">
+          <video controls playsinline preload="none" width="1280" height="720" poster="/videokit/reference/game-first-app-v1.jpg" aria-label="첫 앱 영상"><source src="https://ezotlilwikhhwloejnei.supabase.co/storage/v1/object/public/site-media/videokit/reference/game-first-app-v1.mp4" type="video/mp4"></video>
+          <div class="ref-title"><h3>첫 앱</h3><time datetime="PT9M53S">9:53</time></div>
+          <p>게임 채널 · 폰을 켜면 가장 먼저 여는 게임이 사람마다 다른 이유를 다룬 롱폼</p>
+          <span class="who">구매자 김*준 님 채널</span>
+        </li>
+        <li class="ref">
+          <video controls playsinline preload="none" width="1280" height="720" poster="/videokit/reference/used-car-no-accident-v1.jpg" aria-label="무사고인데 교환? 영상"><source src="https://ezotlilwikhhwloejnei.supabase.co/storage/v1/object/public/site-media/videokit/reference/used-car-no-accident-v1.mp4" type="video/mp4"></video>
+          <div class="ref-title"><h3>무사고인데 교환?</h3><time datetime="PT5M23S">5:23</time></div>
+          <p>중고차 채널 · ‘무사고’라고 적힌 차의 성능지와 보험 이력을 함께 읽어 본 영상</p>
+          <span class="who">구매자 김*준 님 채널</span>
+        </li>
+      </ul>
+    </div>
+  </section>
+
   <!-- 후기 -->
   <section id="reviews" class="band band-reviews">
     <div class="wrap">
@@ -1407,7 +1447,7 @@ document.querySelectorAll('.js-kakao').forEach(a=>{
   document.querySelectorAll('section .sec-head h2, .mix-head h3, .system-head h3').forEach(el => mark(el, 'rv-h'));
   document.querySelectorAll('.sec-head p, .launch-head, .cd, .launch-plans, .claude-req, .band-launch .actions, .for h3, .flow-lead, .flow-step, .flow-claude, .flow-rail, .flow-direct, .why blockquote, .why-body, .tok h3, .tok-note, .system-head p, .system-head .btn, .mix-head p, .mix-grid, .mix-sum, .detail h4, .contact h2, .contact .lede, .contact .actions, .policy').forEach(el => mark(el, 'rvl'));
   document.querySelectorAll('.system-frame').forEach(el => mark(el, 'rv-clip'));
-  ['.for > ul', '.eds', '.caps', '.reviews', '.facts', '.faq-list', '.how', '.steps', '.detail .list', '.promise ul', '.plans'].forEach(sel =>
+  ['.for > ul', '.eds', '.caps', '.refs', '.reviews', '.facts', '.faq-list', '.how', '.steps', '.detail .list', '.promise ul', '.plans'].forEach(sel =>
     document.querySelectorAll(sel).forEach(list => [...list.children].forEach((c, i) => mark(c, 'rvl', i))));
   document.querySelectorAll('.tok-row').forEach((r, i) => mark(r, 'rvl', i));
   document.querySelectorAll('.promise > h3, .promise > p').forEach(el => mark(el, 'rvl'));
@@ -1451,6 +1491,11 @@ document.querySelectorAll('.js-kakao').forEach(a=>{
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   if (!fine || reduce || !window.VanillaTilt) return;
   VanillaTilt.init(document.querySelectorAll('.flow .fc'), { max: 12, speed: 700, perspective: 900, scale: 1.03, glare: true, 'max-glare': .12, reset: true, gyroscope: false });
+})();
+/* 레퍼런스 영상: 하나를 재생하면 나머지는 멈춘다 */
+(()=>{
+  const vs = [...document.querySelectorAll('.refs video')];
+  vs.forEach(v => v.addEventListener('play', () => vs.forEach(o => { if (o !== v) o.pause(); })));
 })();
 </script>
 </body>
