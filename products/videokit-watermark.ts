@@ -159,8 +159,8 @@ export function watermarkKit(zip: Buffer, m: Mark): Buffer {
 }
 
 // 테스트용: 파일 목록으로 zip을 만들고(buildZip), zip 안 파일 내용 · 외부 속성 · 주석을 읽는다(readZipFiles).
-export function buildZip(files: { name: string; content: string | Buffer }[], comment = '') {
-  const when = new Date('2026-11-26T00:00:00Z');
+// 콘텐츠 개인 사본(products/videokit-mark.ts)도 이것으로 만든다: 항목 시각 고정, DEFLATE, 권한 0644.
+export function buildZip(files: { name: string; content: string | Buffer }[], comment = '', when = new Date('2026-11-26T00:00:00Z')) {
   return writeZip(files.map(f => newFile(f.name, Buffer.from(f.content), when)), comment);
 }
 export function readZipFiles(zip: Buffer) {

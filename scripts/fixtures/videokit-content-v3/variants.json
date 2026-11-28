@@ -1,0 +1,59 @@
+{
+ "files": {
+  "guide.md": {
+   "header": true,
+   "footer": true,
+   "spaces": 3,
+   "slots": [
+    {
+     "find": "가장 센 장면을 먼저",
+     "alts": [
+      "가장 센 장면을 먼저",
+      "제일 센 장면을 먼저",
+      "가장 센 장면을 우선",
+      "제일 센 장면을 우선"
+     ]
+    },
+    {
+     "find": "약 30초 안에",
+     "alts": [
+      "약 30초 안에",
+      "대략 30초 안에"
+     ]
+    },
+    {
+     "find": "항상 결말에서",
+     "alts": [
+      "항상 결말에서",
+      "늘 결말에서",
+      "언제나 결말에서"
+     ]
+    }
+   ]
+  },
+  "references/demo/checklist.md": {
+   "header": true,
+   "footer": true,
+   "spaces": 2,
+   "slots": [
+    {
+     "find": "바로 시작한다",
+     "alts": [
+      "바로 시작한다",
+      "곧바로 시작한다"
+     ]
+    }
+   ]
+  },
+  "demo.json": {
+   "json": {
+    "order": true,
+    "indent": true,
+    "about_alts": [
+     "흰 글씨, 검정 외곽선",
+     "검정 외곽선의 흰 글씨"
+    ]
+   }
+  }
+ }
+}
