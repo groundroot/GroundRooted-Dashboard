@@ -646,10 +646,15 @@ html:not(.promo-end) .p-off{display:none!important}
 .rv .stars{display:flex;gap:3px;color:var(--head)}
 .rv .stars svg{width:18px;height:18px}
 @media (max-width:760px){.reviews{grid-template-columns:1fr}.rv,.rv:nth-child(even){padding:24px 0;border-left:0}}
-/* 레퍼런스 영상: 구매자가 키트로 만든 결과 (영상은 누를 때만 받는다: preload="none" + poster) */
+/* 레퍼런스 영상: 구매자가 키트로 만든 결과 (유튜브 일부 공개. 처음엔 포스터만, 누르면 그때 플레이어를 띄운다) */
 .refs{list-style:none;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(20px,2.4vw,32px)}
 .ref{display:flex;flex-direction:column;gap:10px;min-width:0}
-.ref video{display:block;width:100%;height:auto;aspect-ratio:16/9;border-radius:14px;background:#000;margin-bottom:6px}
+.ref-play,.ref iframe{position:relative;display:block;width:100%;height:auto;aspect-ratio:16/9;border:0;padding:0;border-radius:14px;overflow:hidden;background:#000;margin-bottom:6px}
+.ref-play{cursor:pointer}
+.ref-play img{display:block;width:100%;height:100%;object-fit:cover}
+.ref-play .ico{position:absolute;left:50%;top:50%;width:64px;height:64px;margin:-32px 0 0 -32px;border-radius:50%;background:rgba(0,0,0,.62);color:#fff;display:grid;place-items:center;transition:transform .2s,background .2s}
+.ref-play .ico svg{width:26px;height:26px;margin-left:4px}
+.ref-play:hover .ico,.ref-play:focus-visible .ico{transform:scale(1.08);background:rgba(0,0,0,.8)}
 .ref-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px}
 .ref-title h3{font-size:19px;line-height:1.35;letter-spacing:-.02em;font-weight:700;text-wrap:balance}
 .ref-title time{flex:none;font-family:var(--mono);font-size:13px;color:var(--ink-3);font-variant-numeric:tabular-nums}
@@ -1249,19 +1254,19 @@ footer .wrap{align-items:flex-start}
       </div>
       <ul class="refs">
         <li class="ref">
-          <video controls playsinline preload="none" width="1280" height="720" poster="/videokit/reference/used-car-budget-v1.jpg" aria-label="월급 250만 원, 중고차 얼마짜리까지 영상"><source src="https://ezotlilwikhhwloejnei.supabase.co/storage/v1/object/public/site-media/videokit/reference/used-car-budget-v1.mp4" type="video/mp4"></video>
+          <button type="button" class="ref-play" data-yt="lBUKTV4dvH0" data-title="월급 250만 원, 중고차 얼마짜리까지" aria-label="월급 250만 원, 중고차 얼마짜리까지 영상 재생"><img src="/videokit/reference/used-car-budget-v1.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></button>
           <div class="ref-title"><h3>월급 250만 원, 중고차 얼마짜리까지</h3><time datetime="PT6M51S">6:51</time></div>
           <p>중고차 채널 · 월급과 할부금으로 살 수 있는 차를 매물 비교로 풀어 준 영상</p>
           <span class="who">구매자 김*준 님 채널</span>
         </li>
         <li class="ref">
-          <video controls playsinline preload="none" width="1280" height="720" poster="/videokit/reference/game-first-app-v1.jpg" aria-label="첫 앱 영상"><source src="https://ezotlilwikhhwloejnei.supabase.co/storage/v1/object/public/site-media/videokit/reference/game-first-app-v1.mp4" type="video/mp4"></video>
+          <button type="button" class="ref-play" data-yt="7s0cbKzRCvg" data-title="첫 앱" aria-label="첫 앱 영상 재생"><img src="/videokit/reference/game-first-app-v1.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></button>
           <div class="ref-title"><h3>첫 앱</h3><time datetime="PT9M53S">9:53</time></div>
           <p>게임 채널 · 폰을 켜면 가장 먼저 여는 게임이 사람마다 다른 이유를 다룬 롱폼</p>
           <span class="who">구매자 김*준 님 채널</span>
         </li>
         <li class="ref">
-          <video controls playsinline preload="none" width="1280" height="720" poster="/videokit/reference/used-car-no-accident-v1.jpg" aria-label="무사고인데 교환? 영상"><source src="https://ezotlilwikhhwloejnei.supabase.co/storage/v1/object/public/site-media/videokit/reference/used-car-no-accident-v1.mp4" type="video/mp4"></video>
+          <button type="button" class="ref-play" data-yt="tTirBWTzZwg" data-title="무사고인데 교환?" aria-label="무사고인데 교환? 영상 재생"><img src="/videokit/reference/used-car-no-accident-v1.jpg" alt="" width="1280" height="720" loading="lazy" decoding="async"><span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></span></button>
           <div class="ref-title"><h3>무사고인데 교환?</h3><time datetime="PT5M23S">5:23</time></div>
           <p>중고차 채널 · ‘무사고’라고 적힌 차의 성능지와 보험 이력을 함께 읽어 본 영상</p>
           <span class="who">구매자 김*준 님 채널</span>
@@ -1492,10 +1497,19 @@ document.querySelectorAll('.js-kakao').forEach(a=>{
   if (!fine || reduce || !window.VanillaTilt) return;
   VanillaTilt.init(document.querySelectorAll('.flow .fc'), { max: 12, speed: 700, perspective: 900, scale: 1.03, glare: true, 'max-glare': .12, reset: true, gyroscope: false });
 })();
-/* 레퍼런스 영상: 하나를 재생하면 나머지는 멈춘다 */
+/* 레퍼런스 영상: 누르면 포스터를 유튜브 플레이어로 바꾼다. 다른 영상을 누르면 앞의 것은 포스터로 되돌린다(한 번에 하나만 재생) */
 (()=>{
-  const vs = [...document.querySelectorAll('.refs video')];
-  vs.forEach(v => v.addEventListener('play', () => vs.forEach(o => { if (o !== v) o.pause(); })));
+  let open = null;
+  document.querySelectorAll('.refs .ref-play').forEach(btn => btn.addEventListener('click', () => {
+    if (open) open.f.replaceWith(open.btn);
+    const f = document.createElement('iframe');
+    f.src = 'https://www.youtube-nocookie.com/embed/' + btn.dataset.yt + '?autoplay=1&rel=0';
+    f.title = btn.dataset.title;
+    f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
+    f.allowFullscreen = true;
+    btn.replaceWith(f);
+    open = { f, btn };
+  }));
 })();
 </script>
 </body>
