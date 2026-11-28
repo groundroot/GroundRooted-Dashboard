@@ -5,7 +5,7 @@
 import assert from 'node:assert/strict';
 import { createHmac, randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
-import { BRIDGE_HINT, compareVersions, db, deviceLimitForNewKey, handleLatest, issueLicense, resetLimits, supabaseLatestDeps, MANAGE_URL } from '../products/videokit-license.ts';
+import { compareVersions, db, deviceLimitForNewKey, handleLatest, issueLicense, resetLimits, supabaseLatestDeps, MANAGE_URL } from '../products/videokit-license.ts';
 import { addDevices, deviceKeyStatus, deviceOrderMatches, findLicenses, grantDeviceAddon, handleRegister, describeLicense, makeDeviceOrderId, resetDevices, settleDeviceOrder, supabaseRegisterDeps } from '../products/videokit-devices.ts';
 import { checkOrder, hasKit, hasLesson, isOrderId, makeCouponOrderId, priceOf } from '../products/videokit.ts';
 import { deliverKit } from '../products/videokit-delivery.ts';
@@ -128,6 +128,12 @@ function server(t, { enforce = true, latest = RELEASES.latest, bridge = RELEASES
   };
   return { sb, L, R, latestReq, register };
 }
+// 키트 1.4.1이 응답을 받아들이는 조건(개발 봇 구현): 403 error는 두 값, 등록 200 status는 두 값, used · limit은 숫자, manage_url은 https.
+const kitAccepts = (status, body) => {
+  if (status === 403) return ['device_unregistered', 'device_limit'].includes(body.error) && Number.isInteger(body.used) && Number.isInteger(body.limit) && /^https:\/\//.test(body.manage_url);
+  if (status === 200 && 'status' in body) return ['registered', 'already_registered'].includes(body.status) && Number.isInteger(body.used) && Number.isInteger(body.limit);
+  return false;
+};
 const regBody = (d, platform = 'mac', extra = {}) => ({ device: d, platform, label: 'MacBookPro18,3', kit_version: '1.4.1', ...extra });
 
 // ---- 3. 등록 ----
@@ -143,6 +149,8 @@ const regBody = (d, platform = 'mac', extra = {}) => ({ device: d, platform, lab
   r = await s.register(GOOD, regBody(dev('A'))); assert.equal(r.body.status, 'already_registered'); assert.equal(t.devices.length, 1);
   r = await s.register(GOOD, regBody(dev('b'), 'windows', { label: 'Windows PC' }));
   assert.deepEqual(r.body, { status: 'registered', used: 2, limit: 2 });
+  // 키트가 보내는 label(맥 hw.model · 윈도우 'Windows PC') · kit_version · 플랫폼을 저장
+  assert.deepEqual(t.devices.map(d => [d.platform, d.label, d.kit_version]), [['mac', 'MacBookPro18,3', '1.4.1'], ['windows', 'Windows PC', '1.4.1']]);
   // 세 번째 기기 → 403 device_limit, manage_url, 등록하지 않음
   r = await s.register(GOOD, regBody(dev('c')));
   assert.equal(r.status, 403); assert.deepEqual(r.body, { error: 'device_limit', limit: 2, used: 2, manage_url: MANAGE_URL }); assert.equal(t.devices.length, 2);
@@ -186,10 +194,14 @@ const regBody = (d, platform = 'mac', extra = {}) => ({ device: d, platform, lab
     if (want === null) { assert.equal(r.status, 403, v); assert.equal(b.error, 'device_limit'); } else { assert.equal(r.status, 200, String(v)); assert.equal(b.used, want); }
   }
   delete process.env.VIDEOKIT_DEVICE_ENFORCE;
-  // 대수 제한 없는 키(device_limit NULL, 종전 약관): 스위치가 켜져 있어도 등록 · 확인 모두 막지 않음, limit null
+  // 대수 제한 없는 키(device_limit NULL, 종전 약관): 스위치가 켜져 있어도 등록 · 확인 모두 막지 않음.
+  // 응답 limit은 키트가 숫자만 받으므로 999(DB는 NULL 그대로)
   const on = server(t, { enforce: true });
-  for (let i = 0; i < 5; i++) assert.deepEqual((await on.register(OLD, regBody(String(i).repeat(64)))).body, { status: 'registered', used: i + 1, limit: null });
+  for (let i = 0; i < 5; i++) { const r = await on.register(OLD, regBody(String(i).repeat(64))); assert.deepEqual(r.body, { status: 'registered', used: i + 1, limit: 999 }); assert.ok(kitAccepts(r.status, r.body)); }
+  assert.equal(t.licenses.find(l => l.key === OLD).device_limit, null);
   assert.equal((await on.latestReq(OLD, { device: '4'.repeat(64) })).status, 200);
+  const unreg = await on.latestReq(OLD, { device: '9'.repeat(64) });
+  assert.deepEqual([unreg.status, unreg.body.error, unreg.body.limit, unreg.body.used], [403, 'device_unregistered', 999, 5]); assert.ok(kitAccepts(unreg.status, unreg.body));
   console.log('PASS: enforce switch (default off = record only), unlimited keys (device_limit NULL)');
 }
 
@@ -218,6 +230,13 @@ const regBody = (d, platform = 'mac', extra = {}) => ({ device: d, platform, lab
   // 미등록 + 한도 초과: 등록이 403 device_limit
   assert.equal((await s.latestReq(GOOD, { device: dev('c') })).body.error, 'device_unregistered');
   assert.equal((await s.register(GOOD, regBody(dev('c')))).body.error, 'device_limit');
+  // 키트는 헤더 이름을 X-vk-device처럼 대소문자를 섞어 보낸다 → 이름 대소문자 무시
+  for (const name of ['X-vk-device', 'x-vk-device', 'X-VK-DEVICE', 'X-Vk-Device']) {
+    { const rr = await handleLatest(new Request('https://groundrooted.com/api/videokit/latest?platform=mac&current=1.4.1', { headers: { Authorization: `Bearer ${GOOD}`, [name]: dev('a') } }), { ...s.L, now: (now += 61_000) }); assert.equal(rr.status, 200, name); }
+  }
+  // 키트가 정확히 비교하는 403 · 200 본문 모양
+  for (const x of [await s.latestReq(GOOD, { device: dev('9') }), await s.register(GOOD, regBody(dev('9')))]) assert.ok(kitAccepts(x.status, x.body), JSON.stringify(x.body));
+  assert.equal(MANAGE_URL, 'https://groundrooted.com/videokit#contact');
   // 11: 헤더 형식 오류 → 400 (키트 종료 8)
   for (const d of ['xyz', dev('a').slice(1), dev('g'), '']) { r = await s.latestReq(GOOD, { device: d }); assert.equal(r.status, 400, d); assert.deepEqual(r.body, { error: 'bad_device' }); }
   // 11: 헤더 없이 current=1.4.1 이상 → 403 device_unregistered (헤더를 지운 요청)
@@ -243,7 +262,7 @@ const regBody = (d, platform = 'mac', extra = {}) => ({ device: d, platform, lab
     for (const [q, plat, size] of [['platform=mac&current=1.4.0', 'mac', 141], ['platform=windows&current=1.4.0', 'windows', 142], ['platform=mac&current=2026.11.26.2225', 'mac', 141], ['platform=mac', 'mac', 141], ['platform=mac&current=1.3', 'mac', 141]]) {
       const r = await s.latestReq(GOOD, { q });
       assert.equal(r.status, 200, q); assert.equal(r.body.version, '1.4.1'); assert.equal(r.body.platform, plat); assert.equal(r.body.size, size);
-      assert.match(r.body.url, /releases\/1\.4\.1\//); assert.equal(r.body.notes, `- 1.4.1 기기 등록\n\n${BRIDGE_HINT}`);
+      assert.match(r.body.url, /releases\/1\.4\.1\//); assert.equal(r.body.notes, '- 1.4.1 기기 등록', 'bridge notes as-is');
       // 1.4.0 updater의 본문 검사를 통과하는 값 (§6.3)
       assert.ok(/^[0-9A-Za-z.]+$/.test(r.body.version) && /^[0-9a-f]{64}$/.test(r.body.sha256) && Number.isInteger(r.body.size) && typeof r.body.url === 'string');
     }
@@ -253,11 +272,12 @@ const regBody = (d, platform = 'mac', extra = {}) => ({ device: d, platform, lab
   }
   // 헤더 없는 요청도 last_seen_at · last_version 기록 (1.4.0 남은 구매자 수)
   assert.equal(t.licenses.find(l => l.key === GOOD).last_version, '1.3');
-  // bridge.json에 이미 안내가 있으면 두 번 붙이지 않는다
-  let s = server(t, { bridge: { ...RELEASES.bridge, notes: `변경\n${BRIDGE_HINT}` } });
-  assert.equal((await s.latestReq(GOOD, { q: 'platform=mac&current=1.4.0' })).body.notes, `변경\n${BRIDGE_HINT}`);
+  // 등록 안내문(계약 §6.2)은 bridge.json 안의 글을 그대로 쓴다. 서버가 덧붙이지 않는다.
+  const HINT = '업데이트 뒤 /videokit update를 한 번 실행해 이 기기를 등록하세요. 등록해야 다음 업데이트를 받습니다.';
+  let s = server(t, { bridge: { ...RELEASES.bridge, notes: `변경\n${HINT}` } });
+  assert.equal((await s.latestReq(GOOD, { q: 'platform=mac&current=1.4.0' })).body.notes, `변경\n${HINT}`);
   s = server(t, { bridge: { mac: RELEASES.bridge.mac } });
-  assert.equal((await s.latestReq(GOOD, { q: 'platform=mac&current=1.4.0' })).body.notes, BRIDGE_HINT);
+  assert.equal((await s.latestReq(GOOD, { q: 'platform=mac&current=1.4.0' })).body.notes, '');
   // bridge에 그 플랫폼이 없거나 bridge.json이 없으면 503 no_release (1.4.0: "아직 배포된 업데이트가 없습니다", 종료 0)
   for (const bridge of [{ mac: RELEASES.bridge.mac }, null]) {
     s = server(t, { bridge });
@@ -267,7 +287,7 @@ const regBody = (d, platform = 'mac', extra = {}) => ({ device: d, platform, lab
   // bridge 항목 형식이 틀리면 503 unavailable (서명 링크를 만들지 않음)
   s = server(t, { bridge: { mac: { ...RELEASES.bridge.mac, sha256: 'x' } } });
   assert.deepEqual(await quiet(async () => (await s.latestReq(GOOD, { q: 'platform=mac&current=1.4.0' })).body), { error: 'unavailable' });
-  console.log('PASS: header-less 1.4.0 → bridge 1.4.1 only (even with latest 1.4.2, switch on or off), no_release, notes hint');
+  console.log('PASS: header-less 1.4.0 → bridge 1.4.1 only (even with latest 1.4.2, switch on or off), no_release, notes from bridge.json as-is');
 }
 
 // ---- 6 · 7. 리셋 · 한도 축소 · 운영봇 스크립트 함수 ----

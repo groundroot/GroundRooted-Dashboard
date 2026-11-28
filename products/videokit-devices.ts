@@ -6,7 +6,7 @@
 // 키와 기기 값은 로그에 남기지 않는다. 출력에는 키 끝 4자, 기기 값 앞 8자만 보인다.
 import { createHmac, randomUUID, timingSafeEqual } from 'node:crypto';
 import type { SupabaseClient } from '@supabase/supabase-js';
-import { DEVICE_PATTERN, PLATFORMS, VERSION, db, deviceEnforced, invalid, isKey, json, normalizeKey, overLimit, tooMany, type Platform } from './videokit-license.ts';
+import { DEVICE_PATTERN, PLATFORMS, VERSION, db, limitOut, deviceEnforced, invalid, isKey, json, normalizeKey, overLimit, tooMany, type Platform } from './videokit-license.ts';
 import { notifySeller, sendDeviceAddonMail } from './videokit-delivery.ts';
 
 const env = (k: string, d = '') => process.env[k] || d;
@@ -47,9 +47,10 @@ export async function handleRegister(req: Request, deps: RegisterDeps): Promise<
   try { r = await deps.register({ key, device: device.toLowerCase(), platform, label: cleanLabel(body.label), kitVersion, enforce: deps.enforce ?? deviceEnforced() }); }
   catch (e) { console.error('[videokit] device register failed', (e as Error).message); return json({ error: 'unavailable' }, 503); }
   if (r.status === 'invalid_key') return invalid();
-  const counts = { used: r.used ?? 0, limit: r.limit ?? null };
+  const counts = { used: Number(r.used) || 0, limit: r.limit ?? null };
   if (r.status === 'device_limit') return overLimit(counts);
-  return json({ status: r.status, ...counts });
+  // 키트는 used · limit이 숫자인지 확인한다. 대수 제한 없는 키는 limit 999(limitOut).
+  return json({ status: r.status, used: counts.used, limit: limitOut(counts.limit) });
 }
 
 export function supabaseRegisterDeps(sb: SupabaseClient): RegisterDeps {

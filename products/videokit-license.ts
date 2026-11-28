@@ -41,7 +41,11 @@ export function deviceLimitForNewKey(now = Date.now()): number | null {
 // 대수 검사(한도 초과 403 device_limit) 스위치. 꺼져 있으면(기본) 등록 · 기록만 하고 한도는 막지 않는다.
 // 미등록 403 device_unregistered와 1.4.0 이하 전환 규칙은 스위치와 상관없이 계약대로 동작한다(대수 검사가 아니므로).
 export const deviceEnforced = () => ['1', 'true', 'on'].includes(env('VIDEOKIT_DEVICE_ENFORCE').trim().toLowerCase());
-export const MANAGE_URL = 'https://groundrooted.com/videokit/devices';
+// 키트가 안내문에 보여 주는 주소(https여야 함). 구매자 기기 페이지가 아직 없으므로 판매 페이지의 문의 안내로 보낸다.
+export const MANAGE_URL = 'https://groundrooted.com/videokit#contact';
+// 응답의 limit은 키트가 숫자만 받으므로, 대수 제한이 없는 키(device_limit NULL, 종전 약관)는 999로 보낸다. DB에는 NULL 그대로.
+export const UNLIMITED_LIMIT = 999;
+export const limitOut = (limit: number | null) => (limit === null ? UNLIMITED_LIMIT : limit);
 // 기기 값: HMAC-SHA256(구매자 키, 하드웨어ID)의 64자 hex. 서버는 형식만 확인하고 소문자로 저장한다.
 export const DEVICE_PATTERN = /^[0-9a-f]{64}$/i;
 // 키트(update.py)의 vkey와 같은 순서: 날짜 버전(YYYY.MM.DD.HHMM)은 번호 버전(1.3, 1.4.0 …)보다 낮다.
@@ -59,7 +63,6 @@ export function compareVersions(a: unknown, b: unknown): number {
 }
 // 헤더 없이(1.4.0 이하) 받을 수 있는 마지막 버전
 export const BRIDGE_VERSION = '1.4.1';
-export const BRIDGE_HINT = '업데이트 뒤 /videokit update를 한 번 실행해 이 기기를 등록하세요. 등록해야 다음 업데이트를 받습니다.';
 
 // 주문번호 하나에 키 하나. 이미 있으면 그 키를 돌려준다 (새로 만들지 않음).
 // VIDEOKIT_DEVICE_LIMIT_FROM 이후 발급이면 device_limit 2를 넣는다(그 전에는 insert가 지금과 똑같다 — 마이그레이션 전에도 동작).
@@ -138,10 +141,10 @@ const isEntry = (e: unknown): e is ReleaseEntry => {
 
 // 기기 403 본문 (계약 v2 §2.2)
 export const unregistered = (d: Pick<DeviceStatus, 'used' | 'limit'>) => json({
-  error: 'device_unregistered', used: d.used, limit: d.limit,
+  error: 'device_unregistered', used: d.used, limit: limitOut(d.limit),
   register_hint: '이 기기는 업데이트 등록이 안 되어 있습니다. /videokit update를 실행하면 등록합니다.', manage_url: MANAGE_URL,
 }, 403);
-export const overLimit = (d: Pick<DeviceStatus, 'used' | 'limit'>) => json({ error: 'device_limit', limit: d.limit, used: d.used, manage_url: MANAGE_URL }, 403);
+export const overLimit = (d: Pick<DeviceStatus, 'used' | 'limit'>) => json({ error: 'device_limit', limit: limitOut(d.limit), used: d.used, manage_url: MANAGE_URL }, 403);
 
 // 검사 순서(계약 v2 §2.2): 키 → 요청 수 → 파라미터 → 헤더 없음(§6 전환) → 미등록 → 한도 밖 → 배포본.
 export async function handleLatest(req: Request, deps: LatestDeps): Promise<Response> {
@@ -193,9 +196,8 @@ export async function handleLatest(req: Request, deps: LatestDeps): Promise<Resp
   await deps.touch(key, version).catch(e => console.error('[videokit] license touch failed', (e as Error).message));
   if (device !== null) await deps.touchDevice(key, device, version).catch(e => console.error('[videokit] device touch failed', (e as Error).message));
   // 변경 내용: 플랫폼별 notes(mac.notes · windows.notes)가 있으면 그것, 없으면 최상위 notes.
-  let notes = typeof entry.notes === 'string' ? entry.notes : typeof latest?.notes === 'string' ? latest.notes : '';
-  // 1.4.0 화면에 보이는 글은 notes뿐이므로 맨 끝에 등록 안내를 붙인다(bridge.json에 이미 있으면 그대로).
-  if (bridge && !notes.includes(BRIDGE_HINT)) notes = notes ? `${notes}\n\n${BRIDGE_HINT}` : BRIDGE_HINT;
+  // bridge.json의 등록 안내문(계약 §6.2)은 배포할 때 notes에 넣는다. 서버는 덧붙이지 않고 그대로 보낸다.
+  const notes = typeof entry.notes === 'string' ? entry.notes : typeof latest?.notes === 'string' ? latest.notes : '';
   return json({ version: entry.version, platform, sha256: entry.sha256.toLowerCase(), size: entry.size, url: signed, notes });
 }
 
