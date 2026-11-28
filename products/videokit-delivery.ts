@@ -12,7 +12,7 @@ import { editorSupport } from './videokit-editor-support.ts';
 import { issueLicense } from './videokit-license.ts';
 import { createLink, kstDay, LINK_DAYS } from './videokit-link.ts';
 
-type PlanId = 'kit' | 'lesson' | 'pass';
+type PlanId = 'kit' | 'lesson' | 'pass' | 'device';
 
 export { LINK_DAYS };
 
@@ -20,7 +20,7 @@ export type Order = { orderId: string; plan: PlanId; itemName: string; amount: n
 export type DeliveryResult =
   | { status: 'sent'; email: string }      // 보냄 (24시간 안에 같은 주문으로 다시 부르면 Resend가 새로 보내지 않음)
   | { status: 'off' }                      // 발송 설정이 아직 없음
-  | { status: 'none' }                     // 보낼 키트가 없는 상품(강의권)
+  | { status: 'none' }                     // 보낼 키트가 없는 상품(강의권 · 추가 기기)
   | { status: 'failed'; reason: string };
 
 const env = (k: string, d = '') => process.env[k] || d;
@@ -130,7 +130,7 @@ async function sendMail(to: string, mail: { subject: string; html: string; text:
 // 결제 승인 직후 부른다. 결제 완료 화면을 새로고침해도 24시간 안에는 메일이 한 번만 간다.
 // force: 판매자가 새 링크를 다시 보낼 때(scripts/videokit-resend.mjs).
 export async function deliverKit(order: Order, { force = false } = {}): Promise<DeliveryResult> {
-  if (order.plan === 'pass') return { status: 'none' };
+  if (order.plan === 'pass' || order.plan === 'device') return { status: 'none' };
   if (!deliveryConfigured()) return { status: 'off' };
   if (!isEmail(order.email)) { console.error('[videokit] no valid email in payment metadata', order.orderId); return { status: 'failed', reason: 'invalid email' }; }
   const sb = db();
@@ -150,7 +150,7 @@ export async function deliverKit(order: Order, { force = false } = {}): Promise<
 // 카드 · 간편결제(실제 키) 승인 뒤 판매자에게 보내는 주문 알림. 계좌이체 주문 메일(/api/videokit/apply)과 같은 '라벨: 값' 본문에
 // 영수증 세 줄을 넣는다. 제목은 '[결제 완료]'로 계좌이체의 '[구매 신청]'(입금 확인 대기)과 구분한다 — 결제가 끝났고 키트 메일은 자동으로 갔다.
 // 같은 주문은 Resend 멱등 키로 24시간 안에 한 번만 간다. 받는 주소: VIDEOKIT_APPLY_TO(기본 sungchulkang@groundrooted.com).
-const PLAN_MAIL: Record<PlanId, string> = { kit: '키트', lesson: '키트 + 1:1 강의', pass: '1:1 강의권 2회' };
+const PLAN_MAIL: Record<PlanId, string> = { kit: '키트', lesson: '키트 + 1:1 강의', pass: '1:1 강의권 2회', device: '업데이트 기기 1대 추가' };
 // coupon: 쿠폰 주문이면 서버가 주문번호로 확인한 코드(없으면 null)
 export function sellerNotice(o: Pick<Order, 'orderId' | 'plan' | 'amount' | 'email' | 'name'> & { coupon?: string | null }, receiptRows: [string, string][], kit: string, at = Date.now()) {
   const when = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'medium', timeStyle: 'short' }).format(at);
@@ -206,4 +206,23 @@ export async function alertTossBlocked(b: TossBlock) {
   }).catch(() => null);
   if (!res?.ok) console.error('[videokit] toss block alert failed', b.orderId, res?.status);
   return !!res?.ok;
+}
+
+// 추가 기기(카드 · 가상계좌)가 반영되면 구매자에게 보내는 확인 메일. 같은 주문은 Resend 멱등 키로 24시간 안에 한 번만 간다.
+// 키는 끝 4자만 보인다.
+export function deviceAddonEmail(o: { orderId: string; name: string; key: string; limit: number | null; used: number }) {
+  const subject = '[클로드 비디오 키트] 업데이트 기기 1대가 추가되었습니다';
+  const rows: [string, string][] = [['구매자 키', `…-${o.key.slice(-4)}`], ['업데이트 받을 수 있는 기기', o.limit === null ? '제한 없음' : `${o.limit}대 (지금 등록 ${o.used}대)`], ['주문번호', o.orderId]];
+  const text = [`${o.name}님, 업데이트 기기 1대 추가 결제가 확인되어 구매자 키에 반영했습니다.`, '', ...rows.map(([k, v]) => `${k}: ${v}`), '',
+    '새 기기에서 키트를 설치하거나 /videokit update를 실행하면 그 기기가 등록됩니다.', '문의: 이 메일에 답장해 주세요.'].join('\n');
+  const html = `<div style="font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;font-size:15px;line-height:1.6"><p>${esc(o.name)}님, 업데이트 기기 1대 추가 결제가 확인되어 구매자 키에 반영했습니다.</p>`
+    + `<table style="border-collapse:collapse">${rows.map(([k, v]) => `<tr><td style="padding:4px 16px 4px 0;color:#666">${k}</td><td><b>${esc(v)}</b></td></tr>`).join('')}</table>`
+    + '<p>새 기기에서 키트를 설치하거나 <b>/videokit update</b>를 실행하면 그 기기가 등록됩니다.</p><p>문의: 이 메일에 답장해 주세요.</p></div>';
+  return { subject, html, text };
+}
+export async function sendDeviceAddonMail(email: string, o: Parameters<typeof deviceAddonEmail>[0]) {
+  if (!env('RESEND_API_KEY') || !env('VIDEOKIT_MAIL_FROM') || !isEmail(email)) return false;
+  const sent = await sendMail(email, deviceAddonEmail({ ...o, name: o.name.slice(0, 100) }), `vk-device-mail-${o.orderId}`);
+  if (!sent.ok) console.error('[videokit] device addon mail failed', o.orderId, sent.reason);
+  return sent.ok;
 }

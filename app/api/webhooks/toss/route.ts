@@ -5,6 +5,7 @@
 import { depositReady, isOrderId, kitMailAllowed, nameOf, paymentSecret, type TossPayment } from '@/products/videokit';
 import { alertTossBlocked, deliverKit } from '@/products/videokit-delivery';
 import { deniedIp, ipDenied, tossRequest } from '@/products/toss';
+import { settleDeviceOrder } from '@/products/videokit-devices';
 
 export const dynamic = 'force-dynamic';
 
@@ -43,6 +44,16 @@ export async function POST(req: Request) {
   }
   const { order } = ready;
   const meta = payment?.metadata ?? {};
+  // 추가 기기: 키트 메일 대신 허용 대수 +1(주문번호로 멱등). DB 오류면 500으로 토스가 다시 보내게 한다.
+  if (order.plan === 'device') {
+    try {
+      const r = await settleDeviceOrder({ orderId: body.orderId, amount: order.amount, meta, receipt: [['영수증', '가상계좌(토스페이먼츠)']] });
+      return new Response(r.status === 'added' || r.status === 'exists' ? 'ok' : `device ${r.status}`, { status: 200 });
+    } catch (e) {
+      console.error('[videokit] device addon webhook failed', body.orderId, (e as Error).message);
+      return new Response('device addon failed', { status: 500 });
+    }
+  }
   const mail = await deliverKit({
     orderId: body.orderId, plan: order.plan, itemName: nameOf(order.plan, order.tier), amount: order.amount,
     email: String(meta.email ?? ''), name: String(meta.name ?? '구매자'),

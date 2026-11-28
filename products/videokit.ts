@@ -14,19 +14,23 @@ export const plans = {
   lesson: { name: '클로드 비디오 키트 — 키트 + 1:1 강의(3주 · 3회)', saleName: '클로드 비디오 키트 — 키트 + 1:1 강의(2회 · 총 2시간)', sale: 300_000, regular: 500_000 },
   // 키트를 먼저 산 분이 나중에 신청하는 강의권. 키트 파일은 들어 있지 않고, 할인 기간에도 가격이 같다.
   pass: { name: '클로드 비디오 키트 — 키트 구매자 1:1 강의권(2회 · 총 2시간)', saleName: '클로드 비디오 키트 — 키트 구매자 1:1 강의권(2회 · 총 2시간)', sale: 300_000, regular: 300_000 },
+  // 키트 구매자의 업데이트 기기 1대 추가(구매자 키에 허용 대수 +1). 키트 파일은 들어 있지 않다. 결제 화면에는 VIDEOKIT_DEVICE_ADDON_ON 일 때만 보인다.
+  // 주문번호는 구매자 키로 서명한 vk-device-r-<uuid>-<표식>뿐이다(/api/videokit/device/check가 만든다). 쿠폰 미적용.
+  device: { name: '클로드 비디오 키트 — 업데이트 기기 1대 추가', saleName: '클로드 비디오 키트 — 업데이트 기기 1대 추가', sale: 50_000, regular: 50_000 },
 } as const;
 // 결제 화면의 상품 선택에 보이는 짧은 이름과 설명
 export const planLabels: Record<keyof typeof plans, { label: string; note: string }> = {
   kit: { label: '키트', note: '키트 파일 · 사용 설명 eBook · 클로드 코드에 익숙한 분께 권장' },
   lesson: { label: '키트 + 1:1 강의', note: '키트 + 클로드 코드 사용법 · 키트 설치 원격 지원 · 365일 1:1 채팅 지원' },
   pass: { label: '키트 구매자 1:1 강의권', note: '이미 키트를 구입한 분 · 1:1 강의 2회(총 2시간) · 키트 파일 없음' },
+  device: { label: '업데이트 기기 1대 추가', note: '키트 구매자 · 구매자 키에 업데이트 받을 기기 1대를 더합니다 · 키트 파일 없음' },
 };
 // 계좌이체 입금 계좌
 export const BANK = { bank: '토스뱅크', number: '1002-8619-7757', holder: '그라운드루티드' } as const;
 // 강의 일정을 따로 조율하는 상품
 export const hasLesson = (plan: PlanId) => plan === 'lesson' || plan === 'pass';
 // 키트 파일을 보내는 상품
-export const hasKit = (plan: PlanId) => plan !== 'pass';
+export const hasKit = (plan: PlanId) => plan === 'kit' || plan === 'lesson';
 export type PlanId = keyof typeof plans;
 export type Tier = 's' | 'r' | 'c'; // s = 오픈 할인가, r = 정가, c = 쿠폰가(할인가와 같음)
 
@@ -70,7 +74,9 @@ function couponOf(plan: string, uuid: string, tag: string): string | null {
 }
 
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
-const ORDER_ID = new RegExp(`^vk-(kit|lesson|pass)-(s|r)-${UUID}$|^vk-(kit|lesson)-c-${UUID}-[0-9a-f]{12}$`);
+// 추가 기기(device)는 구매자 키로 서명한 표식이 붙은 정가(r) 주문뿐이다. 표식은 승인 뒤 토스 metadata의 키로 확인한다(products/videokit-devices.ts).
+const ORDER_ID = new RegExp(`^vk-(kit|lesson|pass)-(s|r)-${UUID}$|^vk-(kit|lesson)-c-${UUID}-[0-9a-f]{12}$|^vk-device-r-${UUID}-[0-9a-f]{12}$`);
+// 추가 기기(device)에는 쓰지 않는다(표식이 없어 checkOrder가 받지 않음).
 export const makeOrderId = (plan: PlanId, tier: Exclude<Tier, 'c'>, uuid: string) => `vk-${plan}-${tier}-${uuid}`;
 // 쿠폰 주문번호 (최대 61자, 토스 orderId 64자 안). 맞는 코드일 때만 만든다.
 export function makeCouponOrderId(plan: PlanId, code: unknown, uuid: string): string | null {

@@ -221,3 +221,5 @@
 .vk-pay .coupon.applied{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:12px;background:#1b1b20;color:#b4b2aa;font-size:15px}
 .vk-pay .coupon.applied b{color:#ff9b6d;font-weight:650}
 .vk-pay .coupon input[aria-invalid="true"]{border-color:#ff9c86}
+/* 추가 기기 상품: 상자 그림 대신 아이콘 타일 (썸네일과 같은 크기) */
+.vk-pay .pick .method .thumb-icon{display:grid;place-items:center;background:#24242c;color:#ff6b3d}

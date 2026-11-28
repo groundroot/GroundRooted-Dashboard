@@ -3,6 +3,7 @@ import { bankName, checkOrder, hasKit, hasLesson, kitMailAllowed, nameOf, paymen
 import { alertTossBlocked, deliverKit, deliveryConfigured, notifySeller, type DeliveryResult } from '@/products/videokit-delivery';
 import { deniedIp, ipDenied, tossRequest } from '@/products/toss';
 import { parseReceipt, receiptRows } from '@/products/videokit-receipt';
+import { settleDeviceOrder } from '@/products/videokit-devices';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: '결제 결과 | 클로드 비디오 키트', description: '클로드 비디오 키트 결제 결과 확인 화면입니다.', robots: { index: false, follow: false } };
@@ -75,9 +76,31 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
       <a className="btn btn-kakao" href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1 문의</a>
     </Shell>;
   }
+  const testPay = !kitMailAllowed();
+  const receiptOf = (): [string, string][] => {
+    const r = parseReceipt((() => { try { return JSON.parse(String(meta.receipt ?? '')); } catch { return null; } })(), String(meta.name ?? ''), { card: true });
+    return r ? receiptRows(r) : [['영수증', '확인 필요(형식 오류)'], ['영수증 받는 분', '-'], ['영수증 번호', '-']];
+  };
+  // 추가 기기: 키트 메일 대신 구매자 키의 허용 대수 +1. 주문번호가 PK라서 새로고침해도 한 번만 들어간다(그래서 fresh가 아니어도 다시 시도한다).
+  if (order.plan === 'device') {
+    const r = testPay ? null : await settleDeviceOrder({ orderId: orderId!, amount: order.amount, meta: meta as Record<string, string>, receipt: receiptOf() })
+      .catch((e) => { console.error('[videokit] device addon exception', orderId, (e as Error).message); return null; });
+    const ok = r && (r.status === 'added' || r.status === 'exists') ? r : null;
+    return <Shell>
+      <h1>결제가 완료되었습니다</h1>
+      <p className="lede">{itemName} · {won(order.amount)}</p>
+      <div className="order"><b>주문번호</b><span>{orderId}</span></div>
+      {testPay
+        ? <p className="test" role="note">테스트 결제라 실제로 돈이 빠져나가지 않았고, 기기도 추가하지 않습니다.</p>
+        : ok
+          ? <p className="lede">구매자 키(끝자리 {ok.key.slice(-4)})에 업데이트 기기 1대를 더했습니다. 이제 {ok.allowance.limit === null ? '대수 제한 없이' : `${ok.allowance.limit}대까지`} 업데이트를 받을 수 있습니다(지금 등록 {ok.allowance.used}대). 새 기기에서 /videokit update를 실행하면 등록됩니다.</p>
+          : <p className="lede">결제는 정상으로 확인되었습니다. 기기 추가 반영을 확인하고 있으니, 카카오톡으로 주문번호를 남겨 주시면 바로 처리해 드리겠습니다. 판매자에게도 알림이 갔습니다.</p>}
+      <a className="btn btn-kakao" href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1 문의</a>
+      <a className="btn btn-ghost" href="/videokit">상품 페이지로</a>
+    </Shell>;
+  }
   // 결제가 확인되면 결제할 때 적은 이메일로 키트 다운로드 링크를 보낸다. 새로고침해도 24시간 안에는 한 번만 간다.
   // 테스트 키로 승인된 결제(돈이 오가지 않음)에는 키트를 보내지 않는다.
-  const testPay = !kitMailAllowed();
   let mail: DeliveryResult | null = null;
   if (paid.fresh && !testPay) {
     try {
@@ -89,10 +112,9 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
   }
   // 판매자 알림 (영수증 요청 포함). 실제 결제에만, 승인 직후 한 번.
   if (paid.fresh && !testPay) {
-    const receipt = parseReceipt((() => { try { return JSON.parse(String(meta.receipt ?? '')); } catch { return null; } })(), String(meta.name ?? ''), { card: true });
     const kit = !hasKit(order.plan) ? '해당 없음' : mail?.status === 'sent' ? '자동 발송함' : `발송 안 됨(${mail?.status === 'failed' ? mail.reason : mail?.status ?? '-'}) — 직접 보내야 함`;
     await notifySeller({ orderId: orderId!, plan: order.plan, amount: order.amount, coupon: order.coupon, email: String(meta.email ?? ''), name: String(meta.name ?? '구매자') },
-      receipt ? receiptRows(receipt) : [['영수증', '확인 필요(형식 오류)'], ['영수증 받는 분', '-'], ['영수증 번호', '-']], kit).catch(() => false);
+      receiptOf(), kit).catch(() => false);
   }
   const sentTo = mail?.status === 'sent' ? mail.email : '';
   return <Shell>

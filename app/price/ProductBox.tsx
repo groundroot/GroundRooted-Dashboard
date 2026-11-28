@@ -20,6 +20,23 @@ export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier })
       <ul className="inc"><li>1:1 강의 2회 · 총 2시간</li><li>클로드 코드 사용법</li><li>키트 설치 원격 지원</li></ul>
     </div>
   </section>;
+  if (plan === 'device') return <section className="vk-prod" aria-label="구매 상품">
+    <div className="vt-stage" aria-hidden="true"><div className="vt">
+      <div className="vt-main">
+        <p className="vb-brand"><i />GroundRooted</p>
+        <p className="vt-kind">UPDATE DEVICE</p>
+        <p className="vt-title">업데이트 기기 추가<small>클로드 비디오 키트 구매자용</small></p>
+        <p className="vt-meta">맥 · 윈도우 합산</p>
+      </div>
+      <div className="vt-stub"><b>+1</b><span>DEVICE</span></div>
+    </div></div>
+    <div className="vk-prod-copy">
+      <p className="for lec">업데이트 받을 기기가 더 필요하다면</p>
+      <h2>업데이트 기기 1대 추가</h2>
+      <p className="meta">구매자 키 하나로 업데이트를 받을 수 있는 기기 수를 1대 늘립니다. 키트 파일은 들어 있지 않습니다. 기기를 바꾼 경우에는 결제하지 않고 구매 메일 주소로 기기 초기화를 요청하면 됩니다.</p>
+      <ul className="inc"><li>업데이트 기기 +1대</li><li>구매자 키에 바로 반영</li><li>쿠폰 미적용</li></ul>
+    </div>
+  </section>;
   const lec = plan === 'lesson';
   const sessions = tier !== 'r' ? '1:1 강의 2회 · 총 2시간' : '1:1 강의 3회 · 3주';
   return <section className="vk-prod" aria-label="구매 상품">

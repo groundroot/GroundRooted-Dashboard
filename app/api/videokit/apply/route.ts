@@ -4,10 +4,12 @@
 import { isEmail } from '@/products/videokit-delivery';
 import { couponPlan, couponWindow, matchCoupon, priceOf, transferTier } from '@/products/videokit';
 import { parseReceipt, receiptRows } from '@/products/videokit-receipt';
+import { db } from '@/products/videokit-license';
+import { deviceAddonOn, deviceKeyStatus } from '@/products/videokit-devices';
 
 export const dynamic = 'force-dynamic';
 
-const PLANS = { kit: '키트', lesson: '키트 + 1:1 강의', pass: '1:1 강의권 2회' } as const;
+const PLANS = { kit: '키트', lesson: '키트 + 1:1 강의', pass: '1:1 강의권 2회', device: '업데이트 기기 1대 추가' } as const;
 type Plan = keyof typeof PLANS;
 
 const text = (v: unknown, max: number) => (typeof v === 'string' ? v.trim() : '').slice(0, max);
@@ -47,6 +49,20 @@ export async function POST(req: Request) {
   if (sentCoupon && (!coupon || !couponPlan(plan))) return Response.json({ error: 'coupon' }, { status: 400 });
   if (coupon && couponWindow() !== 'open') return Response.json({ error: 'period' }, { status: 400 });
 
+  // 추가 기기: VIDEOKIT_DEVICE_ADDON_ON 일 때만, 구매자 키가 맞고 대수 제한이 있는 키일 때만 받는다(쿠폰 미적용).
+  // 입금이 확인되면 운영봇이 scripts/videokit-devices.mjs add <키> 1 --order <주문번호> 로 반영한다. 메일에는 키 전체를 적는다(운영봇이 그 키로 실행).
+  let deviceRows: [string, string][] = [];
+  if (plan === 'device') {
+    if (!deviceAddonOn()) return Response.json({ error: 'bad' }, { status: 400 });
+    if (coupon) return Response.json({ error: 'coupon' }, { status: 400 });
+    let st: Awaited<ReturnType<typeof deviceKeyStatus>>;
+    try { st = await deviceKeyStatus(db(), body.key); }
+    catch (e) { console.error('[videokit] apply device key check failed', (e as Error).message); return Response.json({ error: 'failed' }, { status: 502 }); }
+    if (!st.ok) return Response.json({ error: st.error === 'unlimited' ? 'unlimited' : 'key' }, { status: 400 });
+    const oid = /^vk-device-r-[0-9a-f-]{36}-[0-9a-f]{12}$/.test(text(body.orderId, 64)) ? text(body.orderId, 64) : '';
+    deviceRows = [['구매자 키', st.key], ['지금 허용 대수', `${st.limit}대 (등록 ${st.used}대)`], ['주문번호', oid || '-'], ['반영 명령', `node scripts/videokit-devices.mjs add ${st.key} 1${oid ? ` --order ${oid}` : ''}`]];
+  }
+
   const key = process.env.RESEND_API_KEY, from = process.env.VIDEOKIT_MAIL_FROM;
   if (!key || !from) {
     console.error('[videokit] apply form received but mail is not configured (RESEND_API_KEY / VIDEOKIT_MAIL_FROM)');
@@ -57,7 +73,7 @@ export async function POST(req: Request) {
   // 마감 전에 연 결제 화면에서 낸 주문은 마감 뒤 30분까지 할인가로 적는다 (화면에 보인 입금액과 같게).
   // 쿠폰이 맞으면 쿠폰가(할인가와 같음). 운영봇이 입금 금액을 이 '금액'과 '쿠폰' 줄로 대조한다.
   const amount = `${new Intl.NumberFormat('ko-KR').format(priceOf(plan, coupon ? 'c' : transferTier(body.orderId, plan)))}원`;
-  const rows: [string, string][] = [['이름', name], ['이메일', email], ['전화번호', phone], ['상품', PLANS[plan]], ['금액', amount], ['쿠폰', coupon ? `적용 · ${coupon}` : '없음'], ['신청 시각', at], ...receiptRows(receipt)];
+  const rows: [string, string][] = [['이름', name], ['이메일', email], ['전화번호', phone], ['상품', PLANS[plan]], ['금액', amount], ['쿠폰', coupon ? `적용 · ${coupon}` : '없음'], ['신청 시각', at], ...deviceRows, ...receiptRows(receipt)];
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',

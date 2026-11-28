@@ -22,18 +22,23 @@ const LATEST = {
   windows: { version: '1.3.1', path: 'releases/1.3.1/ClaudeVideoKit-Windows-1.3.1.zip', sha256: 'b'.repeat(64), size: 456 },
   notes: '- 새 기능',
 };
+// 1.4.1 이상 키트처럼 등록된 기기 헤더(X-VK-Device)를 붙여 부른다. 헤더 없는 1.4.0 경로 · 기기 검사는 test-videokit-devices.mjs.
+const DEVICE = 'd'.repeat(64);
 function fake(over = {}) {
-  const calls = { find: [], touch: [], sign: [] };
+  const calls = { find: [], touch: [], sign: [], touchDevice: [] };
   const deps = {
     findLicense: async k => { calls.find.push(k); return k === GOOD ? { revoked: false } : k === REVOKED ? { revoked: true } : null; },
     touch: async (k, v) => { calls.touch.push([k, v]); },
     readLatest: async () => LATEST,
+    readBridge: async () => null,
+    checkDevice: async () => ({ rank: 1, used: 1, limit: 2 }),
+    touchDevice: async (k, d, v) => { calls.touchDevice.push([k, d, v]); },
     sign: async (p, s) => { calls.sign.push([p, s]); return `https://x.supabase.co/sign/${p}?token=t`; },
     ...over,
   };
   return { deps, calls };
 }
-const req = (key, q = 'platform=mac&current=1.2.0') => new Request(`https://groundrooted.com/api/videokit/latest?${q}`, { headers: key === undefined ? {} : { Authorization: key } });
+const req = (key, q = 'platform=mac&current=1.4.1') => new Request(`https://groundrooted.com/api/videokit/latest?${q}`, { headers: { 'X-VK-Device': DEVICE, ...(key === undefined ? {} : { Authorization: key }) } });
 let t = 1_000_000;
 const call = async (key, q, over) => { const f = fake(over); f.deps.now = (t += 61_000); const r = await handleLatest(req(key, q), f.deps); return { r, body: await r.json(), ...f }; };
 
@@ -44,7 +49,7 @@ const call = async (key, q, over) => { const f = fake(over); f.deps.now = (t += 
   assert.equal(r.status, 200); assert.equal(r.headers.get('cache-control'), 'no-store');
   assert.deepEqual(body, { version: '1.3.1', platform: 'mac', sha256: SHA, size: 123, url: 'https://x.supabase.co/sign/releases/1.3.1/ClaudeVideoKit-1.3.1.zip?token=t', notes: '- 새 기능' });
   assert.deepEqual(calls.sign, [['releases/1.3.1/ClaudeVideoKit-1.3.1.zip', 600]]); assert.equal(SIGN_SECONDS, 600);
-  assert.deepEqual(calls.touch, [[GOOD, '1.2.0']]);
+  assert.deepEqual(calls.touch, [[GOOD, '1.4.1']]); assert.deepEqual(calls.touchDevice, [[GOOD, DEVICE, '1.4.1']]);
   // 윈도우 · 소문자 키 · current 없음
   ({ r, body, calls } = await call(`bearer ${GOOD.toLowerCase()}`, 'platform=windows'));
   assert.equal(r.status, 200); assert.equal(body.platform, 'windows'); assert.equal(body.size, 456); assert.deepEqual(calls.touch, [[GOOD, null]]);
@@ -119,6 +124,9 @@ function fakeBackend({ tableMissing = false } = {}) {
     if (url.hostname === 'api.resend.com') { mails.push(JSON.parse(init.body)); return ok({ id: 'm1' }); }
     if (url.pathname.startsWith('/storage/v1/object/sign/')) return ok({ signedURL: `/object/sign/${url.pathname.split('/object/sign/')[1]}?token=t` });
     if (url.pathname === '/storage/v1/object/videokit/releases/latest.json') return new Response(JSON.stringify(LATEST), { status: 200 });
+    // 기기 확인(rpc) · 기기 기록. 자세한 동작은 test-videokit-devices.mjs.
+    if (url.pathname === '/rest/v1/rpc/videokit_check_device') return ok({ rank: 1, used: 1, limit: null });
+    if (url.pathname === '/rest/v1/videokit_devices' && method === 'PATCH') return new Response(null, { status: 204 });
     // 키트 메일의 짧은 다운로드 링크 표 (자세한 동작은 test-videokit-link.mjs). 여기서는 받기만 한다.
     if (url.pathname === '/rest/v1/videokit_download_links') return method === 'GET' ? ok([]) : new Response(null, { status: method === 'POST' ? 201 : 204 });
     if (url.pathname === '/rest/v1/videokit_licenses') {
@@ -158,12 +166,13 @@ Object.assign(process.env, { SUPABASE_URL: 'https://fake.supabase.co', SUPABASE_
 
   // 운영용 의존성으로 엔드포인트 끝까지: 키 확인 → latest.json → 10분 서명 → last_seen_at · last_version 기록
   resetLimits();
-  const r = await handleLatest(req(`Bearer ${a.key}`, 'platform=windows&current=1.2.0'), supabaseLatestDeps(sb));
+  const r = await handleLatest(req(`Bearer ${a.key}`, 'platform=windows&current=1.4.1'), supabaseLatestDeps(sb));
   const body = await r.json();
   assert.equal(r.status, 200, JSON.stringify(body)); assert.equal(body.version, '1.3.1'); assert.equal(body.sha256, 'b'.repeat(64));
   assert.match(body.url, /^https:\/\/fake\.supabase\.co\/storage\/v1\/object\/sign\/videokit\/releases\/1\.3\.1\/ClaudeVideoKit-Windows-1\.3\.1\.zip\?token=t/);
   assert.ok(be.log.includes('POST /storage/v1/object/sign/videokit/releases/1.3.1/ClaudeVideoKit-Windows-1.3.1.zip'));
-  const row = be.rows.find(x => x.key === a.key); assert.equal(row.last_version, '1.2.0'); assert.ok(Date.now() - Date.parse(row.last_seen_at) < 5000);
+  assert.ok(be.log.includes('POST /rest/v1/rpc/videokit_check_device') && be.log.includes('PATCH /rest/v1/videokit_devices'));
+  const row = be.rows.find(x => x.key === a.key); assert.equal(row.last_version, '1.4.1'); assert.ok(Date.now() - Date.parse(row.last_seen_at) < 5000);
   assert.equal((await handleLatest(req('Bearer VK-AAAA-AAAA-AAAA'), supabaseLatestDeps(sb))).status, 401);
   row.revoked = true;
   assert.equal((await handleLatest(req(`Bearer ${a.key}`), supabaseLatestDeps(sb))).status, 401);
