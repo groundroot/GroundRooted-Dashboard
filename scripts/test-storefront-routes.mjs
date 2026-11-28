@@ -9,7 +9,7 @@ const won = n => `${new Intl.NumberFormat('ko-KR').format(n)}원`;
 
 async function withServer({ port, password, preview }, run) {
   const server = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', 'localhost', '--port', String(port)], {
-    env: { ...process.env, NODE_ENV: 'production', DASHBOARD_PASSWORD: password, MARKETING_PREVIEW_ENABLED: String(preview), VIDEOKIT_COUPON_CODES: '' },
+    env: { ...process.env, NODE_ENV: 'production', DASHBOARD_PASSWORD: password, MARKETING_PREVIEW_ENABLED: String(preview), VIDEOKIT_COUPON_CODES: '', VIDEOKIT_DEVICE_ADDON_ON: '' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let ready = false;
@@ -49,6 +49,13 @@ await withServer({port:3035,password,preview:true}, async request => {
     const r = await fetch('http://localhost:3035/api/videokit/coupon', { method: 'POST', redirect: 'manual', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
     assert.equal(r.status, 400, `coupon ${code}`); assert.deepEqual(await r.json(), { ok: false, error: 'invalid' });
   }
+  // 기기 등록 API(키트 1.4.1)는 로그인 없이 열려 있다(로그인 화면으로 보내지 않음). 키 확인은 라우트가 한다(설정이 없으면 503 unavailable).
+  { const r = await fetch('http://localhost:3035/api/videokit/devices/register', { method: 'POST', redirect: 'manual', headers: { Authorization: 'Bearer nope', 'Content-Type': 'application/json' }, body: '{}' });
+    assert.ok([401, 503].includes(r.status), `register ${r.status}`); assert.ok(['invalid_key', 'unavailable'].includes((await r.json()).error)); }
+  // 추가 기기 상품은 VIDEOKIT_DEVICE_ADDON_ON 이 없으면 결제 화면에 없고, 확인 API도 404 off (로그인 화면으로 가지 않음)
+  { const r = await fetch('http://localhost:3035/api/videokit/device/check', { method: 'POST', redirect: 'manual', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'VK-ABCD-EFGH-JK23' }) });
+    assert.equal(r.status, 404); assert.deepEqual(await r.json(), { ok: false, error: 'off' }); }
+  { const html = await (await request('/price?plan=device')).text(); assert.ok(!html.includes('value="device"') && !html.includes('업데이트 기기 1대 추가'), 'device addon hidden by default'); assert.ok(html.includes('위 목록에서 상품을 골라 주세요')); }
   // 옛 계좌이체 안내 → 결제 화면(키트)으로 영구 이동
   for (const path of ['/videokit/transfer', '/videokit/transfer.html']) { const r = await request(path); assert.equal(r.status, 308, path); assert.equal(r.headers.get('location'), '/price?plan=kit', path); }
   // /price?plan: 옛 ticket → 강의권, 모르는 값 → 아무것도 고르지 않음

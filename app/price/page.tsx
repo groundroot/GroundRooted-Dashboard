@@ -3,6 +3,7 @@ import Shell, { KAKAO_URL, NEWS_URL } from './Shell';
 import Checkout, { type PlanOption } from './Checkout';
 import { BANK, cardPending, hasKit, hasLesson, isPlanId, makeOrderId, nameOf, planLabels, plans, priceOf, tierAt, tossApiKeys, tossKeys, type PlanId } from '@/products/videokit';
 import { LINK_DAYS, deliveryConfigured } from '@/products/videokit-delivery';
+import { deviceAddonOn } from '@/products/videokit-devices';
 
 export const dynamic = 'force-dynamic';
 export const metadata = { title: '결제 | 클로드 비디오 키트', description: '클로드 비디오 키트 결제 화면. 상품을 고르고 계좌이체로 주문합니다(카드 · 간편결제는 심사 중).', robots: { index: false, follow: false } };
@@ -15,16 +16,19 @@ export default async function PricePage({ searchParams }: { searchParams: Promis
   const keys = tossApiKeys() ?? tossKeys();
   const mode = tossApiKeys() ? 'window' : 'widget';
   const tier = tierAt();
-  const options: PlanOption[] = (Object.keys(plans) as PlanId[]).map((id) => ({
-    id, ...planLabels[id], amount: priceOf(id, tier), regular: plans[id].regular,
-    orderId: makeOrderId(id, tier, randomUUID()), orderName: nameOf(id, tier), kit: hasKit(id), lesson: hasLesson(id),
+  // 추가 기기(device)는 VIDEOKIT_DEVICE_ADDON_ON 일 때만 보인다. 주문번호는 구매자 키를 확인한 뒤 서버가 준다(그 전에는 비워 둠).
+  const addon = deviceAddonOn();
+  const ids = (Object.keys(plans) as PlanId[]).filter((id) => id !== 'device' || addon);
+  const options: PlanOption[] = ids.map((id) => ({
+    id, ...planLabels[id], amount: priceOf(id, id === 'device' ? 'r' : tier), regular: plans[id].regular,
+    orderId: id === 'device' ? '' : makeOrderId(id, tier, randomUUID()), orderName: nameOf(id, id === 'device' ? 'r' : tier), kit: hasKit(id), lesson: hasLesson(id),
   }));
   return <Shell>
     <h1>결제하기</h1>
     <p className="lede">상품을 고르고 받는 분 정보와 결제 수단을 선택해 주세요.</p>
     <Checkout
       // plan 없음 → 키트, 옛 링크 ticket → 강의권(pass), 그 밖에 모르는 값 → 선택 없이 연다.
-      plans={options} initial={plan === undefined ? 'kit' : plan === 'ticket' ? 'pass' : isPlanId(plan) ? plan : null} tier={tier}
+      plans={options} initial={plan === undefined ? 'kit' : plan === 'ticket' ? 'pass' : isPlanId(plan) && ids.includes(plan) ? plan : null} tier={tier}
       mode={mode} clientKey={keys.clientKey}
       // 키 종류(live/test)가 섞이면 카드 결제를 열지 않는다. 계좌이체는 그대로 받는다.
       card={!keys.consistent ? 'off' : cardPending() ? 'pending' : 'open'} testKeys={!keys.live}
