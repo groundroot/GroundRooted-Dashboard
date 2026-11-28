@@ -21,7 +21,7 @@ export default function ProductBox({ plan, tier }: { plan: PlanId; tier: Tier })
     </div>
   </section>;
   const lec = plan === 'lesson';
-  const sessions = tier === 's' ? '1:1 강의 2회 · 총 2시간' : '1:1 강의 3회 · 3주';
+  const sessions = tier !== 'r' ? '1:1 강의 2회 · 총 2시간' : '1:1 강의 3회 · 3주';
   return <section className="vk-prod" aria-label="구매 상품">
     <div className={lec ? 'vb-stage has-lesson' : 'vb-stage'} aria-hidden="true"><div className={lec ? 'vb vb-lec' : 'vb'}>
       <div className="vb-f vb-front">

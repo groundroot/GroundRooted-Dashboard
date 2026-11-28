@@ -32,8 +32,45 @@ type Props = {
   mode: 'widget' | 'window'; clientKey: string;
   // open: 카드 · 간편결제 사용 / pending: 심사 중(화면은 보이되 계좌이체를 기본으로) / off: 결제 설정 점검 중
   card: 'open' | 'pending' | 'off'; testKeys: boolean;
-  autoMail: boolean; bank: { bank: string; number: string; holder: string }; linkDays: number; kakao: string;
+  autoMail: boolean; bank: { bank: string; number: string; holder: string }; linkDays: number; kakao: string; news: string;
 };
+// 쿠폰: 서버(/api/videokit/coupon)가 코드를 확인하고 상품별 금액 · 주문번호를 정해 준다.
+type Offer = { amount: number; orderId: string; orderName: string };
+type Coupon = { code: string; offers: Partial<Record<PlanId, Offer>> };
+const COUPON_ERROR: Record<string, string> = {
+  invalid: '유효하지 않은 코드입니다.', period: '쿠폰 사용 기간이 아닙니다.', busy: '확인 요청이 많습니다. 10분 뒤 다시 시도해 주세요.',
+};
+
+function CouponField({ coupon, onApply, onClear }: { coupon: Coupon | null; onApply(c: Coupon): void; onClear(): void }) {
+  const [code, setCode] = useState('');
+  const [msg, setMsg] = useState('');
+  const [busy, setBusy] = useState(false);
+  async function apply() {
+    if (!code.trim()) { setMsg('쿠폰 코드를 입력해 주세요.'); return; }
+    setBusy(true); setMsg('');
+    try {
+      const r = await fetch('/api/videokit/coupon', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
+      const d = await r.json().catch(() => null) as { ok?: boolean; error?: string; code?: string; offers?: Coupon['offers'] } | null;
+      if (d?.ok && d.code && d.offers) { onApply({ code: d.code, offers: d.offers }); setCode(''); }
+      else setMsg(COUPON_ERROR[d?.error ?? ''] ?? COUPON_ERROR.invalid);
+    } catch { setMsg('쿠폰을 확인하지 못했습니다. 다시 시도해 주세요.'); }
+    finally { setBusy(false); }
+  }
+  if (coupon) return <div className="coupon applied" aria-live="polite">
+    <span><b>쿠폰 {coupon.code}</b> 적용됨</span>
+    <button type="button" className="copy" onClick={onClear}>쿠폰 빼기</button>
+  </div>;
+  return <div className="coupon">
+    <label htmlFor="coupon-code">쿠폰 코드 <small>있으면 입력해 주세요</small></label>
+    <div className="coupon-row">
+      <input id="coupon-code" name="coupon_code" autoComplete="off" autoCapitalize="characters" spellCheck={false} maxLength={64} value={code}
+        onChange={(e) => { setCode(e.target.value); setMsg(''); }} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); apply(); } }}
+        aria-invalid={!!msg} aria-describedby={msg ? 'coupon-msg' : undefined} />
+      <button type="button" className="coupon-btn" disabled={busy} onClick={apply}>{busy ? '확인 중…' : '적용'}</button>
+    </div>
+    {msg && <p id="coupon-msg" className="err" role="alert">{msg}</p>}
+  </div>;
+}
 
 // 판매자 주문 메일 제목의 상품명 (app/api/videokit/apply 와 같음)
 const MAIL_LABEL: Record<PlanId, string> = { kit: '키트', lesson: '키트 + 1:1 강의', pass: '1:1 강의권 2회' };
@@ -137,12 +174,15 @@ function Account({ bank, amount, name }: { bank: Props['bank']; amount: number; 
 export default function Checkout(p: Props) {
   // 주소의 plan 값을 모르면(initial = null) 아무 상품도 고르지 않은 채로 연다. 고르기 전에는 상품 목록만 보인다.
   const [planId, setPlanId] = useState<PlanId | null>(p.initial);
+  const [coupon, setCoupon] = useState<Coupon | null>(null);
+  // 쿠폰이 맞는 상품은 서버가 준 쿠폰 금액 · 주문번호로 바꿔 보인다 (승인 때 서버가 주문번호로 다시 확인).
+  const withCoupon = (o: PlanOption): PlanOption & { coupon?: string } => { const f = coupon?.offers[o.id]; return f ? { ...o, ...f, coupon: coupon!.code } : o; };
   const chosen = p.plans.find((x) => x.id === planId);
-  const plan = chosen ?? p.plans[0];
+  const plan = withCoupon(chosen ?? p.plans[0]);
   const [method, setMethod] = useState<'transfer' | 'card'>(p.card === 'open' ? 'card' : 'transfer');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<{ msg: string; mail?: string } | null>(null);
-  const [done, setDone] = useState<{ name: string; email: string; plan: PlanOption; receipt: Receipt } | null>(null);
+  const [done, setDone] = useState<{ name: string; email: string; plan: PlanOption & { coupon?: string }; receipt: Receipt } | null>(null);
   const widgets = useRef<Widgets | null>(null);
   const [widgetReady, setWidgetReady] = useState(false);
   const card = method === 'card' && p.card !== 'off';
@@ -191,10 +231,13 @@ export default function Checkout(p: Props) {
     try {
       if (!card) {
         // 계좌이체 주문: 주문 정보를 판매자 메일로 보낸다 (제목 "[구매 신청] <구성> · <이름>").
-        const data = { name: String(f.get('name')).trim(), email: String(f.get('email')).trim(), phone: String(f.get('phone')).trim(), plan: plan.id, orderId: plan.orderId, receipt, website: String(f.get('website') ?? '') };
+        const data = { name: String(f.get('name')).trim(), email: String(f.get('email')).trim(), phone: String(f.get('phone')).trim(), plan: plan.id, orderId: plan.orderId, coupon: plan.coupon ?? '', receipt, website: String(f.get('website') ?? '') };
         if (!sameEmail(data.email, String(f.get('email2') ?? ''))) throw new Error('email-mismatch');
         const r = await fetch('/api/videokit/apply', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-        if (!r.ok) throw new Error(r.status === 429 ? 'busy' : 'mail');
+        if (!r.ok) {
+          const e = await r.json().catch(() => null) as { error?: string } | null;
+          throw new Error(r.status === 429 ? 'busy' : e?.error === 'coupon' || e?.error === 'period' ? e.error : 'mail');
+        }
         setDone({ name: data.name, email: data.email, plan, receipt });
         scrollTo({ top: 0 });
         return;
@@ -213,16 +256,17 @@ export default function Checkout(p: Props) {
     } catch (err) {
       const m = err instanceof Error ? err.message : '';
       if (!card) {
-        const body = `이름: ${f.get('name')}\n이메일: ${f.get('email')}\n전화번호: ${f.get('phone')}\n상품: ${MAIL_LABEL[plan.id]} (${won(plan.amount)})\n${receiptRows(receipt).map(([k, v]) => `${k}: ${v}\n`).join('')}`;
+        const body = `이름: ${f.get('name')}\n이메일: ${f.get('email')}\n전화번호: ${f.get('phone')}\n상품: ${MAIL_LABEL[plan.id]} (${won(plan.amount)})\n${plan.coupon ? `쿠폰: ${plan.coupon}\n` : ''}${receiptRows(receipt).map(([k, v]) => `${k}: ${v}\n`).join('')}`;
         const mail = `mailto:sungchulkang@groundrooted.com?subject=${encodeURIComponent(`[구매 신청] ${MAIL_LABEL[plan.id]} · ${f.get('name')}`)}&body=${encodeURIComponent(body)}`;
-        setError(m === 'email-mismatch' ? { msg: '두 이메일 주소가 다릅니다. 철자를 확인해 주세요.' } : m === 'busy' ? { msg: '주문이 잠시 몰렸습니다. 10분 뒤 다시 시도해 주세요.' } : { msg: '주문을 보내지 못했습니다. 다시 시도하거나 메일로 주문해 주세요.', mail });
+        if (m === 'coupon' || m === 'period') setCoupon(null);
+        setError(m === 'email-mismatch' ? { msg: '두 이메일 주소가 다릅니다. 철자를 확인해 주세요.' } : m === 'coupon' || m === 'period' ? { msg: `${m === 'period' ? '쿠폰 사용 기간이 아닙니다' : '유효하지 않은 쿠폰 코드입니다'}. 쿠폰을 뺐으니 금액을 확인하고 다시 주문해 주세요.` } : m === 'busy' ? { msg: '주문이 잠시 몰렸습니다. 10분 뒤 다시 시도해 주세요.' } : { msg: '주문을 보내지 못했습니다. 다시 시도하거나 메일로 주문해 주세요.', mail });
       } else setError({ msg: '결제가 완료되지 않았습니다. 다시 시도하거나 계좌이체로 주문해 주세요.' });
     } finally { setBusy(false); }
   }
 
   if (done) return <section className="placed" aria-live="polite">
     <h2>주문이 접수되었습니다</h2>
-    <p className="lede">{done.plan.label} · {won(done.plan.amount)}. 아래 계좌로 입금해 주세요.</p>
+    <p className="lede">{done.plan.label} · {won(done.plan.amount)}{done.plan.coupon && ` (쿠폰 ${done.plan.coupon})`}. 아래 계좌로 입금해 주세요.</p>
     <Account bank={p.bank} amount={done.plan.amount} name={done.name} />
     <ul className="steps">
       <li>입금은 판매자가 직접 확인합니다. 따로 알려 주시지 않아도 됩니다.</li>
@@ -231,17 +275,17 @@ export default function Checkout(p: Props) {
         : <li>입금이 확인되면 <b>{done.email}</b>로 안내드리고, 카카오톡으로 강의 일정을 조율합니다.</li>}
       {done.plan.lesson && done.plan.kit && <li>강의 일정은 입금 확인 뒤 카카오톡으로 조율합니다.</li>}
       {done.receipt.kind !== 'none' && <li>{RECEIPT_LABEL[done.receipt.kind]} 신청을 받았습니다. {done.receipt.kind === 'simple' ? '간이영수증은 PDF로 이메일에 보내드립니다.' : `입금 확인 뒤 ${done.receipt.no} 번호로 홈택스에서 발급합니다.`}</li>}
-      <li>다른 이름으로 입금하셨다면 <a href={p.kakao} target="_blank" rel="noopener">카카오톡 1:1</a>로 알려 주세요.</li>
+      <li>다른 이름으로 입금하셨다면 <a href={p.kakao} target="_blank" rel="noopener">카카오톡 1:1 문의</a>로 알려 주세요.</li>
     </ul>
     <a className="btn btn-ghost" href="/videokit">상품 페이지로</a>
   </section>;
 
-  const sale = plan.amount < plan.regular;
+  const sale = plan.amount < plan.regular && !plan.coupon;
   const payLabel = !card ? `${won(plan.amount)} 계좌이체로 주문하기` : p.card === 'pending' && p.testKeys ? `${won(plan.amount)} 테스트 결제 (심사용)` : `${won(plan.amount)} 결제하기`;
   return <form onSubmit={submit}>
     <fieldset className="pick">
       <legend>상품 선택</legend>
-      {p.plans.map((o) => <label key={o.id} className="method">
+      {p.plans.map(withCoupon).map((o) => <label key={o.id} className="method">
         <input type="radio" name="plan" value={o.id} checked={o.id === planId} onChange={() => setPlanId(o.id)} />
         <img className="thumb" src={`/videokit/plan-${o.id}.png`} alt="" width={52} height={52} />
         <span><b>{o.label}</b><small>{o.note}</small></span>
@@ -250,13 +294,16 @@ export default function Checkout(p: Props) {
     </fieldset>
 
     {!chosen ? <p className="small" role="note">위 목록에서 상품을 골라 주세요.</p> : <>
-    <ProductBox plan={plan.id} tier={p.tier} />
+    <ProductBox plan={plan.id} tier={plan.coupon ? 'c' : p.tier} />
     <div className="order">
       <b>{plan.orderName}</b>
       <span>{plan.kit ? `결제가 확인되면 적어 주신 이메일로 키트 다운로드 링크(맥용 · 윈도우용, ${p.linkDays}일 동안 열림)와 사용 설명서를 보내드립니다.` : '키트를 이미 구입하신 분을 위한 강의권입니다. 키트 파일은 들어 있지 않습니다.'}{plan.lesson && ' 강의 일정은 카카오톡으로 따로 조율합니다.'}</span>
-      <div className="amt" aria-live="polite"><span className="sr">결제 금액 </span>{sale && <s className="was">{won(plan.regular)}</s>}{won(plan.amount)}</div>
+      <div className="amt" aria-live="polite"><span className="sr">결제 금액 </span>{(sale || (plan.coupon && plan.amount < plan.regular)) && <s className="was">{won(plan.regular)}</s>}{won(plan.amount)}</div>
       {sale && <span className="sale">마켓 오픈 할인 · 11월 28일(토) 23:59까지 주문 · 이 화면은 마감 뒤 30분까지 할인가</span>}
+      {plan.coupon && <span className="sale">쿠폰 {plan.coupon} 적용가</span>}
     </div>
+    {/* 쿠폰 대상: 키트 · 키트 + 1:1 강의 (강의권 제외) */}
+    {plan.id !== 'pass' && <CouponField coupon={coupon} onApply={setCoupon} onClear={() => setCoupon(null)} />}
 
     <Buyer kit={plan.kit} onName={setBuyerName} onPhone={setBuyerPhone} />
     <label className="hp" aria-hidden="true">웹사이트<input name="website" tabIndex={-1} autoComplete="off" /></label>
@@ -287,7 +334,7 @@ export default function Checkout(p: Props) {
 
     <dl className="terms-box">
       <div><dt>제공 방법</dt><dd>{plan.kit
-        ? <>결제(입금)가 확인되면 적어 주신 이메일로 키트 다운로드 링크(맥용 · 윈도우용)와 사용 설명 eBook(PDF · EPUB), 설치 안내를 보내드립니다. 링크는 {p.linkDays}일 뒤 삭제되며, 맥용 · 윈도우용을 합쳐 10회까지 내려받을 수 있습니다.{plan.lesson && ' 강의는 카카오톡으로 일정을 조율합니다.'} 업데이트는 키트 안에서 구매자 키로 /videokit update를 실행해 받고(새 버전 소식은 오픈카톡방 공지), 후속지원은 구매일로부터 1년입니다.</>
+        ? <>결제(입금)가 확인되면 적어 주신 이메일로 키트 다운로드 링크(맥용 · 윈도우용)와 사용 설명 eBook(PDF · EPUB), 설치 안내를 보내드립니다. 링크는 {p.linkDays}일 뒤 삭제되며, 맥용 · 윈도우용을 합쳐 10회까지 내려받을 수 있습니다.{plan.lesson && ' 강의는 카카오톡으로 일정을 조율합니다.'} 업데이트는 키트 안에서 구매자 키로 /videokit update를 실행해 받고(새 버전 소식은 <a href={p.news} target="_blank" rel="noopener">업데이트 소식 · 정보 공유 오픈채팅방</a> 공지), 후속지원은 구매일로부터 1년입니다.</>
         : '결제(입금)가 확인되면 카카오톡으로 1:1 강의 일정(2회 · 총 2시간)을 조율합니다. 키트 파일은 들어 있지 않습니다.'}{plan.lesson && ' 1:1 강의는 대표 강성철이 직접 실시간으로 진행합니다. 점프데스크탑 원격 연결과 카카오톡 보이스톡을 쓰며, 회당 1시간입니다.'}</dd></div>
       {plan.kit && <div>
         <dt>지원 환경</dt>

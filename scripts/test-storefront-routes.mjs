@@ -9,7 +9,7 @@ const won = n => `${new Intl.NumberFormat('ko-KR').format(n)}원`;
 
 async function withServer({ port, password, preview }, run) {
   const server = spawn(process.execPath, ['node_modules/next/dist/bin/next', 'start', '--hostname', 'localhost', '--port', String(port)], {
-    env: { ...process.env, NODE_ENV: 'production', DASHBOARD_PASSWORD: password, MARKETING_PREVIEW_ENABLED: String(preview) },
+    env: { ...process.env, NODE_ENV: 'production', DASHBOARD_PASSWORD: password, MARKETING_PREVIEW_ENABLED: String(preview), VIDEOKIT_COUPON_CODES: '' },
     stdio: ['ignore', 'pipe', 'pipe'],
   });
   let ready = false;
@@ -42,6 +42,13 @@ await withServer({port:3035,password,preview:true}, async request => {
     const r = await request(path); assert.equal(r.status, 404, path); assert.match(r.headers.get('x-robots-tag'), /noindex/, path);
     const html = await r.text(); assert.ok(html.includes('페이지를 찾을 수 없습니다'), `${path} 404 page`); assert.ok(!html.includes('pages,'), `${path} leaked file`);
   }
+  // /price 에도 두 오픈채팅방
+  { const html = await (await request('/price?plan=kit')).text(); assert.ok(html.includes('https://open.kakao.com/o/s40bSEXi') && html.includes('https://open.kakao.com/o/pDMhZvYi') && html.includes('업데이트 소식 · 정보 공유'), '/price open chats'); }
+  // 쿠폰 확인 API는 로그인 없이 열려 있고, 틀린 코드는 400 invalid (테스트 서버에는 쿠폰 코드 환경변수가 없다)
+  for (const code of ['NOPE', '', 'churchmate']) {
+    const r = await fetch('http://localhost:3035/api/videokit/coupon', { method: 'POST', redirect: 'manual', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code }) });
+    assert.equal(r.status, 400, `coupon ${code}`); assert.deepEqual(await r.json(), { ok: false, error: 'invalid' });
+  }
   // 옛 계좌이체 안내 → 결제 화면(키트)으로 영구 이동
   for (const path of ['/videokit/transfer', '/videokit/transfer.html']) { const r = await request(path); assert.equal(r.status, 308, path); assert.equal(r.headers.get('location'), '/price?plan=kit', path); }
   // /price?plan: 옛 ticket → 강의권, 모르는 값 → 아무것도 고르지 않음
@@ -58,6 +65,10 @@ await withServer({port:3035,password,preview:true}, async request => {
       assert.ok(html.includes('코덱스와 제미나이로는 작업이 안 되나요?'), 'videokit Codex and Gemini FAQ');
       assert.equal((html.match(/class="skill-name"/g) ?? []).length, 36, 'videokit skill catalog');
       assert.ok(html.includes('open.kakao.com'));
+      // 오픈채팅방 두 개: 1:1 문의 · 업데이트 소식 · 정보 공유. 자리표시 주소는 남기지 않는다.
+      assert.ok(html.includes('https://open.kakao.com/o/s40bSEXi') && html.includes('https://open.kakao.com/o/pDMhZvYi'), 'two open chats');
+      assert.ok(html.includes('카카오톡 1:1 문의') && html.includes('업데이트 소식 · 정보 공유'), 'open chats named');
+      assert.ok(!html.includes('xxxxxxx'), 'no placeholder kakao link');
       for (const plan of ['kit', 'lesson', 'pass']) assert.ok(html.includes(`href="/price?plan=${plan}"`), `buy button ${plan}`);
       assert.ok(!html.includes('신청서 작성'));
     }

@@ -208,3 +208,16 @@
 .vk-pay .dl-expire{padding:14px 16px;border-radius:12px;background:#1b1b20;margin:0 0 20px}
 .vk-pay .dl-expire b{color:#ffb38a;font-weight:700}
 @media (max-width:520px){.vk-pay .dl{grid-template-columns:1fr}}
+
+/* 쿠폰 코드 (상품 요약 아래, 받는 분 정보 위) */
+.vk-pay .coupon{display:grid;gap:6px;margin:-12px 0 28px}
+.vk-pay .coupon label{display:block}
+.vk-pay .coupon-row{display:flex;gap:8px}
+.vk-pay .coupon-row input{flex:1;min-width:0;text-transform:uppercase;letter-spacing:.04em}
+.vk-pay .coupon-row input::placeholder{text-transform:none}
+.vk-pay .coupon-btn{flex:none;min-height:48px;padding:0 20px;border:1px solid #3a3a45;border-radius:10px;background:#24242c;color:#ecebe6;font:inherit;font-weight:650;cursor:pointer}
+.vk-pay .coupon-btn:disabled{opacity:.55;cursor:wait}
+.vk-pay .coupon .err{margin:0}
+.vk-pay .coupon.applied{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;border-radius:12px;background:#1b1b20;color:#b4b2aa;font-size:15px}
+.vk-pay .coupon.applied b{color:#ff9b6d;font-weight:650}
+.vk-pay .coupon input[aria-invalid="true"]{border-color:#ff9c86}

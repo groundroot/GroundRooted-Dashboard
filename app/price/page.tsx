@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto';
-import Shell, { KAKAO_URL } from './Shell';
+import Shell, { KAKAO_URL, NEWS_URL } from './Shell';
 import Checkout, { type PlanOption } from './Checkout';
 import { BANK, cardPending, hasKit, hasLesson, isPlanId, makeOrderId, nameOf, planLabels, plans, priceOf, tierAt, tossApiKeys, tossKeys, type PlanId } from '@/products/videokit';
 import { LINK_DAYS, deliveryConfigured } from '@/products/videokit-delivery';
@@ -28,7 +28,7 @@ export default async function PricePage({ searchParams }: { searchParams: Promis
       mode={mode} clientKey={keys.clientKey}
       // 키 종류(live/test)가 섞이면 카드 결제를 열지 않는다. 계좌이체는 그대로 받는다.
       card={!keys.consistent ? 'off' : cardPending() ? 'pending' : 'open'} testKeys={!keys.live}
-      autoMail={deliveryConfigured()} bank={BANK} linkDays={LINK_DAYS} kakao={KAKAO_URL} />
-    <p className="small">결제하면 <a href="/videokit/terms">이용약관</a>과 <a href="/videokit#refund">환불 안내</a>에 동의하는 것으로 봅니다. 개인정보는 <a href="/videokit/privacy">개인정보처리방침</a>에 따라 처리합니다. 궁금한 점은 <a href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1</a>로 문의해 주세요.</p>
+      autoMail={deliveryConfigured()} bank={BANK} linkDays={LINK_DAYS} kakao={KAKAO_URL} news={NEWS_URL} />
+    <p className="small">결제하면 <a href="/videokit/terms">이용약관</a>과 <a href="/videokit#refund">환불 안내</a>에 동의하는 것으로 봅니다. 개인정보는 <a href="/videokit/privacy">개인정보처리방침</a>에 따라 처리합니다. 궁금한 점은 <a href={KAKAO_URL} target="_blank" rel="noopener">카카오톡 1:1 문의</a> 오픈채팅방으로, 새 버전 소식은 <a href={NEWS_URL} target="_blank" rel="noopener">업데이트 소식 · 정보 공유</a> 오픈채팅방에서 받아 보세요.</p>
   </Shell>;
 }
