@@ -16,7 +16,6 @@ export const metadata: Metadata = {
   title: "ReadyMD 레디엠디 | 모아 둔 PDF를, 읽고 다시 쓰는 나의 지식으로",
   description: "For Your 2nd Brain. 지성 확장의 시작, ReadyMD. PDF를 읽기 편한 전자책과 AI에 활용할 자료 파일로 바꿔 보세요.",
   robots: { index: false, follow: false },
-  icons: { icon: "/favicon.svg" },
 };
 
 const faqs = [
