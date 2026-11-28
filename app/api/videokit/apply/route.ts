@@ -2,7 +2,7 @@
 // 필요한 환경변수: RESEND_API_KEY, VIDEOKIT_MAIL_FROM (Resend에서 인증한 보내는 주소)
 // 선택: VIDEOKIT_APPLY_TO (받는 주소, 기본 sungchulkang@groundrooted.com)
 import { isEmail } from '@/products/videokit-delivery';
-import { priceOf, transferTier } from '@/products/videokit';
+import { couponPlan, couponWindow, matchCoupon, priceOf, transferTier } from '@/products/videokit';
 import { parseReceipt, receiptRows } from '@/products/videokit-receipt';
 
 export const dynamic = 'force-dynamic';
@@ -41,6 +41,12 @@ export async function POST(req: Request) {
   const receipt = parseReceipt(body.receipt, name);
   if (!receipt) return Response.json({ error: 'receipt' }, { status: 400 });
 
+  // 쿠폰: 코드를 보냈으면 서버에서 다시 확인한다. 틀리거나 대상 상품이 아니면 주문을 받지 않는다(화면 입금액과 메일 금액이 어긋나지 않게).
+  const sentCoupon = text(body.coupon, 64);
+  const coupon = sentCoupon ? matchCoupon(sentCoupon) : null;
+  if (sentCoupon && (!coupon || !couponPlan(plan))) return Response.json({ error: 'coupon' }, { status: 400 });
+  if (coupon && couponWindow() !== 'open') return Response.json({ error: 'period' }, { status: 400 });
+
   const key = process.env.RESEND_API_KEY, from = process.env.VIDEOKIT_MAIL_FROM;
   if (!key || !from) {
     console.error('[videokit] apply form received but mail is not configured (RESEND_API_KEY / VIDEOKIT_MAIL_FROM)');
@@ -49,15 +55,16 @@ export async function POST(req: Request) {
   const to = process.env.VIDEOKIT_APPLY_TO || 'sungchulkang@groundrooted.com';
   const at = new Intl.DateTimeFormat('ko-KR', { timeZone: 'Asia/Seoul', dateStyle: 'medium', timeStyle: 'short' }).format(Date.now());
   // 마감 전에 연 결제 화면에서 낸 주문은 마감 뒤 30분까지 할인가로 적는다 (화면에 보인 입금액과 같게).
-  const amount = `${new Intl.NumberFormat('ko-KR').format(priceOf(plan, transferTier(body.orderId, plan)))}원`;
-  const rows: [string, string][] = [['이름', name], ['이메일', email], ['전화번호', phone], ['상품', PLANS[plan]], ['금액', amount], ['신청 시각', at], ...receiptRows(receipt)];
+  // 쿠폰이 맞으면 쿠폰가(할인가와 같음). 운영봇이 입금 금액을 이 '금액'과 '쿠폰' 줄로 대조한다.
+  const amount = `${new Intl.NumberFormat('ko-KR').format(priceOf(plan, coupon ? 'c' : transferTier(body.orderId, plan)))}원`;
+  const rows: [string, string][] = [['이름', name], ['이메일', email], ['전화번호', phone], ['상품', PLANS[plan]], ['금액', amount], ['쿠폰', coupon ? `적용 · ${coupon}` : '없음'], ['신청 시각', at], ...receiptRows(receipt)];
 
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { Authorization: `Bearer ${key}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       from, to: [to], reply_to: email,
-      subject: `[구매 신청] ${PLANS[plan]} · ${name}`,
+      subject: `[구매 신청] ${PLANS[plan]}${coupon ? ' · 쿠폰' : ''} · ${name}`,
       text: rows.map(([k, v]) => `${k}: ${v}`).join('\n'),
       html: `<table style="font-family:-apple-system,'Apple SD Gothic Neo',sans-serif;font-size:15px;border-collapse:collapse">${rows.map(([k, v]) => `<tr><td style="padding:6px 16px 6px 0;color:#666">${k}</td><td style="padding:6px 0"><b>${esc(v)}</b></td></tr>`).join('')}</table>`,
     }),

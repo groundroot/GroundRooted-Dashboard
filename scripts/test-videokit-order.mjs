@@ -11,9 +11,9 @@ assert.equal(priceOf('kit', 'r'), 300000); assert.equal(priceOf('lesson', 'r'), 
 const kitS = makeOrderId('kit', 's', randomUUID());
 const lessonS = makeOrderId('lesson', 's', randomUUID());
 const kitR = makeOrderId('kit', 'r', randomUUID());
-assert.deepEqual(checkOrder(kitS, '100000', before), { ok: true, plan: 'kit', tier: 's', amount: 100000 });
-assert.deepEqual(checkOrder(lessonS, 300000, before), { ok: true, plan: 'lesson', tier: 's', amount: 300000 });
-assert.deepEqual(checkOrder(kitR, 300000, after), { ok: true, plan: 'kit', tier: 'r', amount: 300000 });
+assert.deepEqual(checkOrder(kitS, '100000', before), { ok: true, plan: 'kit', tier: 's', amount: 100000, coupon: null });
+assert.deepEqual(checkOrder(lessonS, 300000, before), { ok: true, plan: 'lesson', tier: 's', amount: 300000, coupon: null });
+assert.deepEqual(checkOrder(kitR, 300000, after), { ok: true, plan: 'kit', tier: 'r', amount: 300000, coupon: null });
 // 할인가 주문: 마감 후 30분까지만
 assert.equal(checkOrder(kitS, 100000, SALE_ENDS + 29 * 60_000).ok, true);
 assert.equal(checkOrder(kitS, 100000, SALE_ENDS + 31 * 60_000).ok, false);
@@ -28,8 +28,8 @@ assert.equal(plans.kit.sale, 100000); assert.equal(plans.lesson.regular, 500000)
 // 강의권: 할인 기간에도 30만원, 키트 없음, 강의 있음
 assert.equal(priceOf('pass', 's'), 300000); assert.equal(priceOf('pass', 'r'), 300000);
 const passS = makeOrderId('pass', 's', randomUUID()), passR = makeOrderId('pass', 'r', randomUUID());
-assert.deepEqual(checkOrder(passS, 300000, before), { ok: true, plan: 'pass', tier: 's', amount: 300000 });
-assert.deepEqual(checkOrder(passR, 300000, after), { ok: true, plan: 'pass', tier: 'r', amount: 300000 });
+assert.deepEqual(checkOrder(passS, 300000, before), { ok: true, plan: 'pass', tier: 's', amount: 300000, coupon: null });
+assert.deepEqual(checkOrder(passR, 300000, after), { ok: true, plan: 'pass', tier: 'r', amount: 300000, coupon: null });
 assert.equal(checkOrder(passS, 100000, before).ok, false); assert.equal(checkOrder(passR, 200000, after).ok, false);
 assert.ok(isPlanId('pass') && !hasKit('pass') && hasLesson('pass') && hasKit('kit') && !hasLesson('kit') && hasKit('lesson') && hasLesson('lesson'));
 // 계좌이체: 할인 기간에 연 화면(주문번호 s)은 마감 + 30분까지 할인가, 그 뒤 · 다른 상품 · 주문번호 없음은 지금 구간

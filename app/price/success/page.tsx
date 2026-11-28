@@ -91,7 +91,7 @@ export default async function SuccessPage({ searchParams }: { searchParams: Prom
   if (paid.fresh && !testPay) {
     const receipt = parseReceipt((() => { try { return JSON.parse(String(meta.receipt ?? '')); } catch { return null; } })(), String(meta.name ?? ''), { card: true });
     const kit = !hasKit(order.plan) ? '해당 없음' : mail?.status === 'sent' ? '자동 발송함' : `발송 안 됨(${mail?.status === 'failed' ? mail.reason : mail?.status ?? '-'}) — 직접 보내야 함`;
-    await notifySeller({ orderId: orderId!, plan: order.plan, amount: order.amount, email: String(meta.email ?? ''), name: String(meta.name ?? '구매자') },
+    await notifySeller({ orderId: orderId!, plan: order.plan, amount: order.amount, coupon: order.coupon, email: String(meta.email ?? ''), name: String(meta.name ?? '구매자') },
       receipt ? receiptRows(receipt) : [['영수증', '확인 필요(형식 오류)'], ['영수증 받는 분', '-'], ['영수증 번호', '-']], kit).catch(() => false);
   }
   const sentTo = mail?.status === 'sent' ? mail.email : '';
