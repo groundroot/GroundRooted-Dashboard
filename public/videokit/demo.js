@@ -101,7 +101,7 @@ const questions = [
     options: [
       { label: "컷 편집과 자막만", detail: "인터뷰에서 핵심을 고르고 선택한 자막을 만듭니다.", skills: [] },
       { label: "제목에 지정 글꼴 적용", detail: "영상 첫머리에 정해 둔 글꼴로 제목을 넣습니다.", skills: ["글꼴 적용 (font-apply)"] },
-      { label: "첫 장면에 제목 넣기", detail: "영상 첫머리에 내용을 소개하는 모션 타이틀을 더합니다.", skills: ["모션그래픽 (motion-graphics)"] },
+      { label: "첫 장면에 제목 넣기", detail: "영상 첫머리에 내용을 소개하는 모션 타이틀을 더합니다.", skills: ["모션그래픽 (motion-design)"] },
       {
         label: "레퍼런스 영상의 편집 스타일 참고",
         detail: "공개 유튜브 레퍼런스의 도입 · 리듬 · 구성을 분석해 이 프로젝트에 맞는 새 기획과 편집 스타일을 만듭니다.",
