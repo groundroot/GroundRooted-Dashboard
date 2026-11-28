@@ -67,6 +67,7 @@ await withServer({port:3035,password,preview:true}, async request => {
     assert.equal(response.status, 200);
     const js = await response.text();
     assert.ok(js.includes('다빈치 리졸브(베타)'), 'demo Resolve beta');
+    assert.ok(js.includes('label: "프리미어 프로"') && !js.includes('프리미어 프로(베타)'), 'demo Premiere without beta');
     assert.doesNotMatch(js, /\b(?:Free|Studio)\b/, 'demo Resolve without edition split');
     assert.ok(js.includes('내 목소리로 내레이션 만들기'), 'demo own-voice option');
     assert.ok(js.includes('컴퓨터에서 배경 음원 만들기'), 'demo computer-generated music example');
