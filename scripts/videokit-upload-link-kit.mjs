@@ -28,8 +28,9 @@ const storage = sb.storage.from(bucket);
 const current = { version };
 for (const [platform, file] of [['mac', macZip], ['windows', winZip]]) {
   const body = await readFile(file);
-  // 다운로드 버튼은 이 zip에 구매자 표식을 넣어 내준다. 넣을 수 없는 zip(MANIFEST 형식이 다름 등)이면 올리지 않는다(올리면 모든 다운로드가 503).
-  try { watermarkKit(body, { orderId: 'CHECK', issued: '2000-01-01', code: 'CHECK000' }); }
+  // 다운로드 버튼은 이 zip에 구매자 표식을 넣어 내준다. 넣을 수 없는 zip(MANIFEST 형식이 다름, MANIFEST 해시가 zip 내용과 다름,
+  // 설명서 PDF · EPUB를 열 수 없음 등)이면 올리지 않는다(올리면 모든 다운로드가 503). 링크 태그(계약 v3 §5)까지 시험 비밀로 넣어 본다.
+  try { await watermarkKit(body, { orderId: 'CHECK', issued: '2000-01-01', code: 'CHECK000' }, { linkTag: p => createHash('sha256').update(`check|${p}`).digest('hex').slice(0, 12) }); }
   catch (e) { console.error(`구매자 표식을 넣을 수 없는 zip입니다 (${file}): ${e.message}`); process.exit(1); }
   const path = `kit/links/${version}/${fileName(platform, version)}`;
   const { error } = await storage.upload(path, body, { upsert: true, contentType: 'application/zip' });

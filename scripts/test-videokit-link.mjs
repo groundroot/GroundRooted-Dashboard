@@ -5,7 +5,9 @@ import {
   newCode, normalizeCode, CODE_PATTERN, linkUrl, expiryFor, kstDay, maskName, isCurrent, fileName,
   loadLink, handleDownload, downloadPage, resetLimits, createLink, revokeLink, supabaseLinkDeps, clientIp, ipBlocked, SIGN_SECONDS, DEFAULT_MAX_DOWNLOADS, markFor,
 } from '../products/videokit-link.ts';
-import { watermarkKit, buildZip, readZipFiles, LICENSE_PATH } from '../products/videokit-watermark.ts';
+import { watermarkKit, buildZip, readZipFiles, LICENSE_PATH, TAGGED_SKILLS } from '../products/videokit-watermark.ts';
+import { linkTag } from '../products/videokit-mark.ts';
+import { PDFDocument, PDFName, StandardFonts } from 'pdf-lib';
 import { createHash } from 'node:crypto';
 import { db } from '../products/videokit-license.ts';
 import { deliverKit, kitEmail } from '../products/videokit-delivery.ts';
@@ -46,7 +48,7 @@ const KIT = buildZip([
 ]);
 {
   const mark = { orderId: 'VK-KIT-20261127-AB12', issued: '2026-11-27', code: 'ABCD2345' };
-  const { files, comment } = readZipFiles(watermarkKit(KIT, mark));
+  const { files, comment } = readZipFiles(await watermarkKit(KIT, mark));
   const line = 'Claude Video Kit · order VK-KIT-20261127-AB12 · issued 2026-11-27 · link ABCD2345';
   assert.equal(comment, line, 'zip comment');
   const lic = files.get(LICENSE_PATH).content.toString('utf8');
@@ -63,9 +65,9 @@ const KIT = buildZip([
   assert.equal(m.files['.claude/skills/x/SKILL.md'].sha256, sha(Buffer.from(SKILL)));
   assert.equal(m.version, '1.3'); assert.deepEqual(m.default_rules, {});
   // 키트 구조가 아니면 표식 없이 내보내지 않는다(throw)
-  assert.throws(() => watermarkKit(buildZip([{ name: `${T}CLAUDE.md`, content: 'x' }]), mark), /MANIFEST/);
-  assert.throws(() => watermarkKit(Buffer.from('not a zip'), mark), /zip/);
-  assert.throws(() => watermarkKit(watermarkKit(KIT, mark), mark), /LICENSE/);
+  await assert.rejects(watermarkKit(buildZip([{ name: `${T}CLAUDE.md`, content: 'x' }]), mark), /MANIFEST/);
+  await assert.rejects(watermarkKit(Buffer.from('not a zip'), mark), /zip/);
+  await assert.rejects(watermarkKit(await watermarkKit(KIT, mark), mark), /LICENSE/);
   // 주문번호 · 발급일: 없으면 TEST-<코드>, 이상한 글자는 _, 발급일은 created_at의 KST 날짜
   const base = { code: 'ABCD2345', email: 'a@b.co', name: null, expires_at: '', revoked: false, download_count: 0, max_downloads: 10 };
   assert.deepEqual(markFor({ ...base, order_id: 'VK-1', created_at: '2026-11-27T15:30:00Z' }, 0), { orderId: 'VK-1', issued: '2026-11-28', code: 'ABCD2345' });
@@ -76,6 +78,56 @@ const KIT = buildZip([
   assert.equal(markFor({ ...base, order_id: card, created_at: null }, 0).orderId, card, 'card order id is kept as is');
   assert.equal(markFor({ ...base, order_id: '계좌이체-홍길동-1127', created_at: null }, 0).orderId, '계좌이체-홍길동-1127', 'manual Korean order id is kept');
   console.log('PASS: buyer mark (LICENSE.txt, zip comment, MANIFEST license + sha, CLAUDE.md comments)');
+}
+
+// ---- 계약 v3 §5: 스킬 · 설명서 링크 태그 (VIDEOKIT_MARK_SECRET이 있을 때) ----
+{
+  const M = `${T}0. Claude Video Kit Manual/`;
+  const pdfDoc = await PDFDocument.create();
+  const f = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  for (let i = 0; i < 3; i++) pdfDoc.addPage([400, 600]).drawText(`page ${i + 1}`, { x: 50, y: 500, size: 12, font: f });
+  pdfDoc.setKeywords(['manual']);
+  const PDF = Buffer.from(await pdfDoc.save());
+  const OPF = '<?xml version="1.0"?>\n<package xmlns="http://www.idpf.org/2007/opf" unique-identifier="bookid"><metadata xmlns:dc="http://purl.org/dc/elements/1.1/">\n<dc:identifier id="bookid">urn:uuid:1</dc:identifier>\n</metadata></package>\n';
+  const EPUB = buildZip([{ name: 'mimetype', content: 'application/epub+zip' }, { name: 'META-INF/container.xml', content: '<container><rootfiles><rootfile full-path="OEBPS/content.opf"/></rootfiles></container>' },
+    { name: 'OEBPS/content.opf', content: OPF }, { name: 'OEBPS/style.css', content: 'body{}' }, { name: 'OEBPS/b.css', content: 'p{}' }]);
+  const SHORTS = '---\nname: shorts\n---\n본문\n';
+  const parts = { 'CLAUDE.md': ROOT_MD, 'System/CLAUDE.md': SYS_MD, '.claude/skills/shorts/SKILL.md': SHORTS, '.claude/skills/x/SKILL.md': SKILL,
+    '0. Claude Video Kit Manual/Claude-Video-Kit-Manual.pdf': PDF, '0. Claude Video Kit Manual/Claude-Video-Kit-Manual.epub': EPUB };
+  const manifest = (over = {}) => `{\n"version": "1.4.2",\n"files": {\n${Object.entries({ ...Object.fromEntries(Object.entries(parts).map(([k, v]) => [k, sha(Buffer.from(v))])), ...over })
+    .map(([k, h]) => `"${k}": {\n"sha256": "${h}"\n}`).join(',\n')},\n"System/audio": {\n"link": "../Assets/Voices"\n}\n}\n}`;
+  const kit = (m = manifest()) => buildZip([...Object.entries(parts).map(([k, v]) => ({ name: T + k, content: v })), { name: `${T}System/audio`, content: '../Assets/Voices' }, { name: `${T}System/MANIFEST.json`, content: m }]);
+  const mark = { orderId: '계좌이체-홍길동-1127', issued: '2026-11-28', code: 'ABCD2345' };
+  const tag = p => linkTag('TEST-MARK-SECRET', 'ABCD2345', p);
+  const out = readZipFiles(await watermarkKit(kit(), mark, { linkTag: tag })).files;
+  const m = JSON.parse(out.get(`${T}System/MANIFEST.json`).content);
+  // 모든 표식 파일의 sha256 = MANIFEST (업데이트가 '고친 파일'로 보지 않음)
+  for (const [rel, e] of Object.entries(m.files)) if (e.sha256) assert.equal(sha(out.get(T + rel).content), e.sha256, rel);
+  assert.equal(out.get(`${T}.claude/skills/shorts/SKILL.md`).content.toString(), `${SHORTS}\n<!-- vk:${tag('.claude/skills/shorts/SKILL.md')} -->\n`);
+  assert.equal(tag('.claude/skills/shorts/SKILL.md'), linkTag('TEST-MARK-SECRET', 'ABCD2345', '.claude/skills/shorts/SKILL.md'));
+  assert.equal(out.get(`${T}.claude/skills/x/SKILL.md`).content.toString(), SKILL, 'skills outside the list are untouched');
+  assert.equal(TAGGED_SKILLS.length, 10);
+  // PDF: 쪽 수 그대로, Keywords에 vk:태그(기존 값 뒤에), XMP dc:identifier
+  const pdfTag = tag('0. Claude Video Kit Manual/Claude-Video-Kit-Manual.pdf');
+  const pdf = await PDFDocument.load(out.get(`${M}Claude-Video-Kit-Manual.pdf`).content);
+  assert.equal(pdf.getPageCount(), 3); assert.equal(pdf.getKeywords(), `manual vk:${pdfTag}`);
+  assert.match(Buffer.from(pdf.catalog.lookup(PDFName.of('Metadata')).contents).toString(), new RegExp(`<dc:identifier>vk:${pdfTag}</dc:identifier>`));
+  // EPUB: mimetype 첫 항목 그대로, OPF identifier 하나 더(기존 것 유지), 첫 CSS 끝 주석
+  const epubTag = tag('0. Claude Video Kit Manual/Claude-Video-Kit-Manual.epub');
+  const epubBuf = out.get(`${M}Claude-Video-Kit-Manual.epub`).content, epub = readZipFiles(epubBuf).files;
+  assert.equal([...epub.keys()][0], 'mimetype'); assert.deepEqual(epubBuf.subarray(0, 30 + 8), EPUB.subarray(0, 30 + 8), 'mimetype entry bytes unchanged');
+  const opf = epub.get('OEBPS/content.opf').content.toString();
+  assert.ok(opf.includes('<dc:identifier id="bookid">urn:uuid:1</dc:identifier>') && opf.includes(`<dc:identifier id="vk">vk:${epubTag}</dc:identifier>\n</metadata>`));
+  assert.equal(epub.get('OEBPS/style.css').content.toString(), `body{}\n/* vk:${epubTag} 주문 계좌이체-홍길동-1127 */\n`);
+  assert.equal(epub.get('OEBPS/b.css').content.toString(), 'p{}', 'only the first CSS');
+  assert.equal(out.get(`${T}System/audio`).content.toString(), '../Assets/Voices', 'symlink entry kept');
+  // 비밀이 없으면(linkTag 없음) 종전 표식만
+  const plain = readZipFiles(await watermarkKit(kit(), mark)).files;
+  assert.deepEqual(plain.get(`${M}Claude-Video-Kit-Manual.pdf`).content, PDF); assert.equal(plain.get(`${T}.claude/skills/shorts/SKILL.md`).content.toString(), SHORTS);
+  // MANIFEST 해시가 zip 내용과 다르면(원본부터 틀림) 내보내지 않는다
+  await assert.rejects(watermarkKit(kit(manifest({ '.claude/skills/x/SKILL.md': 'f'.repeat(64) })), mark, { linkTag: tag }), /does not match \.claude\/skills\/x\/SKILL\.md/);
+  await assert.rejects(watermarkKit(kit(manifest({ 'System/gone.md': 'f'.repeat(64) })), mark), /does not match System\/gone\.md/);
+  console.log('PASS: v3 §5 link tags — 10 skills, manual PDF (Keywords · XMP · page count), EPUB (OPF id · first CSS · mimetype), MANIFEST all hashes re-checked');
 }
 
 const CURRENT = { version: '1.3', mac: { path: 'kit/links/1.3/ClaudeVideoKit-Mac-1.3.zip' }, windows: { path: 'kit/links/1.3/ClaudeVideoKit-Windows-1.3.zip' } };
@@ -101,6 +153,7 @@ function fake(over = {}) {
     sign: async (p, s, d) => { calls.sign.push([p, s, d]); return `https://x.supabase.co/storage/v1/object/sign/videokit/${p}?token=t&download=${d}`; },
     readKit: async p => { assert.ok(p.startsWith('kit/links/1.3/')); return KIT; },
     putPersonal: async (p, b) => { calls.put.push([p, b]); },
+    markSecret: 'TEST-MARK-SECRET',
     now: NOW,
     ...over,
   };

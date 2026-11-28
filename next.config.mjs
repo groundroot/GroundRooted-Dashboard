@@ -12,6 +12,10 @@ const securityHeaders = [
 
 const nextConfig = {
   poweredByHeader: false,
+  // /d/<코드>/<os>가 설명서 PDF에 '주문 …'을 쓸 때 읽는 한글 글꼴(products/videokit-watermark.ts PDF_FONT). fs로 읽으므로 번들에 직접 넣는다.
+  outputFileTracingIncludes: {
+    '/d/[code]/[platform]': ['./products/fonts/Pretendard-Regular.ttf'],
+  },
   async headers() {
     return [{ source: '/:path*', headers: securityHeaders }];
   },
