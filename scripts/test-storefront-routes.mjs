@@ -56,6 +56,7 @@ await withServer({port:3035,password,preview:true}, async request => {
   { const r = await fetch('http://localhost:3035/api/videokit/device/check', { method: 'POST', redirect: 'manual', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ key: 'VK-ABCD-EFGH-JK23' }) });
     assert.equal(r.status, 404); assert.deepEqual(await r.json(), { ok: false, error: 'off' }); }
   { const html = await (await request('/price?plan=device')).text(); assert.ok(!html.includes('value="device"') && !html.includes('업데이트 기기 1대 추가'), 'device addon hidden by default'); assert.ok(html.includes('위 목록에서 상품을 골라 주세요')); }
+  { const html = await (await request('/')).text(); assert.ok(!html.includes('plan=device') && !html.includes('업데이트 기기 1대 추가'), 'home does not list device addon'); }
   // 옛 계좌이체 안내 → 결제 화면(키트)으로 영구 이동
   for (const path of ['/videokit/transfer', '/videokit/transfer.html']) { const r = await request(path); assert.equal(r.status, 308, path); assert.equal(r.headers.get('location'), '/price?plan=kit', path); }
   // /price?plan: 옛 ticket → 강의권, 모르는 값 → 아무것도 고르지 않음
