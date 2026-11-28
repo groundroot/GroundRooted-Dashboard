@@ -5,9 +5,9 @@ const questions = [
     title: "누구에게 어떤 영상으로 보여줄까요?",
     help: "영상의 목적을 정하면 핵심 장면을 고르는 기준이 생깁니다.",
     options: [
-      { label: "유튜브 강연 하이라이트", detail: "강연을 놓친 사람에게 핵심 메시지를 전합니다.", skill: "하이라이트", id: "talking-head-highlight" },
-      { label: "인스타그램 릴스", detail: "처음 보는 사람에게 기억할 만한 한 가지를 전합니다.", skill: "쇼츠", id: "shorts" },
-      { label: "내부 교육용 요약", detail: "팀원이 사례에서 배운 점을 회의 전에 훑어볼 수 있게 합니다.", skill: "하이라이트", id: "talking-head-highlight" },
+      { label: "유튜브 강연 하이라이트", detail: "강연을 놓친 사람에게 핵심 메시지를 전합니다.", skill: "강연 하이라이트", id: "talking-head-highlight" },
+      { label: "인스타그램 릴스", detail: "처음 보는 사람에게 기억할 만한 한 가지를 전합니다.", skill: "쇼츠 만들기", id: "shorts" },
+      { label: "내부 교육용 요약", detail: "팀원이 사례에서 배운 점을 회의 전에 훑어볼 수 있게 합니다.", skill: "강연 하이라이트", id: "talking-head-highlight" },
     ],
   },
   {
@@ -52,7 +52,7 @@ const questions = [
         label: "내 목소리로 내레이션 만들기",
         detail: "Claude가 대본을 쓰면 맥의 VoiceStudio에서 본인 목소리로 생성해 편집에 사용합니다.",
         tags: [["local", "로컬 음성 모델"], ["note", "맥 전용"]],
-        skills: ["내레이션 (script-narration · voicestudio)"],
+        skills: ["원고 내레이션 (script-narration)", "음성 만들기 (voicestudio)"],
         rule: "내레이션 대본은 Claude가 쓰고, 사용 권한이 있는 본인 목소리로 컴퓨터에서 생성합니다. 인터뷰 답변에는 원래 목소리를 씁니다.",
         flow: [
           ["내레이션 대본", "인터뷰 앞뒤를 잇는 문장을 Claude가 씁니다. 자막 두 줄 안에 들어가게 끊습니다.", ["claude"]],
@@ -100,12 +100,12 @@ const questions = [
     help: "선택한 영상에 맞는 편집 스킬과 자막 스킬에 더할 조합을 고릅니다.",
     options: [
       { label: "컷 편집과 자막만", detail: "인터뷰에서 핵심을 고르고 선택한 자막을 만듭니다.", skills: [] },
-      { label: "제목에 지정 글꼴 적용", detail: "영상 첫머리에 정해 둔 글꼴로 제목을 넣습니다.", skills: ["글꼴 적용 (font-apply)"] },
-      { label: "첫 장면에 제목 넣기", detail: "영상 첫머리에 내용을 소개하는 모션 타이틀을 더합니다.", skills: ["모션그래픽 (motion-design)"] },
+      { label: "제목에 지정 글꼴 적용", detail: "영상 첫머리에 정해 둔 글꼴로 제목을 넣습니다.", skills: ["폰트 적용 (font-apply)"] },
+      { label: "첫 장면에 제목 넣기", detail: "영상 첫머리에 내용을 소개하는 모션 타이틀을 더합니다.", skills: ["모션 그래픽 (motion-design)"] },
       {
         label: "레퍼런스 영상의 편집 스타일 참고",
         detail: "공개 유튜브 레퍼런스의 도입 · 리듬 · 구성을 분석해 이 프로젝트에 맞는 새 기획과 편집 스타일을 만듭니다.",
-        skills: ["레퍼런스 분석 (viral-video-research)"],
+        skills: ["인기 영상 분석 (viral-video-research)"],
         rule: "레퍼런스는 도입 · 리듬 · 구성 패턴만 분석합니다. 다른 사람의 영상, 대사, 음성, 채널 이름은 편집과 결과물에 쓰지 않습니다.",
         flow: [
           ["레퍼런스 분석", "고른 공개 영상에서 도입 길이, 컷 리듬, 자막 · 효과음 쓰임, 장 구성을 패턴으로 정리합니다.", ["claude"]],
@@ -235,11 +235,21 @@ function renderPlan() {
     ["마감 · 버전", format.delivery],
     ["편집 프로그램", editor.label],
     ["소리", audio.label],
-    ["쓸 스킬", skills.join(" · ")],
+    ["쓸 스킬", skills],
   ];
   document.querySelector("#plan-details").replaceChildren(...details.map(([name, value]) => {
     const item = document.createElement("div");
-    item.append(element("dt", name), element("dd", value));
+    const dd = element("dd", Array.isArray(value) ? "" : value);
+    if (Array.isArray(value)) {
+      dd.className = "skill-list";
+      dd.append(...value.map(skill => {
+        const [, label, id] = skill.match(/^(.*) \((.*)\)$/);
+        const line = element("span", label, "skill");
+        line.append(" ", element("small", id));
+        return line;
+      }));
+    }
+    item.append(element("dt", name), dd);
     return item;
   }));
   document.querySelector("#plan-rules").replaceChildren(

@@ -186,6 +186,9 @@ fieldset { min-width: 0; border: 0; margin: 0; padding: 0; display: grid; gap: .
 
 #plan-details dt { color: var(--muted); font-size: .875rem; }
 #plan-details dd { margin: .2rem 0 0; font-weight: 700; }
+#plan-details .skill { display: block; word-break: keep-all; }
+#plan-details .skill + .skill { margin-top: .2rem; }
+#plan-details .skill small { color: var(--muted); font-size: .75rem; font-weight: 500; white-space: nowrap; }
 .plan h3 { font-size: 1.15rem; }
 #plan-rules { padding-left: 1.2rem; margin-top: .6rem; color: var(--muted); }
 #plan-rules li + li { margin-top: .35rem; }
